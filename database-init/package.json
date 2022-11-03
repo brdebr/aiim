@@ -6,6 +6,9 @@
   "scripts": {
     "read": "node readImageData.mjs"
   },
+  "engines": {
+    "node": "16.14.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
