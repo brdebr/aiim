@@ -1,9 +1,15 @@
 import { exec } from "child_process";
 
-const matchImageData = (imageData) => {
+const matchImageDataImageMagick = (imageData) => {
   const regex = /\s{4}parameters:(.*(\r?\n).*(\r?\n).*)/gm;
   const matches = regex.exec(imageData);
-  return matches[0].replace(/\s{4}parameters:/g, "").trim();
+  return matches?.[0].replace(/\s{4}parameters:/g, "").trim() || imageData;
+};
+
+const findImageData = (imageData) => {
+  const regex = /Parameters\s*:\s(.*)/gm;
+  const matches = regex.exec(imageData);
+  return matches?.[0].replace(/Parameters\s*:\s/g, "").trim() || imageData;
 };
 
 const modelHashes = {
@@ -16,36 +22,38 @@ const modelHashes = {
 
 
 const imageDataToObject = (imageData) => {
-  const parsedImageData = imageData.replace(/\r\n(.*)png:IHDR.bit-depth-orig(.*)/g, "").trim();
+  const parsedImageData = imageData.trim();
   const imageObject = {};
-  const prompt = /^(.*)(\r?\n)/gm.exec(parsedImageData)[0].replace(/\r?\n/g, "");
+  const prompt = /^(.*)(Negative\sprompt:|Steps:)/gm.exec(parsedImageData)?.[0].replace(/(\.Negative\sprompt:|\.Steps:)/g, "");
   const negativePrompt = /Negative\sprompt:(.*)\r?\n/gm.exec(parsedImageData)?.[0].replace(/\r?\n/g, "").replace("Negative prompt:", "").trim();
   const steps = /Steps:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Steps:", "").trim();
   const sampler = /Sampler:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Sampler:", "").trim();
   const cfg = /CFG scale:([^,]+)/gm.exec(parsedImageData)?.[0].replace("CFG scale:", "").trim();
   const seed = /Seed:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Seed:", "").trim();
-  const size = /Size:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Size:", "").trim();
+  const size = /Size:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Size:", "").trim() || '';
   const width = size.split("x")?.[0];
   const height = size.split("x")?.[1];
   const modelHash = /Model hash:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Model hash:", "").trim();
   const model = Object.keys(modelHashes).find(key => modelHashes[key] === modelHash);
   const denoising = /Denoising strength:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Denoising strength:", "").trim();
   const firstPass = /First pass size:([^,]+)/gm.exec(parsedImageData)?.[0].replace("First pass size:", "").trim();
+  const faceRestoration = /Face restoration:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Face restoration:", "").trim();
 
-  imageObject["prompt"] = prompt || undefined;
-  imageObject["negativePrompt"] = negativePrompt || undefined;
+  imageObject["prompt"] = prompt || null;
+  imageObject["negativePrompt"] = negativePrompt || null;
 
-  imageObject["steps"] = steps ? parseFloat(steps) : undefined;
-  imageObject["sampler"] = sampler || undefined;
-  imageObject["cfg"] = cfg ? parseFloat(cfg) : undefined;
-  imageObject["seed"] = seed || undefined;
-  imageObject["width"] = width ? parseInt(width) : undefined;
-  imageObject["height"] = height ? parseInt(height) : undefined;
-  imageObject["modelHash"] = modelHash || undefined;
-  imageObject["model"] = model || undefined;
-  imageObject["denoising"] = denoising ? parseFloat(denoising) : undefined;
-  imageObject["firstPass"] = firstPass || undefined;
-  imageObject["rawText"] = parsedImageData;
+  imageObject["steps"] = steps ? parseFloat(steps) : null;
+  imageObject["sampler"] = sampler || null;
+  imageObject["cfg"] = cfg ? parseFloat(cfg) : null;
+  imageObject["seed"] = seed || null;
+  imageObject["width"] = width ? parseInt(width) : null;
+  imageObject["height"] = height ? parseInt(height) : null;
+  imageObject["modelHash"] = modelHash || null;
+  imageObject["model"] = model || null;
+  imageObject["denoising"] = denoising ? parseFloat(denoising) : null;
+  imageObject["firstPass"] = firstPass || null;
+  imageObject["faceRestoration"] = faceRestoration || null;
+  imageObject["rawText"] = parsedImageData || imageData;
   return imageObject;
 }
 
@@ -53,14 +61,16 @@ const getImageData = async (imageRoute) => {
   if (!imageRoute.includes(".png")) {
     throw new Error("Image route must be a png file, was: " + imageRoute);
   }
-  const imageMagickCommand = `magick identify -verbose "${imageRoute}"`;
+  // const imageMagickCommand = `magick identify -verbose "${imageRoute}"`;
+  const effixComand = `exiftool "${imageRoute}"`;
   return new Promise((resolve, reject) => {
-    exec(imageMagickCommand, (err, stdout, stderr) => {
+    exec(effixComand, (err, stdout, stderr) => {
       if (err) {
         reject(err);
       }
-      // console.log(stdout);
-      resolve(matchImageData(stdout));
+      const rawText = stdout;
+      const greppedText = findImageData(rawText);
+      resolve(greppedText || rawText);
     });
   });
 };
@@ -82,12 +92,22 @@ import { readdirSync } from "fs";
 const images = readdirSync(imagesPath);
 const imagesRoutes = images.map((image) => `${imagesPath}\\${image}`);
 
+console.log(`Processing ${imagesRoutes.length} images -->`);
+let i = 0;
+
 // async for loop
 for await (const imageRoute of imagesRoutes) {
+  console.log('---------------------');
+  const percentCompleted = ((i / imagesRoutes.length) * 100).toFixed(2);
+  console.log(`Processing image: ${i}/${imagesRoutes.length} - ${percentCompleted}%`);
   console.log(imageRoute);
+  console.log('---------------------');
   const imageObject = await getImageObject(imageRoute);
   console.log(imageObject);
+  i++;
 }
+
+// console.log(await getImageObject('D:\\dev\\git\\outputs_old_000\\txt2img-images\\01389-2666212342-a cyberpunk city wallpaper, from the film directed by denis villeneuve and david cronenberg with art direction by salvador dali.png'));
 
 
 
