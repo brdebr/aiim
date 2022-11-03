@@ -21,7 +21,7 @@ const modelHashes = {
 };
 
 
-const imageDataToObject = (imageData) => {
+const imageDataToObject = (imageData, imageRoute) => {
   const parsedImageData = imageData.trim();
   const imageObject = {};
   const prompt = /^(.*)(Negative\sprompt:|Steps:)/gm.exec(parsedImageData)?.[0].replace(/(\.Negative\sprompt:|\.Steps:)/g, "");
@@ -39,6 +39,8 @@ const imageDataToObject = (imageData) => {
   const firstPass = /First pass size:([^,]+)/gm.exec(parsedImageData)?.[0].replace("First pass size:", "").trim();
   const faceRestoration = /Face restoration:([^,]+)/gm.exec(parsedImageData)?.[0].replace("Face restoration:", "").trim();
 
+  imageObject["imagePath"] = imageRoute.split("/").pop();
+  imageObject["number"] = `${imageObject["imagePath"]}`.substring(0, 5);
   imageObject["prompt"] = prompt || null;
   imageObject["negativePrompt"] = negativePrompt || null;
 
@@ -50,10 +52,10 @@ const imageDataToObject = (imageData) => {
   imageObject["height"] = height ? parseInt(height) : null;
   imageObject["modelHash"] = modelHash || null;
   imageObject["model"] = model || null;
-  imageObject["denoising"] = denoising ? parseFloat(denoising) : null;
-  imageObject["firstPass"] = firstPass || null;
+  imageObject["denoisingHr"] = denoising ? parseFloat(denoising) : null;
+  imageObject["firstPassHr"] = firstPass || null;
   imageObject["faceRestoration"] = faceRestoration || null;
-  imageObject["rawText"] = parsedImageData || imageData;
+  imageObject["rawParameters"] = parsedImageData || imageData;
   return imageObject;
 }
 
@@ -77,7 +79,7 @@ const getImageData = async (imageRoute) => {
 
 const getImageObject = async (imageRoute) => {
   const imageData = await getImageData(imageRoute);
-  const imageObject = imageDataToObject(imageData);
+  const imageObject = imageDataToObject(imageData, imageRoute);
   return imageObject;
 };
 
@@ -85,12 +87,12 @@ const getImageObject = async (imageRoute) => {
 //----------------------------------
 
 
-const imagesPath = "D:\\dev\\git\\outputs_old_000\\txt2img-images";
+const imagesPath = "/home/bryan-ub/DEV/MULTIMEDIA/AI generated/Volumes/outputs_old_000/txt2img-images";
 // const imagesPath = "D:\\dev\\git\\sd-webui\\log\\images\\";
 
 import { readdirSync } from "fs";
 const images = readdirSync(imagesPath);
-const imagesRoutes = images.map((image) => `${imagesPath}\\${image}`);
+const imagesRoutes = images.map((image) => `${imagesPath}/${image}`);
 
 console.log(`Processing ${imagesRoutes.length} images -->`);
 let i = 0;
@@ -106,8 +108,6 @@ for await (const imageRoute of imagesRoutes) {
   console.log(imageObject);
   i++;
 }
-
-// console.log(await getImageObject('D:\\dev\\git\\outputs_old_000\\txt2img-images\\01389-2666212342-a cyberpunk city wallpaper, from the film directed by denis villeneuve and david cronenberg with art direction by salvador dali.png'));
 
 
 
