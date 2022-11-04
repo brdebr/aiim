@@ -6,11 +6,10 @@ export class ImageObjectController {
   constructor(private readonly imageService: ImageObjectService) {}
 
   @Get()
-  page(@Query('size') size = '10', @Query('page') page = '1') {
-    const pageInt = parseInt(page);
+  page(@Query('size') size = '10', @Query('page') page?: string) {
     const sizeInt = parseInt(size);
 
-    return this.imageService.page(sizeInt, (pageInt - 1) * sizeInt);
+    return this.imageService.page(sizeInt, page);
   }
 
   @Get('gallery')

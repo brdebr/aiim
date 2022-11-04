@@ -82,12 +82,15 @@ export class ImageObjectService {
     return queryResponse;
   }
 
-  async page(size = 100, skip = 0) {
+  async page(size = 100, cursorId?: string) {
+    const cursor = cursorId ? { id: cursorId } : undefined;
+    const skip = cursorId ? 1 : 0;
     const queryResponse = await this.prisma.imageObject.findMany({
       take: size,
       skip,
+      cursor,
       orderBy: {
-        generatedAt: 'desc',
+        id: 'desc',
       },
       select: defaultImageFields,
     });
