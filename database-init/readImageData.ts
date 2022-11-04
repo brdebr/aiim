@@ -159,11 +159,12 @@ const imagesPath =
   '/home/bryan-ub/DEV/MULTIMEDIA/AI generated/Volumes/outputs_old_000/txt2img-images';
 // const imagesPath = "D:\\dev\\git\\sd-webui\\log\\images\\";
 
-import { readdirSync, readFileSync } from 'fs';
+import { readdirSync, readFileSync, statSync } from 'fs';
 const images = readdirSync(imagesPath);
 const imagesRoutes = images.map((image) => `${imagesPath}/${image}`);
 
 console.log(`Processing ${imagesRoutes.length} images -->`);
+console.time('Processing images');
 let i = 0;
 (async () => {
   for await (const imageRoute of imagesRoutes) {
@@ -178,7 +179,9 @@ let i = 0;
     const imageObject = await getImageObject(imageRoute);
     console.log(imageObject);
     const imageBuffer = readFileSync(imageRoute);
+    const { size } = statSync(imageRoute);
     imageObject['imageFile'] = imageBuffer;
+    imageObject['imageSize'] = size;
 
     await prisma.imageObject.create({
       data: {
@@ -200,9 +203,11 @@ let i = 0;
         rawParameters: imageObject['rawParameters'] as string,
         generatedAt: new Date(imageObject['modifiedTime'] as string),
         imageFile: imageBuffer,
+        imageSize: size,
       },
     });
     console.timeEnd(`Image ${i}`);
     i++;
   }
+  console.timeEnd('Processing images');
 })();

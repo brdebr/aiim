@@ -13,12 +13,24 @@ datasource db {
 model ImageObject {
   id               String @id @default(auto()) @map("_id") @db.ObjectId
 
+  // Metadata
+  number           String
+  fileName         String
+  imageFile        Bytes
+  imageSize        Int
+  rawParameters    String
+
+  // Time metadata
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  generatedAt      DateTime
+  timeToGenerate   Int      @default(0)
+
+  // Prompt
   prompt           String
   negativePrompt   String?
 
-  number           String
-  fileName         String
-
+  // Configs
   steps            Int
   sampler          String
   cfg              Float
@@ -30,16 +42,10 @@ model ImageObject {
   model            String?
   modelHash        String
 
+  // High res
   denoisingHr      Float?
   firstPassHr      String?
 
+  // Face restoration
   faceRestoration  String?
-  rawParameters    String
-
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  generatedAt      DateTime
-  timeToGenerate   Int      @default(0)
-
-  imageFile        Bytes
 }
