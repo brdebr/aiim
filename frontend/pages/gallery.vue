@@ -1,53 +1,87 @@
 <template>
   <div>
     <h1>
-      Hi I'm your gallery 🤺 - {{ images.length }}
+      Hi I'm your gallery 🤺
     </h1>
     <div class="pagination" v-show="!imagesPending">
-      <button @click="fetchPrevious">
+      <button @click="fetchPrevious" :disabled="!images || pageNumber === 1">
         &lt; Previous
       </button>
       <div>
-        Page - {{ pageNumber }} / {{ amountOfPages }}
+        Page [ {{ pageNumber }} / {{ amountOfPages }} ] - [ {{ imagesCount }} images - {{ pageSize }} per page ]
       </div>
-      <button @click="fetchNext">
+      <button @click="fetchNext" :disabled="!images || pageNumber === amountOfPages">
         Next &gt;
       </button>
     </div>
     <div class="gallery-wip-grid">
       <div v-for="image in images" :key="image.id">
-        <img :src="`http://localhost:3000/images/${image.id}`" :title="image.prompt" :alt="image.prompt" />
+        <img :src="`http://localhost:3005/images/${image.id}`" lazy :title="image.prompt" :alt="image.prompt" />
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-const { data: imagesCount } = await useFetch('http://localhost:3000/images/total');
+
+type ImageObject = {
+  id: string;
+  // Prompt
+  prompt: string;
+  negativePrompt: string;
+  // Configs
+  seed: string;
+  steps: number;
+  sampler: string;
+  cfg: number;
+  width: number;
+  height: number;
+  // Model
+  model: string;
+  modelHash: string;
+  // High res
+  denoisingHr: number;
+  firstPassHr: string;
+  // Face restoration
+  faceRestoration: string;
+  // Metadata
+  generatedAt: string;
+  imageSize: string;
+  timeToGenerate: number;
+}
+type ImageObjectsPageResponse = ImageObject[]
+
+const { data: imagesCount } = await useFetch<number>('http://localhost:3005/images/total');
 
 const page = ref('');
 const pageNumber = ref(1);
-const pageSize = ref(40);
-const amountOfPages = computed(() => Math.ceil(imagesCount.value / pageSize.value));
+const pageSize = ref(100);
+const cursorsHistory = ref<string[]>([]);
+const amountOfPages = computed(() => imagesCount.value ? Math.ceil(imagesCount.value / pageSize.value) : 0);
 
-const { data: images, refresh, pending: imagesPending } = await useFetch(() => {
+const { data: images, refresh, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
   const query = new URLSearchParams({
     page: page.value,
     size: pageSize.value.toString(),
   });
-  return `http://localhost:3000/images?${query.toString()}`;
+  return `http://localhost:3005/images?${query.toString()}`;
 });
 
 
 const fetchNext = async () => {
-  if (images.value.length < pageSize.value) {
+  if (!images.value || images.value.length < pageSize.value) {
     return;
   }
+  cursorsHistory.value.push(page.value);
   page.value = images.value[pageSize.value-1].id;
   pageNumber.value ++;
 };
 const fetchPrevious = async () => {
-  page.value = images.value[0].id;
+  if (pageNumber.value === 1 || !images.value) {
+    return;
+  }
+  const previousCursor = `${cursorsHistory.value.pop()}`;
+  page.value = previousCursor;
   pageNumber.value --;
 };
 </script>
