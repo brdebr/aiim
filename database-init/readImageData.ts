@@ -1,14 +1,16 @@
 import { exec } from 'child_process';
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
-const matchImageDataImageMagick = (imageData) => {
-  const regex = /\s{4}parameters:(.*(\r?\n).*(\r?\n).*)/gm;
-  const matches = regex.exec(imageData);
-  return matches?.[0].replace(/\s{4}parameters:/g, '').trim() || imageData;
-};
+// const matchImageDataImageMagick = (imageData) => {
+//   const regex = /\s{4}parameters:(.*(\r?\n).*(\r?\n).*)/gm;
+//   const matches = regex.exec(imageData);
+//   return matches?.[0].replace(/\s{4}parameters:/g, '').trim() || imageData;
+// };
 
 const findImageData = (imageData) => {
-  const regexTimeMofiied = /File\sModification\sDate\/Time\s*:\s(.*)/gm;
-  const matchesTimeModified = regexTimeMofiied.exec(imageData);
+  const regexTimeModified = /File\sModification\sDate\/Time\s*:\s(.*)/gm;
+  const matchesTimeModified = regexTimeModified.exec(imageData);
   const modifiedTime =
     matchesTimeModified?.[0]
       .replace(/File\sModification\sDate\/Time\s*:\s/g, '')
@@ -25,14 +27,14 @@ const findImageData = (imageData) => {
 const modelHashes = {
   '1.5-emaonly': '81761151',
   '1.5-inpainting': '3e16efc8',
-  1.4: '7460a6fa',
+  '1.4': '7460a6fa',
   'bryanwd-person': 'da781e47',
   '1.5-pruned': 'a9263745',
 };
 
 const imageDataToObject = (imageData, imageRoute) => {
   const parsedImageData = imageData.trim();
-  const imageObject = {};
+  const imageObject = {} as Record<string, unknown>;
 
   const prompt = /^(.*)(Negative\sprompt:|Steps:)/gm
     .exec(parsedImageData)?.[0]
@@ -94,7 +96,7 @@ const imageDataToObject = (imageData, imageRoute) => {
     .trim();
 
   imageObject['filename'] = imageRoute.split('/').pop();
-  imageObject['number'] = `${imageObject['imagePath']}`.substring(0, 5);
+  imageObject['number'] = `${imageObject['filename']}`.substring(0, 5);
   imageObject['prompt'] = prompt || null;
   imageObject['negativePrompt'] = negativePrompt || null;
 
@@ -113,11 +115,10 @@ const imageDataToObject = (imageData, imageRoute) => {
   return imageObject;
 };
 
-const getImageData = async (imageRoute) => {
+const getImageData = async (imageRoute): Promise<string[]> => {
   if (!imageRoute.includes('.png')) {
     throw new Error('Image route must be a png file, was: ' + imageRoute);
   }
-  // const imageMagickCommand = `magick identify -verbose "${imageRoute}"`;
   const effixComand = `exiftool "${imageRoute}"`;
   return new Promise((resolve, reject) => {
     exec(effixComand, (err, stdout, stderr) => {
@@ -134,33 +135,74 @@ const getImageData = async (imageRoute) => {
 const getImageObject = async (imageRoute) => {
   const [imageData, modifiedTime] = await getImageData(imageRoute);
   const imageObject = imageDataToObject(imageData, imageRoute);
-  imageObject['modifiedTime'] = modifiedTime;
+  imageObject['modifiedTime'] = modifiedTime
+    .replace(/:/, '-')
+    .replace(/:/, '-');
+
   return imageObject;
 };
 
+//----------------------------------
+// (async () => {
+//   const cats = await prisma.imageObject.findMany({
+//     where: {
+//       prompt: {
+//         contains: 'cat',
+//       },
+//     },
+//   });
+//   console.log(cats);
+// })();
 //----------------------------------
 
 const imagesPath =
   '/home/bryan-ub/DEV/MULTIMEDIA/AI generated/Volumes/outputs_old_000/txt2img-images';
 // const imagesPath = "D:\\dev\\git\\sd-webui\\log\\images\\";
 
-import { readdirSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 const images = readdirSync(imagesPath);
 const imagesRoutes = images.map((image) => `${imagesPath}/${image}`);
 
 console.log(`Processing ${imagesRoutes.length} images -->`);
 let i = 0;
+(async () => {
+  for await (const imageRoute of imagesRoutes) {
+    console.time(`Image ${i}`);
+    console.log('---------------------');
+    const percentCompleted = ((i / imagesRoutes.length) * 100).toFixed(2);
+    console.log(
+      `Processing image: ${i}/${imagesRoutes.length} - ${percentCompleted}%`,
+    );
+    console.log(imageRoute);
+    console.log('---------------------');
+    const imageObject = await getImageObject(imageRoute);
+    console.log(imageObject);
+    const imageBuffer = readFileSync(imageRoute);
+    imageObject['imageFile'] = imageBuffer;
 
-// async for loop
-for await (const imageRoute of imagesRoutes) {
-  console.log('---------------------');
-  const percentCompleted = ((i / imagesRoutes.length) * 100).toFixed(2);
-  console.log(
-    `Processing image: ${i}/${imagesRoutes.length} - ${percentCompleted}%`,
-  );
-  console.log(imageRoute);
-  console.log('---------------------');
-  const imageObject = await getImageObject(imageRoute);
-  console.log(imageObject);
-  i++;
-}
+    await prisma.imageObject.create({
+      data: {
+        fileName: imageObject['filename'] as string,
+        number: imageObject['number'] as string,
+        prompt: imageObject['prompt'] as string,
+        negativePrompt: imageObject['negativePrompt'] as string,
+        steps: imageObject['steps'] as number,
+        sampler: imageObject['sampler'] as string,
+        cfg: imageObject['cfg'] as number,
+        seed: imageObject['seed'] as string,
+        width: imageObject['width'] as number,
+        height: imageObject['height'] as number,
+        modelHash: imageObject['modelHash'] as string,
+        model: imageObject['model'] as string,
+        denoisingHr: imageObject['denoisingHr'] as number,
+        firstPassHr: imageObject['firstPassHr'] as string,
+        faceRestoration: imageObject['faceRestoration'] as string,
+        rawParameters: imageObject['rawParameters'] as string,
+        generatedAt: new Date(imageObject['modifiedTime'] as string),
+        imageFile: imageBuffer,
+      },
+    });
+    console.timeEnd(`Image ${i}`);
+    i++;
+  }
+})();

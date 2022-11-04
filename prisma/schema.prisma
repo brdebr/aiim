@@ -14,32 +14,32 @@ model ImageObject {
   id               String @id @default(auto()) @map("_id") @db.ObjectId
 
   prompt           String
-  negativePrompt   String
+  negativePrompt   String?
 
-  number           Int
+  number           String
   fileName         String
 
   steps            Int
   sampler          String
   cfg              Float
-  seed             Int
+  seed             String
 
   width            Int
   height           Int
 
-  model            String
+  model            String?
   modelHash        String
 
-  denoisingHr      Float
-  firstPassHr      String
+  denoisingHr      Float?
+  firstPassHr      String?
 
-  faceRestoration  String
+  faceRestoration  String?
   rawParameters    String
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   generatedAt      DateTime
-  timeToGenerate   Int
+  timeToGenerate   Int      @default(0)
 
   imageFile        Bytes
 }

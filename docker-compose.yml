@@ -4,14 +4,15 @@ version: '3.1'
 services:
   aiim-db:
     container_name: aiim-db_container
-    image: 'mongo:4.4.9'
+    image: 'prismagraphql/mongo-single-replica:4.4.3-bionic'
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+      INIT_WAIT_SEC: 3
     volumes:
       - ./docker-data/db:/data/db
-      # - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      # - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     ports:
       - 27017:27017
