@@ -11,6 +11,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Project
+docker-data
+
 # OS
 .DS_Store
 

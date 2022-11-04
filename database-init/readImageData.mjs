@@ -7,9 +7,19 @@ const matchImageDataImageMagick = (imageData) => {
 };
 
 const findImageData = (imageData) => {
-  const regex = /Parameters\s*:\s(.*)/gm;
-  const matches = regex.exec(imageData);
-  return matches?.[0].replace(/Parameters\s*:\s/g, '').trim() || imageData;
+  const regexTimeMofiied = /File\sModification\sDate\/Time\s*:\s(.*)/gm;
+  const matchesTimeModified = regexTimeMofiied.exec(imageData);
+  const modifiedTime =
+    matchesTimeModified?.[0]
+      .replace(/File\sModification\sDate\/Time\s*:\s/g, '')
+      .trim() || imageData;
+
+  const regexParameters = /Parameters\s*:\s(.*)/gm;
+  const matchesParameters = regexParameters.exec(imageData);
+  const parameters =
+    matchesParameters?.[0].replace(/Parameters\s*:\s/g, '').trim() || imageData;
+
+  return [parameters, modifiedTime];
 };
 
 const modelHashes = {
@@ -83,7 +93,7 @@ const imageDataToObject = (imageData, imageRoute) => {
     .replace('Face restoration:', '')
     .trim();
 
-  imageObject['imagePath'] = imageRoute.split('/').pop();
+  imageObject['filename'] = imageRoute.split('/').pop();
   imageObject['number'] = `${imageObject['imagePath']}`.substring(0, 5);
   imageObject['prompt'] = prompt || null;
   imageObject['negativePrompt'] = negativePrompt || null;
@@ -115,15 +125,16 @@ const getImageData = async (imageRoute) => {
         reject(err);
       }
       const rawText = stdout;
-      const greppedText = findImageData(rawText);
-      resolve(greppedText || rawText);
+      const [greppedText, modifiedTime] = findImageData(rawText);
+      resolve([greppedText || rawText, modifiedTime]);
     });
   });
 };
 
 const getImageObject = async (imageRoute) => {
-  const imageData = await getImageData(imageRoute);
+  const [imageData, modifiedTime] = await getImageData(imageRoute);
   const imageObject = imageDataToObject(imageData, imageRoute);
+  imageObject['modifiedTime'] = modifiedTime;
   return imageObject;
 };
 

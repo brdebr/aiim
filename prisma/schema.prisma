@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ImageObject {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+
+  prompt           String
+  negativePrompt   String
+
+  number           Int
+  fileName         String
+
+  steps            Int
+  sampler          String
+  cfg              Float
+  seed             Int
+
+  width            Int
+  height           Int
+
+  model            String
+  modelHash        String
+
+  denoisingHr      Float
+  firstPassHr      String
+
+  faceRestoration  String
+  rawParameters    String
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  generatedAt      DateTime
+  timeToGenerate   Int
+
+  imageFile        Bytes
+}
