@@ -23,13 +23,13 @@ export class PrismaService
         },
       },
     });
-    this.logger.log(`Connecting to database ->`);
+    this.logger.log(`Connecting to database:`);
     this.logger.log(`${url}`);
   }
 
   async onModuleInit() {
     await this.$connect();
-    this.logger.log(`Connected to database 🚀`);
+    this.logger.log(`Connected to MongoDB database 🚀`);
   }
 
   async onModuleDestroy() {
