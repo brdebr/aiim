@@ -53,6 +53,7 @@ export class ImageObjectController {
   async getImage(@Param('id') id: string, @Res() response) {
     const image = await this.imageService.getImage(id);
     response.set('Content-Type', 'image/png');
+    response.set('Content-Disposition', `attachment; filename=${image.id}.png`);
     response.send(image.imageFile);
   }
 }

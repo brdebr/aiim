@@ -1,32 +1,27 @@
 <template>
   <div>
     <h1>
-      Hi I'm your gallery 🤺
+      Hi I'm your gallery
     </h1>
-    <div class="pagination" v-show="!imagesPending">
-      <button @click="fetchPrevious" :disabled="!images || pageNumber === 1">
-        &lt; Previous
-      </button>
-      <div>
-        Page [ {{ pageNumber }} / {{ amountOfPages }} ] - [ {{ imagesCount }} images - {{ pageSize }} per page ]
-      </div>
-      <button @click="fetchNext" :disabled="!images || pageNumber === amountOfPages">
-        Next &gt;
-      </button>
-    </div>
     <div class="gallery-grid">
       <img
-        v-for="image in images" :key="image.id"
+        v-for="image in allImages" :key="image.id"
         :data-width="image.width" :data-height="image.height"
-        :src="`http://localhost:3005/api/images/${image.id}`"
+        :data-id="image.id"
+        :src="`${baseURL}/api/images/${image.id}`"
         loading="lazy"
+        :class="getImageClass(image)"
         :title="image.prompt" :alt="image.prompt"
       />
+      <InfiniteLoading :distance="850" @infinite="fetchMoreImages" />
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
+// @ts-expect-error - The component is not typed
+import InfiniteLoading from 'v3-infinite-loading';
+import 'v3-infinite-loading/lib/style.css'
 
 type ImageObject = {
   id: string;
@@ -55,48 +50,73 @@ type ImageObject = {
 }
 type ImageObjectsPageResponse = ImageObject[]
 
-const { data: imagesCount } = await useFetch<number>('http://localhost:3005/api/images/total');
-
+// API
+const baseURL = import.meta.env.DEV ? 'http://localhost:3005' : 'https://ai.home.bryan-web.dev';
 const pageId = ref('');
-const pageNumber = ref(1);
-const pageSize = ref(15);
-const cursorsHistory = ref<string[]>([]);
-const amountOfPages = computed(() => imagesCount.value ? Math.ceil(imagesCount.value / pageSize.value) : 0);
+const pageSize = ref(20);
 
-const { data: images, refresh, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
+// Fetching
+const { data: imagesCount } = await useFetch<number>(`/api/images/total`);
+
+const { data: currentImagesFetched, refresh, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
   const query = new URLSearchParams({
     page: pageId.value,
     size: pageId.value ? pageSize.value.toString() : (pageSize.value + 10).toString(),
   });
-  return `http://localhost:3005/api/images?${query.toString()}`;
+  console.log(`Fetching images -> ${pageId.value}`);
+  console.log(`/api/images?${query.toString()}`);
+  
+  return `/api/images?${query.toString()}`;
+}, {
+  baseURL,
 });
 
-const fetchNext = async () => {
-  if (!images.value || images.value.length < pageSize.value) {
+// Infinite loading
+const allImages = ref<ImageObject[]>(currentImagesFetched.value || []);
+watch(currentImagesFetched, (newImages) => {
+  if (!newImages) {
+    return
+  }
+  allImages.value = allImages.value.concat(newImages);
+});
+const fetchMoreImages = async ($state: { loaded: () => void; }) => {
+  if (!currentImagesFetched.value) {
     return;
   }
-  cursorsHistory.value.push(pageId.value);
-  pageId.value = images.value[images.value.length - 1].id;
-  pageNumber.value ++;
+  const lastImage = currentImagesFetched.value[currentImagesFetched.value.length - 1];
+  pageId.value = lastImage.id;
+
+  $state?.loaded();
 };
-const fetchPrevious = async () => {
-  if (pageNumber.value === 1 || !images.value) {
-    return;
+
+// Image class
+const getImageClass = (image: ImageObject) => {
+  if (image.width / image.height < 0.85) {
+    return 'tall';
   }
-  const previousCursor = `${cursorsHistory.value.pop()}`;
-  pageId.value = previousCursor;
-  pageNumber.value --;
-};
+  if (image.width / image.height > 1.15) {
+    return 'wide';
+  }
+  return '';
+}
 </script>
 <style lang="scss">
 .gallery-grid {
   display: grid;
   grid-gap: 4px;
-  grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
   img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+  }
+  @media screen and (min-width: 600px) {
+    img.tall {
+      grid-row-end: span 2 / auto;
+    }
+    img.wide {
+      grid-column-end: span 2 / auto;
+    }
   }
  }
 .pagination {

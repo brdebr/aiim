@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "sass": "^1.56.0",
-    "sass-loader": "^13.1.0"
+    "sass-loader": "^13.1.0",
+    "v3-infinite-loading": "^1.2.1"
   }
 }
