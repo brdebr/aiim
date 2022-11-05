@@ -4,11 +4,15 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "preview": "node .output/server/index.mjs",
+    "prod": "npm run generate && npm run build && npm run preview",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "nuxt": "3.0.0-rc.13",
-    "@vue/runtime-dom": "3.2.41"
+    "nuxt": "3.0.0-rc.13"
+  },
+  "dependencies": {
+    "sass": "^1.56.0",
+    "sass-loader": "^13.1.0"
   }
 }

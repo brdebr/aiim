@@ -14,10 +14,14 @@
         Next &gt;
       </button>
     </div>
-    <div class="gallery-wip-grid">
-      <div v-for="image in images" :key="image.id">
-        <img :src="`http://localhost:3005/images/${image.id}`" lazy :title="image.prompt" :alt="image.prompt" />
-      </div>
+    <div class="gallery-grid">
+      <img
+        v-for="image in images" :key="image.id"
+        :data-width="image.width" :data-height="image.height"
+        :src="`http://localhost:3005/api/images/${image.id}`"
+        loading="lazy"
+        :title="image.prompt" :alt="image.prompt"
+      />
     </div>
   </div>
 </template>
@@ -51,29 +55,28 @@ type ImageObject = {
 }
 type ImageObjectsPageResponse = ImageObject[]
 
-const { data: imagesCount } = await useFetch<number>('http://localhost:3005/images/total');
+const { data: imagesCount } = await useFetch<number>('http://localhost:3005/api/images/total');
 
-const page = ref('');
+const pageId = ref('');
 const pageNumber = ref(1);
-const pageSize = ref(100);
+const pageSize = ref(15);
 const cursorsHistory = ref<string[]>([]);
 const amountOfPages = computed(() => imagesCount.value ? Math.ceil(imagesCount.value / pageSize.value) : 0);
 
 const { data: images, refresh, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
   const query = new URLSearchParams({
-    page: page.value,
-    size: pageSize.value.toString(),
+    page: pageId.value,
+    size: pageId.value ? pageSize.value.toString() : (pageSize.value + 10).toString(),
   });
-  return `http://localhost:3005/images?${query.toString()}`;
+  return `http://localhost:3005/api/images?${query.toString()}`;
 });
-
 
 const fetchNext = async () => {
   if (!images.value || images.value.length < pageSize.value) {
     return;
   }
-  cursorsHistory.value.push(page.value);
-  page.value = images.value[pageSize.value-1].id;
+  cursorsHistory.value.push(pageId.value);
+  pageId.value = images.value[images.value.length - 1].id;
   pageNumber.value ++;
 };
 const fetchPrevious = async () => {
@@ -81,21 +84,21 @@ const fetchPrevious = async () => {
     return;
   }
   const previousCursor = `${cursorsHistory.value.pop()}`;
-  page.value = previousCursor;
+  pageId.value = previousCursor;
   pageNumber.value --;
 };
 </script>
-<style>
-.gallery-wip-grid {
+<style lang="scss">
+.gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-gap: 1rem;
-}
-.gallery-wip-grid img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+  grid-gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+ }
 .pagination {
   background-color: aquamarine;
   position: fixed;
@@ -105,5 +108,6 @@ const fetchPrevious = async () => {
   display: flex;
   justify-content: space-between;
   padding: 1rem;
+  z-index: 1;
 }
 </style>
