@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { bytesToHuman } from 'src/utils';
 
-const defaultImageFields = {
+export const defaultImageFieldsSelect = {
   id: true,
   // Prompt
   prompt: true,
@@ -28,8 +28,8 @@ const defaultImageFields = {
   timeToGenerate: true,
 };
 
-const defaultsWithFile = {
-  ...defaultImageFields,
+export const defaultsWithFile = {
+  ...defaultImageFieldsSelect,
   imageFile: true,
 };
 
@@ -64,7 +64,7 @@ export class ImageObjectService {
           contains: q,
         },
       },
-      select: defaultImageFields,
+      select: defaultImageFieldsSelect,
     });
     return queryResponse;
   }
@@ -92,7 +92,7 @@ export class ImageObjectService {
       orderBy: {
         id: 'desc',
       },
-      select: defaultImageFields,
+      select: defaultImageFieldsSelect,
     });
     return queryResponse.map((img) => {
       const sizeInHuman = bytesToHuman(img.imageSize);

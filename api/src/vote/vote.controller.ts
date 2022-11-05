@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { VoteService, VoteType } from './vote.service';
 
 type VoteDao = {
@@ -19,5 +19,11 @@ export class VoteController {
       body.type,
     );
     return vote;
+  }
+
+  @Get('my-votes')
+  async myVotes(@Query('id') userId: string, @Query('type') type: VoteType) {
+    const votes = this.voteService.getVotesByUserId(userId, type);
+    return votes;
   }
 }
