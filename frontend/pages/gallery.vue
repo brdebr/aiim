@@ -12,6 +12,7 @@
         loading="lazy"
         :class="getImageClass(image)"
         :title="image.prompt" :alt="image.prompt"
+        @click="vote(image.id)"
       />
       <InfiniteLoading :distance="650" @infinite="fetchMoreImages" />
     </div>
@@ -69,6 +70,15 @@ const { data: currentImagesFetched, refresh, pending: imagesPending } = await us
 }, {
   baseURL: apiBaseURL,
 });
+
+const vote = async (id: string) => {
+  console.log(`Voting for ${id}`);
+  await fetch(`${apiBaseURL}/api/vote`, {
+    method: 'POST',
+    body: JSON.stringify({ id }),
+  });
+  refresh();
+}
 
 // Infinite loading
 const allImages = ref<ImageObject[]>(currentImagesFetched.value || []);

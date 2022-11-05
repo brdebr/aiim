@@ -13,11 +13,11 @@ export class ImageObjectController {
   }
 
   @Get('gallery')
-  galleryPage(@Query('size') size = '10', @Query('page') page = '1') {
+  galleryPage(@Query('size') size = '10', @Query('page') page?: string) {
     const pageInt = parseInt(page);
     const sizeInt = parseInt(size);
 
-    return this.imageService.galleryPage(sizeInt, (pageInt - 1) * sizeInt);
+    return this.imageService.galleryPage(sizeInt, page);
   }
 
   @Get('search')
