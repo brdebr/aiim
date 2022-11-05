@@ -14,7 +14,7 @@ export class VoteService {
   async voteForImage(imageId: string, userId: string, voteType: VoteType) {
     const vote = await this.prisma.vote.create({
       data: {
-        vote: voteType,
+        vote: voteType || VoteType.UPVOTE,
         image: {
           connect: {
             id: imageId,

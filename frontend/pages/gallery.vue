@@ -71,13 +71,13 @@ const { data: currentImagesFetched, refresh, pending: imagesPending } = await us
   baseURL: apiBaseURL,
 });
 
-const vote = async (id: string) => {
-  console.log(`Voting for ${id}`);
-  await fetch(`${apiBaseURL}/api/vote`, {
+const vote = async (imageId: string) => {
+  console.log(`Voting for ${imageId}`);
+  await $fetch(`${apiBaseURL}/api/vote`, {
     method: 'POST',
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ userId: '63668ec2570e312941a44c94', imageId }),
   });
-  refresh();
+  // refresh();
 }
 
 // Infinite loading
