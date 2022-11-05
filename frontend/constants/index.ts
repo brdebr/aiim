@@ -1,0 +1,1 @@
+export const apiBaseURL = import.meta.env.DEV ? 'http://localhost:3005' : 'https://ai.home.bryan-web.dev';

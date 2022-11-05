@@ -8,12 +8,12 @@
         v-for="image in allImages" :key="image.id"
         :data-width="image.width" :data-height="image.height"
         :data-id="image.id"
-        :src="`${baseURL}/api/images/${image.id}`"
+        :src="`${apiBaseURL}/api/images/${image.id}`"
         loading="lazy"
         :class="getImageClass(image)"
         :title="image.prompt" :alt="image.prompt"
       />
-      <InfiniteLoading :distance="850" @infinite="fetchMoreImages" />
+      <InfiniteLoading :distance="650" @infinite="fetchMoreImages" />
     </div>
   </div>
 </template>
@@ -22,6 +22,7 @@ import { ref } from 'vue';
 // @ts-expect-error - The component is not typed
 import InfiniteLoading from 'v3-infinite-loading';
 import 'v3-infinite-loading/lib/style.css'
+import { apiBaseURL } from '@/constants';
 
 type ImageObject = {
   id: string;
@@ -51,24 +52,22 @@ type ImageObject = {
 type ImageObjectsPageResponse = ImageObject[]
 
 // API
-const baseURL = import.meta.env.DEV ? 'http://localhost:3005' : 'https://ai.home.bryan-web.dev';
-const pageId = ref('');
-const pageSize = ref(20);
+const router = useRouter();
+const pageId = ref(router.currentRoute.value.query.page as string || '');
+const pageSize = ref(25);
 
 // Fetching
-const { data: imagesCount } = await useFetch<number>(`/api/images/total`);
-
 const { data: currentImagesFetched, refresh, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
   const query = new URLSearchParams({
     page: pageId.value,
-    size: pageId.value ? pageSize.value.toString() : (pageSize.value + 10).toString(),
+    size: pageId.value ? pageSize.value.toString() : (pageSize.value + 35).toString(),
   });
   console.log(`Fetching images -> ${pageId.value}`);
   console.log(`/api/images?${query.toString()}`);
   
   return `/api/images?${query.toString()}`;
 }, {
-  baseURL,
+  baseURL: apiBaseURL,
 });
 
 // Infinite loading
@@ -85,6 +84,11 @@ const fetchMoreImages = async ($state: { loaded: () => void; }) => {
   }
   const lastImage = currentImagesFetched.value[currentImagesFetched.value.length - 1];
   pageId.value = lastImage.id;
+  router.push({
+    query: {
+      page: lastImage.id,
+    },
+  });
 
   $state?.loaded();
 };
@@ -103,7 +107,7 @@ const getImageClass = (image: ImageObject) => {
 <style lang="scss">
 .gallery-grid {
   display: grid;
-  grid-gap: 4px;
+  grid-gap: 2px;
   grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
   img {
     width: 100%;
@@ -112,7 +116,7 @@ const getImageClass = (image: ImageObject) => {
   }
   @media screen and (min-width: 600px) {
     img.tall {
-      grid-row-end: span 2 / auto;
+      grid-row-end: span 2;
     }
     img.wide {
       grid-column-end: span 2 / auto;

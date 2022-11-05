@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { bytesToHuman, excludeKeys } from 'src/utils';
+import { bytesToHuman } from 'src/utils';
 
 const defaultImageFields = {
   id: true,
@@ -101,12 +101,15 @@ export class ImageObjectService {
     });
   }
 
-  async galleryPage(size = 20, skip = 0) {
+  async galleryPage(size = 20, cursorId?: string) {
+    const cursor = cursorId ? { id: cursorId } : undefined;
+    const skip = cursorId ? 1 : 0;
     const queryResponse = await this.prisma.imageObject.findMany({
       take: size,
       skip,
+      cursor,
       orderBy: {
-        generatedAt: 'desc',
+        id: 'desc',
       },
       select: defaultsWithFile,
     });
