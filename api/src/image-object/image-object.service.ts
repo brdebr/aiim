@@ -82,6 +82,39 @@ export class ImageObjectService {
     return queryResponse;
   }
 
+  async random(size = 20) {
+    console.time('All ids');
+    const allIds = (
+      await this.prisma.imageObject.findMany({
+        select: {
+          id: true,
+        },
+      })
+    ).map((img) => img.id);
+
+    const randomIds = new Set();
+    while (randomIds.size < size) {
+      randomIds.add(allIds[Math.floor(Math.random() * allIds.length)]);
+    }
+    const randomIdsArray = Array.from(randomIds) as string[];
+    console.timeEnd('All ids');
+
+    const queryResponse = await this.prisma.imageObject.findMany({
+      take: size,
+      where: {
+        id: {
+          in: randomIdsArray,
+        },
+      },
+      select: defaultImageFieldsSelect,
+    });
+    return queryResponse.map((img) => {
+      const sizeInHuman = bytesToHuman(img.imageSize);
+      const returnObj = { ...img, fileSize: sizeInHuman };
+      return returnObj;
+    });
+  }
+
   async page(size = 20, cursorId?: string) {
     const cursor = cursorId ? { id: cursorId } : undefined;
     const skip = cursorId ? 1 : 0;

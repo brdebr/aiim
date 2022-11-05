@@ -63,10 +63,11 @@ const { data: currentImagesFetched, refresh, pending: imagesPending } = await us
     page: pageId.value,
     size: pageId.value ? pageSize.value.toString() : (pageSize.value + 35).toString(),
   });
+  const endpoint = `/api/images?${query.toString()}`;
   console.log(`Fetching images -> ${pageId.value}`);
-  console.log(`/api/images?${query.toString()}`);
+  console.log(endpoint);
   
-  return `/api/images?${query.toString()}`;
+  return endpoint;
 }, {
   baseURL: apiBaseURL,
 });

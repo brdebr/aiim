@@ -12,12 +12,12 @@ export class ImageObjectController {
     return this.imageService.page(sizeInt, page);
   }
 
-  @Get('gallery')
-  galleryPage(@Query('size') size = '10', @Query('page') page?: string) {
-    const pageInt = parseInt(page);
+  @Get('random')
+  async random(@Query('size') size = '10') {
     const sizeInt = parseInt(size);
 
-    return this.imageService.galleryPage(sizeInt, page);
+    const results = await this.imageService.random(sizeInt);
+    return results;
   }
 
   @Get('search')
