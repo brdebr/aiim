@@ -16,7 +16,7 @@ export class ImageObjectController {
   async random(@Query('size') size = '10') {
     const sizeInt = parseInt(size);
 
-    const results = await this.imageService.random(sizeInt);
+    const results = await this.imageService.pageRandoms(sizeInt);
     return results;
   }
 
@@ -31,7 +31,7 @@ export class ImageObjectController {
 
   @Get('search-prompts')
   async searchPropmts(@Query('q') q) {
-    const results = await this.imageService.searchPrompts(q);
+    const results = await this.imageService.searchGroupedByPrompts(q);
     return {
       resultsCount: results.length,
       total: results.reduce((acc, cur) => acc + cur._count, 0),

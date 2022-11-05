@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ImageObject } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { bytesToHuman } from 'src/utils';
 
@@ -69,7 +70,7 @@ export class ImageObjectService {
     return queryResponse;
   }
 
-  async searchPrompts(q: string) {
+  async searchGroupedByPrompts(q: string) {
     const queryResponse = await this.prisma.imageObject.groupBy({
       by: ['prompt'],
       _count: true,
@@ -82,8 +83,7 @@ export class ImageObjectService {
     return queryResponse;
   }
 
-  async random(size = 20) {
-    console.time('All ids');
+  async pageRandoms(size = 20) {
     const allIds = (
       await this.prisma.imageObject.findMany({
         select: {
@@ -97,7 +97,6 @@ export class ImageObjectService {
       randomIds.add(allIds[Math.floor(Math.random() * allIds.length)]);
     }
     const randomIdsArray = Array.from(randomIds) as string[];
-    console.timeEnd('All ids');
 
     const queryResponse = await this.prisma.imageObject.findMany({
       take: size,
@@ -108,11 +107,7 @@ export class ImageObjectService {
       },
       select: defaultImageFieldsSelect,
     });
-    return queryResponse.map((img) => {
-      const sizeInHuman = bytesToHuman(img.imageSize);
-      const returnObj = { ...img, fileSize: sizeInHuman };
-      return returnObj;
-    });
+    return this.addHumanFileSize(queryResponse);
   }
 
   async page(size = 20, cursorId?: string) {
@@ -127,11 +122,7 @@ export class ImageObjectService {
       },
       select: defaultImageFieldsSelect,
     });
-    return queryResponse.map((img) => {
-      const sizeInHuman = bytesToHuman(img.imageSize);
-      const returnObj = { ...img, fileSize: sizeInHuman };
-      return returnObj;
-    });
+    return this.addHumanFileSize(queryResponse);
   }
 
   async galleryPage(size = 20, cursorId?: string) {
@@ -146,7 +137,11 @@ export class ImageObjectService {
       },
       select: defaultsWithFile,
     });
-    return queryResponse.map((img) => {
+    return this.addHumanFileSize(queryResponse);
+  }
+
+  addHumanFileSize(images: Partial<ImageObject>[]) {
+    return images.map((img) => {
       const sizeInHuman = bytesToHuman(img.imageSize);
       const returnObj = { ...img, fileSize: sizeInHuman };
       return returnObj;
