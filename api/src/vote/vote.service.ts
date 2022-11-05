@@ -22,7 +22,9 @@ export class VoteService {
     });
 
     if (existingVote) {
-      throw new Error('You have already voted for this image dummy! 😥');
+      throw new Error(
+        `You have already voted for this image dummy! 😥 - ${userId} - ${imageId}`,
+      );
     }
 
     const vote = await this.prisma.vote.create({
@@ -57,8 +59,13 @@ export class VoteService {
           },
         },
       },
+      take: 150,
     });
+    const length = votes.length;
 
-    return votes.map((vote) => excludeKeys(vote, 'userId', 'imageId'));
+    return {
+      results: votes.map((vote) => excludeKeys(vote, 'userId', 'imageId')),
+      count: length,
+    };
   }
 }

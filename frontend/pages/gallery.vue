@@ -25,7 +25,7 @@ import InfiniteLoading from 'v3-infinite-loading';
 import 'v3-infinite-loading/lib/style.css'
 import { apiBaseURL } from '@/constants';
 
-type ImageObject = {
+export type ImageObject = {
   id: string;
   // Prompt
   prompt: string;
@@ -77,16 +77,15 @@ const vote = async (imageId: string) => {
     method: 'POST',
     body: JSON.stringify({ userId: '63668ec2570e312941a44c94', imageId }),
   });
-  // refresh();
 }
 
 // Infinite loading
 const allImages = ref<ImageObject[]>(currentImagesFetched.value || []);
-watch(currentImagesFetched, (newImages) => {
-  if (!newImages) {
+watch(currentImagesFetched, (newFetchedImages) => {
+  if (!newFetchedImages) {
     return
   }
-  allImages.value = allImages.value.concat(newImages);
+  allImages.value = allImages.value.concat(newFetchedImages);
 });
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
   if (!currentImagesFetched.value) {
