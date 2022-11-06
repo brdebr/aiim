@@ -6,6 +6,11 @@
       -
       <NuxtLink to="/votes">Votes</NuxtLink>
     </div>
+    <div>
+      <v-btn>
+        Button
+      </v-btn>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>

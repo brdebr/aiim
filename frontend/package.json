@@ -9,7 +9,9 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "nuxt": "3.0.0-rc.13"
+    "nuxt": "3.0.0-rc.13",
+    "vite-plugin-vuetify": "^1.0.0",
+    "vuetify": "^3.0.0"
   },
   "dependencies": {
     "sass": "^1.56.0",
