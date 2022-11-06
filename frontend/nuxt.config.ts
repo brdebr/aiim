@@ -17,6 +17,7 @@ export default defineNuxtConfig({
         ))
     },
     'nuxt-windicss',
+    '@pinia/nuxt',
   ],
   devServer: {
     host: '0.0.0.0'
