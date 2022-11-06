@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { defaultImageFieldsSelect } from 'src/image-object/image-object.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { excludeKeys } from 'src/utils';
@@ -15,8 +15,13 @@ export enum VoteType {
 export class VoteService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private logger = new Logger(VoteService.name);
+
   async voteForImage(imageId: string, userId: string, voteType: VoteType) {
-    console.log('voteForImage', imageId, userId, voteType);
+    const voteStr = voteType ? ` - ${voteType}` : '';
+    this.logger.log(
+      `Voting for image "${imageId}" by user "${userId}${voteStr}"`,
+    );
     const existingVote = await this.prisma.vote.findFirst({
       where: {
         imageId,

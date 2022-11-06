@@ -56,7 +56,7 @@ const loading = ref(false);
 const handleLogin = async () => {
   loading.value = true;
   const loginInfo = await authStore.login(email.value, password.value);
-  console.log(loginInfo.value);
+  console.log('Login info: ', loginInfo.value);
   router.push("/gallery");
   loading.value = false;
 };

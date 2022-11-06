@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 
@@ -15,6 +15,8 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
+
+  private logger = new Logger(AuthService.name);
 
   async validateUser(
     email: string,
@@ -40,6 +42,9 @@ export class AuthService {
 
   async generateJwt(email: string) {
     const user = await this.userService.getUserByEmail(email);
+    this.logger.log(
+      `Generating JWT for user "${user.id}": "${user.email}" - "${user.name}"`,
+    );
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
