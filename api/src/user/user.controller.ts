@@ -8,8 +8,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('me')
-  async getCurrentUser(@JwtObject() logInfo: JwtPayload) {
-    const user = await this.userService.getUserById(logInfo.id);
+  async getCurrentUser(@JwtObject() loginInfo: JwtPayload) {
+    const user = await this.userService.getUserById(loginInfo.id);
     return user;
   }
 

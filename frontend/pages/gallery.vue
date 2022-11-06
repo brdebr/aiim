@@ -4,7 +4,9 @@
       Hi I'm your gallery
     </h1>
     <div>
-      <NuxtLink to="/gallery" @click="refreshFirstPage">Gallery</NuxtLink>
+      <NuxtLink to="/">Home</NuxtLink>
+      -
+      <NuxtLink to="/gallery" @click="pageId=''">Gallery</NuxtLink>
       -
       <NuxtLink to="/votes">Votes</NuxtLink>
     </div>
@@ -17,7 +19,7 @@
         <img
           :data-width="image.width" :data-height="image.height"
           :data-id="image.id"
-          :src="`${apiBaseURL}/api/images/${image.id}`"
+          :src="`${apiBaseURL}/api/images/view/${image.id}`"
           loading="lazy"
           :class="getImageClass(image)"
           :title="image.prompt" :alt="image.prompt"
@@ -33,6 +35,8 @@
 import InfiniteLoading from 'v3-infinite-loading';
 import 'v3-infinite-loading/lib/style.css'
 import { apiBaseURL } from '@/constants';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '~~/store/auth';
 
 export type ImageObject = {
   id: string;
@@ -70,8 +74,11 @@ const router = useRouter();
 const pageId = ref(router.currentRoute.value.query.page as string || '');
 const pageSize = ref(25);
 
+const authStore = useAuthStore();
+const { authHeader } = storeToRefs(authStore);
+
 // Fetching
-const { data: currentImagesFetched, refresh, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
+const { data: currentImagesFetched, refresh: refreshCurrentImages, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
   const query = new URLSearchParams({
     page: pageId.value,
     size: pageId.value ? pageSize.value.toString() : (pageSize.value + 35).toString(),
@@ -82,27 +89,27 @@ const { data: currentImagesFetched, refresh, pending: imagesPending } = await us
   return endpoint;
 }, {
   baseURL: apiBaseURL,
+  headers: authHeader.value,
 });
-const { data: votedImageIds} = await useFetch<string[]>(() => {
-  const query = new URLSearchParams({
-    id: "63668ec2570e312941a44c94",
-  });
-  const endpoint = `/api/vote/voted-image-ids?${query.toString()}`;
+const { data: votedImageIds, refresh: refreshVoted } = await useFetch<string[]>(() => {
+  const endpoint = `/api/vote/voted-image-ids`;
   return endpoint;
 }, {
   baseURL: apiBaseURL,
+  headers: authHeader.value,
 });
 
 const vote = async (image: ImageObjectVoted) => {
   console.log(`Voting for ${image.id}`);
-  await $fetch(`${apiBaseURL}/api/vote`, {
+  await $fetch(`${apiBaseURL}/api/vote/${image.id}`, {
     method: 'POST',
-    body: JSON.stringify({ userId: '63668ec2570e312941a44c94', imageId: image.id }),
+    headers: authHeader.value,
   });
   image.isVoted = true;
+  votedImageIds.value?.push(image.id);
 }
 
-const addIsVoted = (images: ImageObject[]): ImageObjectVoted[] => {
+const addIsVotedProp = (images: ImageObject[]): ImageObjectVoted[] => {
   return images.map(image => {
     return {
       ...image,
@@ -112,16 +119,16 @@ const addIsVoted = (images: ImageObject[]): ImageObjectVoted[] => {
 }
 
 // Infinite loading
-const allImages = ref<ImageObjectVoted[]>(addIsVoted(currentImagesFetched.value || []));
+const allImages = ref<ImageObjectVoted[]>(addIsVotedProp(currentImagesFetched.value || []));
 watch(currentImagesFetched, (newFetchedImages) => {
   if (!newFetchedImages) {
     return
   }
   if (!router.currentRoute.value.query.page) {
-    allImages.value = addIsVoted(newFetchedImages);
+    allImages.value = addIsVotedProp(newFetchedImages);
     return;
   }
-  allImages.value = allImages.value.concat(addIsVoted(newFetchedImages));
+  allImages.value = allImages.value.concat(addIsVotedProp(newFetchedImages));
 });
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
   if (!currentImagesFetched.value) {
@@ -139,8 +146,12 @@ const fetchMoreImages = async ($state: { loaded: () => void; }) => {
 };
 const refreshFirstPage = async () => {
   pageId.value = '';
-  await refresh();
+  await refreshCurrentImages();
 }
+onMounted(() => {
+  refreshFirstPage();
+  refreshVoted();
+});
 
 // Image class
 const getImageClass = (image: ImageObject) => {

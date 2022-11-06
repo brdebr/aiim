@@ -26,7 +26,7 @@ const layoutStore = useLayoutStore();
 const { showingDrawerButton, backgroundCover } = storeToRefs(layoutStore);
 const backgroundStyle = computed(() => {
   if (!backgroundCover.value) return '';
-  const url = `url(${apiBaseURL}/api/images/${backgroundCover.value})`
+  const url = `url(${apiBaseURL}/api/images/view/${backgroundCover.value})`
   return url
 });
 

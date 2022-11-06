@@ -1,7 +1,9 @@
 <template>
-  <div>
+  <div v-if="!imagesPending">
     <h1>Voted - {{ currentImagesFetched?.count }}</h1>
     <div>
+      <NuxtLink to="/">Home</NuxtLink>
+      -
       <NuxtLink to="/gallery">Gallery</NuxtLink>
       -
       <NuxtLink to="/votes">Votes</NuxtLink>
@@ -11,22 +13,20 @@
         v-for="image in allVotedImages" :key="image.id"
         :data-width="image.width" :data-height="image.height"
         :data-id="image.id"
-        :src="`${apiBaseURL}/api/images/${image.id}`"
+        :src="`${apiBaseURL}/api/images/view/${image.id}`"
         loading="lazy"
         :class="getImageClass(image)"
         :title="image.prompt" :alt="image.prompt"
       />
-      <!-- <InfiniteLoading :distance="650" @infinite="fetchMoreImages" /> -->
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
-// @ts-expect-error - The component is not typed
-import InfiniteLoading from "v3-infinite-loading";
-import "v3-infinite-loading/lib/style.css";
 import { apiBaseURL } from "@/constants";
 import { ImageObject } from "@/pages/gallery.vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "~~/store/auth";
 
 type Vote = {
   id: string;
@@ -44,27 +44,18 @@ type ImageObjectsPageResponse = {
 type VoteWithImage = Omit<Vote, "image"> & ImageObject;
 
 // API
-const router = useRouter();
-const pageId = ref((router.currentRoute.value.query.page as string) || "");
-const pageSize = ref(25);
+const authStore = useAuthStore();
+const { authHeader } = storeToRefs(authStore);
 
 // Fetching
 const {
   data: currentImagesFetched,
   refresh,
   pending: imagesPending,
-} = await useFetch<ImageObjectsPageResponse>(
-  () => {
-    const query = new URLSearchParams({
-      id: "63668ec2570e312941a44c94",
-    });
-    const endpoint = `/api/vote/my-votes?${query.toString()}`;
-    console.log(`Fetching voted images -> ${"63668ec2570e312941a44c94"} - ${endpoint}`);
-
-    return endpoint;
-  },
+} = await useFetch<ImageObjectsPageResponse>('/api/vote/my-votes',
   {
     baseURL: apiBaseURL,
+    headers: authHeader.value
   }
 );
 
@@ -76,26 +67,21 @@ const allVotedImages = ref<VoteWithImage[]>(currentImagesFetched.value?.results.
     ...image,
   }
 }) || []);
-// watch(currentImagesFetched, (newFetchedImages) => {
-//   if (!newFetchedImages) {
-//     return
-//   }
-//   allImages.value = allImages.value.concat(newFetchedImages);
-// });
-// const fetchMoreImages = async ($state: { loaded: () => void; }) => {
-//   if (!currentImagesFetched.value) {
-//     return;
-//   }
-//   const lastImage = currentImagesFetched.value[currentImagesFetched.value.length - 1];
-//   pageId.value = lastImage.id;
-//   router.push({
-//     query: {
-//       page: lastImage.id,
-//     },
-//   });
+watch(currentImagesFetched, (newVal) => {
+  if (newVal) {
+    allVotedImages.value = newVal.results.map(el => {
+      const { image, ...rest } = el;
+      return {
+        ...rest,
+        ...image,
+      }
+    })
+  }
+});
 
-//   $state?.loaded();
-// };
+onMounted(() => {
+  refresh();
+});
 
 // Image class
 const getImageClass = (image: ImageObject) => {

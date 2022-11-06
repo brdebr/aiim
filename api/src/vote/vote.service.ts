@@ -7,6 +7,8 @@ export enum VoteType {
   UPVOTE = 'UPVOTE',
   DOWNVOTE = 'DOWNVOTE',
   FAVORITE = 'FAVORITE',
+  TO_MODIFY = 'TO_MODIFY',
+  TO_UPSCALE = 'TO_UPSCALE',
 }
 
 @Injectable()
@@ -14,10 +16,11 @@ export class VoteService {
   constructor(private readonly prisma: PrismaService) {}
 
   async voteForImage(imageId: string, userId: string, voteType: VoteType) {
+    console.log('voteForImage', imageId, userId, voteType);
     const existingVote = await this.prisma.vote.findFirst({
       where: {
-        imageId: imageId,
-        userId: userId,
+        imageId,
+        userId,
       },
     });
 

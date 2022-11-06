@@ -4,27 +4,33 @@
       <div class="text-h6 qq--text-center qq--mb-5">
         Login
       </div>
-      <v-text-field
-        v-model="email"
-        type="text"
-        name="email"
-        label="Email"
-        variant="outlined"
-      />
-      <v-text-field
-        v-model="password"
-        :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="showPassword ? 'text' : 'password'"
-        name="password"
-        label="Password"
-        variant="outlined"
-        hint="At least 8 characters"
-        counter
-        @click:append="showPassword = !showPassword"
-      />
-      <v-btn variant="outlined" block size="large" class="qq--my-3">
-        Login
-      </v-btn>
+      <form @submit.prevent="handleLogin">
+        <v-text-field
+          v-model="email"
+          type="text"
+          class="qq--mb-3"
+          name="email"
+          label="Email"
+          :disabled="loading"
+          variant="outlined"
+        />
+        <v-text-field
+          v-model="password"
+          :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="showPassword ? 'text' : 'password'"
+          class="qq--mb-3"
+          name="password"
+          label="Password"
+          variant="outlined"
+          hint="At least 8 characters"
+          counter
+          :disabled="loading"
+          @click:append-inner="showPassword = !showPassword"
+        />
+        <v-btn type="submit" variant="outlined" block size="large" class="qq--my-3" :loading="loading">
+          Login
+        </v-btn>
+      </form>
     </div>
   </v-theme-provider>
 </template>
@@ -32,16 +38,30 @@
 import { useLayoutStore } from "@/store/layout";
 import { storeToRefs } from "pinia";
 import { apiBaseURL } from "~~/constants";
+import { useAuthStore } from "~~/store/auth";
 import { ImageObject } from "./gallery.vue";
 
-const email = ref("");
-const password = ref("");
-const showPassword = ref(false);
-
-const { data: randomCovers } = useFetch<ImageObject[]>('/api/images/random-cover', { baseURL: apiBaseURL });
+const router = useRouter();
+const authStore = useAuthStore();
 
 const layoutStore = useLayoutStore();
 const { showingDrawerButton, backgroundCover } = storeToRefs(layoutStore);
+
+const email = ref("");
+const password = ref("mypassucu");
+
+const showPassword = ref(false);
+const loading = ref(false);
+
+const handleLogin = async () => {
+  loading.value = true;
+  const loginInfo = await authStore.login(email.value, password.value);
+  console.log(loginInfo.value);
+  router.push("/gallery");
+  loading.value = false;
+};
+
+const { data: randomCovers } = useFetch<ImageObject[]>('/api/images/random-cover', { baseURL: apiBaseURL });
 watch(randomCovers, (newVal) => {
   if (newVal) {
     backgroundCover.value = newVal?.[0].id;

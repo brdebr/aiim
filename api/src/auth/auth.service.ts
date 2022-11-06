@@ -16,7 +16,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<boolean> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<JwtPayload | null> {
     const user = await this.userService.getUserByEmail(email);
 
     const isPasswordCorrect = await this.userService.comparePassword(
@@ -27,7 +30,12 @@ export class AuthService {
     if (!user || !isPasswordCorrect) {
       throw new ForbiddenException('Invalid credentials');
     }
-    return true;
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: 'user',
+    };
   }
 
   async generateJwt(email: string) {

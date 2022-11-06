@@ -1,6 +1,9 @@
 import vuetify from 'vite-plugin-vuetify';
 
 export default defineNuxtConfig({
+  imports: {
+    dirs: ['store']
+  },
   css: ['vuetify/styles'],
   vite: {
     ssr: {
