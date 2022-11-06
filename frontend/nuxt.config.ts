@@ -15,7 +15,8 @@ export default defineNuxtConfig({
         nuxt.hooks.hook('vite:extendConfig', config => config.plugins.push(
             vuetify()
         ))
-    }
+    },
+    'nuxt-windicss',
   ],
   devServer: {
     host: '0.0.0.0'
