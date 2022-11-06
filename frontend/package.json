@@ -14,6 +14,7 @@
     "vuetify": "^3.0.0"
   },
   "dependencies": {
+    "@mdi/font": "^7.0.96",
     "sass": "^1.56.0",
     "sass-loader": "^13.1.0",
     "v3-infinite-loading": "^1.2.1"
