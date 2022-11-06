@@ -22,8 +22,20 @@ export class VoteController {
   }
 
   @Get('my-votes')
-  async myVotes(@Query('id') userId: string, @Query('type') type: VoteType) {
+  async votesByUser(
+    @Query('id') userId: string,
+    @Query('type') type: VoteType,
+  ) {
     const votes = this.voteService.getVotesByUserId(userId, type);
     return votes;
+  }
+
+  @Get('voted-image-ids')
+  async voteImageIds(
+    @Query('id') userId: string,
+    @Query('type') type: VoteType,
+  ) {
+    const voteImageIds = this.voteService.getVotedImageIdsByUser(userId, type);
+    return voteImageIds;
   }
 }

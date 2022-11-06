@@ -68,4 +68,17 @@ export class VoteService {
       count: length,
     };
   }
+
+  async getVotedImageIdsByUser(userId: string, voteType?: VoteType) {
+    const votes = await this.prisma.vote.findMany({
+      where: {
+        userId: userId || '',
+        vote: voteType || VoteType.UPVOTE,
+      },
+      select: {
+        imageId: true,
+      },
+    });
+    return votes.map((vote) => vote.imageId);
+  }
 }
