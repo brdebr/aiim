@@ -16,5 +16,8 @@ export default defineNuxtConfig({
             vuetify()
         ))
     }
-  ]
+  ],
+  devServer: {
+    host: '0.0.0.0'
+  }
 })
