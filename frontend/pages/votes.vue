@@ -1,6 +1,11 @@
 <template>
   <div>
     <h1>Voted - {{ currentImagesFetched?.count }}</h1>
+    <div>
+      <NuxtLink to="/gallery">Gallery</NuxtLink>
+      -
+      <NuxtLink to="/votes">Votes</NuxtLink>
+    </div>
     <div class="gallery-grid" v-if="allVotedImages.length">
       <img
         v-for="image in allVotedImages" :key="image.id"

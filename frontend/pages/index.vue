@@ -3,6 +3,8 @@
     Hi world 🌍
     <div>
       <NuxtLink to="/gallery">Gallery</NuxtLink>
+      -
+      <NuxtLink to="/votes">Votes</NuxtLink>
     </div>
   </div>
 </template>

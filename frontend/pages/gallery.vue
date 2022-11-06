@@ -3,6 +3,11 @@
     <h1>
       Hi I'm your gallery
     </h1>
+    <div>
+      <NuxtLink to="/gallery">Gallery</NuxtLink>
+      -
+      <NuxtLink to="/votes">Votes</NuxtLink>
+    </div>
     <div class="gallery-grid">
       <img
         v-for="image in allImages" :key="image.id"
