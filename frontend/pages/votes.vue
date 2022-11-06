@@ -59,8 +59,7 @@ const {
       id: "63668ec2570e312941a44c94",
     });
     const endpoint = `/api/vote/my-votes?${query.toString()}`;
-    console.log(`Fetching voted images -> ${"63668ec2570e312941a44c94"}`);
-    console.log(endpoint);
+    console.log(`Fetching voted images -> ${"63668ec2570e312941a44c94"} - ${endpoint}`);
 
     return endpoint;
   },
@@ -68,14 +67,6 @@ const {
     baseURL: apiBaseURL,
   }
 );
-
-// const vote = async (imageId: string) => {
-//   console.log(`Voting for ${imageId}`);
-//   await $fetch(`${apiBaseURL}/api/vote`, {
-//     method: 'POST',
-//     body: JSON.stringify({ userId: '63668ec2570e312941a44c94', imageId }),
-//   });
-// }
 
 // Infinite loading
 const allVotedImages = ref<VoteWithImage[]>(currentImagesFetched.value?.results.map(el => {

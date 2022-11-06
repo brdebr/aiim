@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ImageObject } from '@prisma/client';
+import { ImageObject, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { bytesToHuman } from 'src/utils';
 
@@ -32,6 +32,12 @@ export const defaultImageFieldsSelect = {
 export const defaultsWithFile = {
   ...defaultImageFieldsSelect,
   imageFile: true,
+};
+
+type ImageObjectFilter = {
+  [key in keyof ImageObject]?: ImageObject[key] extends string
+    ? Prisma.StringFilter
+    : ImageObject[key];
 };
 
 @Injectable()
@@ -83,31 +89,57 @@ export class ImageObjectService {
     return queryResponse;
   }
 
-  async pageRandoms(size = 20) {
-    const allIds = (
-      await this.prisma.imageObject.findMany({
-        select: {
-          id: true,
-        },
-      })
-    ).map((img) => img.id);
+  async pageRandomImages(size = 20) {
+    const allIds = await this.getAllIds();
+    const randomIdsArray = await this.getAmountOfRandomItems(allIds, size);
+    return this.getImagesByIds(randomIdsArray);
+  }
 
-    const randomIds = new Set();
-    while (randomIds.size < size) {
-      randomIds.add(allIds[Math.floor(Math.random() * allIds.length)]);
-    }
-    const randomIdsArray = Array.from(randomIds) as string[];
+  async randomImagesFiltered(size = 20, filters: ImageObjectFilter) {
+    const allIds = await this.getAllIdsFiltered(filters);
+    const randomIdsArray = await this.getAmountOfRandomItems(allIds, size);
+    return this.getImagesByIds(randomIdsArray);
+  }
 
+  async getAllIdsFiltered(filters: ImageObjectFilter) {
+    const queryResponse = await this.prisma.imageObject.findMany({
+      where: filters,
+      select: {
+        id: true,
+      },
+    });
+    return queryResponse.map((image) => image.id);
+  }
+
+  async getAllIds() {
+    const queryResponse = await this.prisma.imageObject.findMany({
+      select: {
+        id: true,
+      },
+    });
+    return queryResponse.map((img) => img.id);
+  }
+
+  async getImagesByIds(ids: string[], size = 20) {
     const queryResponse = await this.prisma.imageObject.findMany({
       take: size,
       where: {
         id: {
-          in: randomIdsArray,
+          in: ids,
         },
       },
       select: defaultImageFieldsSelect,
     });
     return this.addHumanFileSize(queryResponse);
+  }
+
+  async getAmountOfRandomItems(array: Array<unknown>, size = 20) {
+    const randomSet = new Set();
+    while (randomSet.size < size) {
+      randomSet.add(array[Math.floor(Math.random() * array.length)]);
+    }
+    const randomIdsArray = Array.from(randomSet) as string[];
+    return randomIdsArray;
   }
 
   async page(size = 20, cursorId?: string) {

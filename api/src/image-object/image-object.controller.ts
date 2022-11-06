@@ -16,7 +16,23 @@ export class ImageObjectController {
   async random(@Query('size') size = '10') {
     const sizeInt = parseInt(size);
 
-    const results = await this.imageService.pageRandoms(sizeInt);
+    const results = await this.imageService.pageRandomImages(sizeInt);
+    return results;
+  }
+
+  @Get('random-cover')
+  async randomCover(@Query('size') size = '5') {
+    const sizeInt = parseInt(size);
+    const width = 384;
+    const height = 704;
+
+    const results = await this.imageService.randomImagesFiltered(sizeInt, {
+      width,
+      height,
+      prompt: {
+        contains: 'cyberpunk',
+      },
+    });
     return results;
   }
 

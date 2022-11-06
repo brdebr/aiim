@@ -77,9 +77,8 @@ const { data: currentImagesFetched, refresh, pending: imagesPending } = await us
     size: pageId.value ? pageSize.value.toString() : (pageSize.value + 35).toString(),
   });
   const endpoint = `/api/images?${query.toString()}`;
-  console.log(`Fetching images -> ${pageId.value}`);
-  console.log(endpoint);
-  
+  console.log(`Fetching images -> ${endpoint}`);
+
   return endpoint;
 }, {
   baseURL: apiBaseURL,
@@ -93,7 +92,6 @@ const { data: votedImageIds} = await useFetch<string[]>(() => {
 }, {
   baseURL: apiBaseURL,
 });
-// console.log(votedImageIds.value);
 
 const vote = async (image: ImageObjectVoted) => {
   console.log(`Voting for ${image.id}`);

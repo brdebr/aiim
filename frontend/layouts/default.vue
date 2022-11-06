@@ -4,7 +4,7 @@
       <template v-if="showingDrawerButton" v-slot:prepend>
           <v-app-bar-nav-icon/>
       </template>
-      <v-app-bar-title class="qq--mx-4 qq--text-center">
+      <v-app-bar-title class="qq--mx-4 qq--text-center qq--select-none">
         AI-Image Manager
       </v-app-bar-title>
       <div v-show="showSpacer" class="app-bar-spacer">
@@ -20,9 +20,15 @@
 <script setup lang="ts">
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia';
+import { apiBaseURL } from '~~/constants';
 
 const layoutStore = useLayoutStore();
-const { showingDrawerButton } = storeToRefs(layoutStore);
+const { showingDrawerButton, backgroundCover } = storeToRefs(layoutStore);
+const backgroundStyle = computed(() => {
+  if (!backgroundCover.value) return '';
+  const url = `url(${apiBaseURL}/api/images/${backgroundCover.value})`
+  return url
+});
 
 const showSpacer = computed(() => {
   return showingDrawerButton.value;
@@ -33,7 +39,7 @@ onMounted(() => {
   doc.value = document.documentElement;
 });
 useResizeObserver(doc, useThrottleFn(
-  (entries) => {
+  () => {
     doc.value?.style.setProperty('--doc-height', `${window.innerHeight}px`)
   }, 100)
 );
@@ -56,8 +62,16 @@ html, body, .__nuxt, .v-application {
   width: 100%;
 }
 
+.v-toolbar {
+  width: 100%;
+}
+
 .v-main {
   background-color: rgb(243, 243, 230);
+
+  background-image: v-bind(backgroundStyle);
+  background-size: cover;
+  background-position: center;
 }
 
 .v-app-bar {
