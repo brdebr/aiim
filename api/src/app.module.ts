@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ImageObjectModule } from './image-object/image-object.module';
 import { VoteModule } from './vote/vote.module';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     ImageObjectModule,
     VoteModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
