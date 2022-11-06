@@ -1,4 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { JwtObject } from 'src/auth/auth.decorator';
+import { JwtPayload } from 'src/auth/auth.service';
 import { VoteService, VoteType } from './vote.service';
 
 type VoteDao = {
@@ -23,19 +25,22 @@ export class VoteController {
 
   @Get('my-votes')
   async votesByUser(
-    @Query('id') userId: string,
+    @JwtObject() logInfo: JwtPayload,
     @Query('type') type: VoteType,
   ) {
-    const votes = this.voteService.getVotesByUserId(userId, type);
+    const votes = this.voteService.getVotesByUserId(logInfo.id, type);
     return votes;
   }
 
   @Get('voted-image-ids')
   async voteImageIds(
-    @Query('id') userId: string,
+    @JwtObject() logInfo: JwtPayload,
     @Query('type') type: VoteType,
   ) {
-    const voteImageIds = this.voteService.getVotedImageIdsByUser(userId, type);
+    const voteImageIds = this.voteService.getVotedImageIdsByUser(
+      logInfo.id,
+      type,
+    );
     return voteImageIds;
   }
 }

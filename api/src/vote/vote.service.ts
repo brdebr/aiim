@@ -23,7 +23,7 @@ export class VoteService {
 
     if (existingVote) {
       throw new Error(
-        `You have already voted for this image dummy! 😥 - ${userId} - ${imageId}`,
+        `You've already voted for this image dummy! 😥 - ${userId} - ${imageId}`,
       );
     }
 
@@ -46,7 +46,7 @@ export class VoteService {
     return vote;
   }
 
-  async getVotesByUserId(userId: string, voteType?: VoteType) {
+  async getVotesByUserId(userId: string, voteType?: VoteType, size = 150) {
     const votes = await this.prisma.vote.findMany({
       where: {
         userId: userId,
@@ -59,7 +59,7 @@ export class VoteService {
           },
         },
       },
-      take: 150,
+      take: size,
     });
     const length = votes.length;
 

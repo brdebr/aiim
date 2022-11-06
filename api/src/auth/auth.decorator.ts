@@ -3,6 +3,7 @@ import {
   createParamDecorator,
   ExecutionContext,
   ForbiddenException,
+  SetMetadata,
 } from '@nestjs/common';
 
 export const JwtObject = createParamDecorator(
@@ -15,3 +16,5 @@ export const JwtObject = createParamDecorator(
     }
   },
 );
+
+export const Public = () => SetMetadata('isPublic', true);

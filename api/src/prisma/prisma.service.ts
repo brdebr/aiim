@@ -29,7 +29,7 @@ export class PrismaService
 
   async onModuleInit() {
     await this.$connect();
-    this.logger.log(`Connected to MongoDB database 🚀`);
+    this.logger.log(`Connected to MongoDB database 🍃`);
   }
 
   async onModuleDestroy() {

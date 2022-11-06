@@ -37,6 +37,8 @@ export const defaultsWithFile = {
 type ImageObjectFilter = {
   [key in keyof ImageObject]?: ImageObject[key] extends string
     ? Prisma.StringFilter
+    : ImageObject[key] extends number
+    ? Prisma.IntFilter | number
     : ImageObject[key];
 };
 
@@ -157,7 +159,7 @@ export class ImageObjectService {
     return this.addHumanFileSize(queryResponse);
   }
 
-  async galleryPage(size = 20, cursorId?: string) {
+  async pageIncludingFile(size = 20, cursorId?: string) {
     const cursor = cursorId ? { id: cursorId } : undefined;
     const skip = cursorId ? 1 : 0;
     const queryResponse = await this.prisma.imageObject.findMany({

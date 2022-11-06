@@ -1,25 +1,36 @@
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Public } from 'src/auth/auth.decorator';
 import { ImageObjectService } from './image-object.service';
 
 @Controller('images')
 export class ImageObjectController {
   constructor(private readonly imageService: ImageObjectService) {}
 
-  @Get()
-  page(@Query('size') size = '10', @Query('page') page?: string) {
-    const sizeInt = parseInt(size);
+  @Public()
+  @Get('view/:id')
+  async getImage(@Param('id') id: string, @Res() response) {
+    const image = await this.imageService.getImage(id);
+    response.set('Content-Type', 'image/png');
+    response.set('Content-Disposition', `attachment; filename=${image.id}.png`);
+    response.send(image.imageFile);
+  }
 
+  paseSize = '10';
+
+  @Get()
+  page(@Query('size') size = this.paseSize, @Query('page') page?: string) {
+    const sizeInt = parseInt(size);
     return this.imageService.page(sizeInt, page);
   }
 
   @Get('random')
-  async random(@Query('size') size = '10') {
+  async random(@Query('size') size = this.paseSize) {
     const sizeInt = parseInt(size);
-
     const results = await this.imageService.pageRandomImages(sizeInt);
     return results;
   }
 
+  @Public()
   @Get('random-cover')
   async randomCover(@Query('size') size = '5') {
     const sizeInt = parseInt(size);
@@ -45,16 +56,6 @@ export class ImageObjectController {
     };
   }
 
-  @Get('search-prompts')
-  async searchPropmts(@Query('q') q) {
-    const results = await this.imageService.searchGroupedByPrompts(q);
-    return {
-      resultsCount: results.length,
-      total: results.reduce((acc, cur) => acc + cur._count, 0),
-      results,
-    };
-  }
-
   @Get('total')
   count() {
     return this.imageService.count();
@@ -65,11 +66,13 @@ export class ImageObjectController {
     return this.imageService.allPrompts();
   }
 
-  @Get(':id')
-  async getImage(@Param('id') id: string, @Res() response) {
-    const image = await this.imageService.getImage(id);
-    response.set('Content-Type', 'image/png');
-    response.set('Content-Disposition', `attachment; filename=${image.id}.png`);
-    response.send(image.imageFile);
+  @Get('search-prompts')
+  async searchPrompts(@Query('q') q) {
+    const results = await this.imageService.searchGroupedByPrompts(q);
+    return {
+      resultsCount: results.length,
+      total: results.reduce((acc, cur) => acc + cur._count, 0),
+      results,
+    };
   }
 }
