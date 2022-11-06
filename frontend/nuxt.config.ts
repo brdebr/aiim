@@ -26,6 +26,7 @@ export default defineNuxtConfig({
         ],
       }
     ],
+    '@vueuse/nuxt',
   ],
   devServer: {
     host: '0.0.0.0'
