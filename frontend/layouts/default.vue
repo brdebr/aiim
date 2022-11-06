@@ -4,14 +4,14 @@
       <template v-if="showingDrawerButton" v-slot:prepend>
           <v-app-bar-nav-icon/>
       </template>
-      <v-app-bar-title class="w--mx-4 w--text-center">
+      <v-app-bar-title class="qq--mx-4 qq--text-center">
         AI-Image Manager
       </v-app-bar-title>
       <div v-show="showSpacer" class="app-bar-spacer">
       </div>
     </v-app-bar>
     <v-main>
-      <div class="w--px-3">
+      <div class="qq--px-3">
         <slot/>
       </div>
     </v-main>
