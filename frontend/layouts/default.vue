@@ -28,11 +28,28 @@ const showSpacer = computed(() => {
   return showingDrawerButton.value;
 });
 
+const doc = ref();
+onMounted(() => {
+  doc.value = document.documentElement;
+});
+useResizeObserver(doc, useThrottleFn(
+  (entries) => {
+    doc.value?.style.setProperty('--doc-height', `${window.innerHeight}px`)
+  }, 100)
+);
+
 </script>
 <style lang="scss">
+:root {
+ --doc-height: 100vh;
+}
 html, body, .__nuxt, .v-application {
   height: 100vh;
+  height: var(--doc-height);
   width: 100vw;
+}
+.v-application__wrap {
+  min-height: unset !important;
 }
 .mobile-layout, .v-main, .v-main > div {
   height: 100%;
