@@ -1,7 +1,7 @@
 <template>
   <div class="mobile-layout">
     <v-app-bar :elevation="0" :color="'indigo-lighten-1'" border="b-md">
-      <template v-slot:prepend>
+      <template v-if="showingDrawerButton" v-slot:prepend>
           <v-app-bar-nav-icon/>
       </template>
       <v-app-bar-title>
@@ -15,6 +15,14 @@
     </v-main>
   </div>
 </template>
+<script setup lang="ts">
+import { useLayoutStore } from '@/store/layout'
+import { storeToRefs } from 'pinia';
+
+const layoutStore = useLayoutStore();
+const { showingDrawerButton } = storeToRefs(layoutStore);
+
+</script>
 <style lang="scss">
 html, body, .__nuxt, .v-application {
   height: 100vh;

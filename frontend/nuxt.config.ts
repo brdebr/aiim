@@ -17,7 +17,15 @@ export default defineNuxtConfig({
         ))
     },
     'nuxt-windicss',
-    '@pinia/nuxt',
+    ['@pinia/nuxt', {
+        autoImports: [
+          // automatically imports `defineStore`
+          'defineStore', // import { defineStore } from 'pinia'
+          // automatically imports `defineStore` as `definePiniaStore`
+          ['defineStore', 'definePiniaStore'], // import { defineStore as definePiniaStore } from 'pinia'
+        ],
+      }
+    ],
   ],
   devServer: {
     host: '0.0.0.0'
