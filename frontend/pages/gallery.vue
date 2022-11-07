@@ -1,27 +1,20 @@
 <template>
   <div>
     <h1>
-      Hi I'm your gallery
+      Hi I'm your gallery - {{ totalImages }} images
     </h1>
-    <div>
-      <NuxtLink to="/">Home</NuxtLink>
-      -
-      <NuxtLink to="/gallery" @click="pageId=''">Gallery</NuxtLink>
-      -
-      <NuxtLink to="/votes">Votes</NuxtLink>
-    </div>
     <div class="gallery-grid">
       <div
         v-for="image in allImages" :key="image.id"
         class="gallery-image-item"
-        :class="{ 'gallery-image-item--voted': image.isVoted }"
+        :class="getImageClass(image)"
        >
+        <v-icon v-if="isVoted(image.id)" icon="mdi-cards-diamond" color="#25ff11" />
         <img
           :data-width="image.width" :data-height="image.height"
           :data-id="image.id"
           :src="`${apiBaseURL}/api/images/view/${image.id}`"
           loading="lazy"
-          :class="getImageClass(image)"
           :title="image.prompt" :alt="image.prompt"
           @click="vote(image)"
         />
@@ -63,10 +56,6 @@ export type ImageObject = {
 }
 type ImageObjectsPageResponse = ImageObject[]
 
-type ImageObjectVoted = ImageObject & {
-  isVoted: boolean;
-}
-
 // API
 const router = useRouter();
 const pageId = ref(router.currentRoute.value.query.page as string || '');
@@ -91,42 +80,45 @@ const { data: currentImagesFetched, refresh: refreshCurrentImages, pending: imag
 });
 const { data: votedImageIds, refresh: refreshVoted } = await useFetch<string[]>(() => {
   const endpoint = `/api/vote/voted-image-ids`;
+  console.log(`Fetching voted image ids -> ${endpoint}`);
   return endpoint;
 }, {
   baseURL: apiBaseURL,
   headers: authHeader.value,
 });
 
-const vote = async (image: ImageObjectVoted) => {
+const totalImages = ref('');
+
+onMounted(async () => {
+  totalImages.value = await $fetch('/api/images/total',{
+    baseURL: apiBaseURL,
+    headers: authHeader.value,
+  });
+});
+
+const vote = async (image: ImageObject) => {
   console.log(`Voting for ${image.id}`);
   await $fetch(`${apiBaseURL}/api/vote/${image.id}`, {
     method: 'POST',
     headers: authHeader.value,
   });
-  image.isVoted = true;
   votedImageIds.value?.push(image.id);
 }
-
-const addIsVotedProp = (images: ImageObject[]): ImageObjectVoted[] => {
-  return images.map(image => {
-    return {
-      ...image,
-      isVoted: votedImageIds.value?.includes(image.id) || false,
-    }
-  })
+const isVoted = (id: string) => {
+  return votedImageIds.value?.includes(id);
 }
 
 // Infinite loading
-const allImages = ref<ImageObjectVoted[]>(addIsVotedProp(currentImagesFetched.value || []));
+const allImages = ref<ImageObject[]>(currentImagesFetched.value || []);
 watch(currentImagesFetched, (newFetchedImages) => {
   if (!newFetchedImages) {
     return
   }
   if (!router.currentRoute.value.query.page) {
-    allImages.value = addIsVotedProp(newFetchedImages);
+    allImages.value = newFetchedImages;
     return;
   }
-  allImages.value = allImages.value.concat(addIsVotedProp(newFetchedImages));
+  allImages.value = allImages.value.concat(newFetchedImages);
 });
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
   if (!currentImagesFetched.value) {
@@ -144,7 +136,6 @@ const fetchMoreImages = async ($state: { loaded: () => void; }) => {
 };
 const refreshFirstPage = async () => {
   pageId.value = '';
-  await refreshCurrentImages();
 }
 onMounted(() => {
   refreshFirstPage();
@@ -167,60 +158,36 @@ const getImageClass = (image: ImageObject) => {
   display: grid;
   grid-gap: 3px;
   grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
-  .gallery-image-item--voted {
-    display: flex;
-    position: relative;
-    background-color: rgb(122, 122, 122);
-    &::after {
-      transition: all 0.2s;
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-    }
-    &:not(:hover)::after {
-      content: '✅';
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-    img {
-      margin: auto;
-      width: calc(100% - 20px);
-      height: calc(100% - 20px);
-    }
-  }
-
-  img, .gallery-image-item {
+  
+  .gallery-image-item {
     width: 100%;
     height: 100%;
-    transition: all 0.2s;
-    object-fit: contain;
-  }
-  @media screen and (min-width: 600px) {
-    img.tall {
-      grid-row-end: span 2;
+    position: relative;
+
+    .v-icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 3;
     }
-    img.wide {
-      grid-column-end: span 2 / auto;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 1;
+    }
+  }
+  
+  @media screen and (min-width: 600px) {
+    .gallery-image-item {
+      &.tall {
+        grid-row-end: span 2;
+      }
+      &.wide {
+        grid-column-end: span 2 / auto;
+      }
     }
   }
  }
-.pagination {
-  background-color: aquamarine;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  z-index: 1;
-}
 </style>

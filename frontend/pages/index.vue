@@ -42,7 +42,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const layoutStore = useLayoutStore();
-const { showingDrawerButton, backgroundCover } = storeToRefs(layoutStore);
+const { backgroundCover } = storeToRefs(layoutStore);
 
 const email = ref("");
 const password = ref("mypassucu");
@@ -65,9 +65,9 @@ watch(randomCovers, (newVal) => {
   }
 }, { immediate: true });
 
-const toggleDrawer = () => {
-  showingDrawerButton.value = !showingDrawerButton.value;
-};
+onUnmounted(() => {
+  backgroundCover.value = '';
+});
 </script>
 <style lang="scss">
 .login-page {

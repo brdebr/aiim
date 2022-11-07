@@ -1,6 +1,7 @@
 import { storeToRefs } from "pinia";
 import { apiBaseURL } from "~~/constants";
 import { useLayoutStore } from "./layout";
+import { useStorage } from '@vueuse/core'
 
 export type loginResponse = {
   token: string;
@@ -15,15 +16,35 @@ export type LoginInfo = {
 }
 
 export const useAuthStore = definePiniaStore('auth', () => {
+  const storedUserId = useStorage('aiim-user-id', '');
+  const storedLoginInfo = useStorage<string>('aiim-login-info', '');
+  const storedToken = useStorage('aiim-api-token', '');
+
   const userId = ref('');
   const loginInfo = ref<LoginInfo | null>(null);
-  const layoutStore = useLayoutStore();
-  const { backgroundCover } = storeToRefs(layoutStore);
-
   const token = ref('');
+
+  const loadStoredIntoState = () => {
+    if (storedUserId.value) {
+      userId.value = storedUserId.value;
+    }
+    if (storedLoginInfo.value) {
+      loginInfo.value = JSON.parse(storedLoginInfo.value || '{}') as LoginInfo;
+    }
+    if (storedToken.value) {
+      token.value = storedToken.value;
+    }
+  }
+
   const authHeader = computed(() => ({
-    'Authorization': `Bearer ${token.value}`
+    'Authorization': `Bearer ${token.value || storedToken.value}`
   }));
+
+  const fetchUser = async () => {
+    const user = await $fetch<LoginInfo>('/api/users/me', { baseURL: apiBaseURL, headers: authHeader.value });
+    console.log('Fetched current user:',user);
+    return {...user, role: 'user'};
+  }
 
   const login = async (email: string, password: string) => {
     const loginResponse = await $fetch<loginResponse>('/api/auth/login', {
@@ -31,9 +52,11 @@ export const useAuthStore = definePiniaStore('auth', () => {
       body: JSON.stringify({ email, password }),
       baseURL: apiBaseURL,
     });
-    token.value = loginResponse.token;
-    loginInfo.value = loginResponse.payload;
-    backgroundCover.value = '';
+    storedToken.value = loginResponse.token;
+    storedLoginInfo.value = JSON.stringify(loginResponse.payload);
+    storedUserId.value = loginResponse.payload.id;
+
+    loadStoredIntoState();
     return loginInfo;
   };
 
@@ -43,5 +66,7 @@ export const useAuthStore = definePiniaStore('auth', () => {
     token,
     authHeader,
     login,
+    loadStoredIntoState,
+    fetchUser,
   }
 })

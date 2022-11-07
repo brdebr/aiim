@@ -1,15 +1,29 @@
 <template>
   <div class="mobile-layout">
     <v-app-bar :elevation="0" :color="'indigo-lighten-1'" border="b-md">
-      <template v-if="showingDrawerButton" v-slot:prepend>
-          <v-app-bar-nav-icon/>
+      <template v-if="showDrawerIcon" v-slot:prepend>
+          <v-app-bar-nav-icon @click="toggleDrawer"/>
       </template>
       <v-app-bar-title class="qq--mx-4 qq--text-center qq--select-none">
         AI-Image Manager
       </v-app-bar-title>
-      <div v-show="showSpacer" class="app-bar-spacer">
+      <div v-show="showDrawerIcon" class="app-bar-spacer">
       </div>
     </v-app-bar>
+    <v-navigation-drawer
+      v-model="drawerActive"
+    >
+      <v-list>
+        <v-list-item
+          v-for="item in drawerItems"
+          :key="item.label"
+          :title="item.label"
+          :to="item.route"
+          nav
+        >
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
     <v-main>
       <div class="qq--px-3">
         <slot/>
@@ -22,16 +36,25 @@ import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia';
 import { apiBaseURL } from '~~/constants';
 
+const route = useRoute();
+
 const layoutStore = useLayoutStore();
-const { showingDrawerButton, backgroundCover } = storeToRefs(layoutStore);
+const { drawerActive, backgroundCover, drawerItems } = storeToRefs(layoutStore);
 const backgroundStyle = computed(() => {
   if (!backgroundCover.value) return '';
   const url = `url(${apiBaseURL}/api/images/view/${backgroundCover.value})`
   return url
 });
 
-const showSpacer = computed(() => {
-  return showingDrawerButton.value;
+const authStore = useAuthStore();
+const { userId } = storeToRefs(authStore);
+
+const toggleDrawer = () => {
+  drawerActive.value = !drawerActive.value;
+}
+
+const showDrawerIcon = computed(() => {
+  return !!userId.value;
 });
 
 const doc = ref();

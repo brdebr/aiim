@@ -16,18 +16,10 @@
       <strong>Role:</strong> {{ loginInfo.role }}
     </p>
   </div>
-  <div>
-      <NuxtLink to="/">Home</NuxtLink>
-      -
-      <NuxtLink to="/gallery">Gallery</NuxtLink>
-      -
-      <NuxtLink to="/votes">Votes</NuxtLink>
-    </div>
 </template>
 <script lang="ts" setup>
 
 const authStore = useAuthStore();
 const { loginInfo, token } = storeToRefs(authStore);
-console.log(`Token for profile: ${loginInfo.value?.id}`);
-console.log(token.value);
+console.log(`Token for profile: ${loginInfo.value?.id}`, token.value);
 </script>
