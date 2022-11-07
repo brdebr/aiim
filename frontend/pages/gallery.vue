@@ -34,9 +34,7 @@
 // @ts-expect-error - The component is not typed
 import InfiniteLoading from 'v3-infinite-loading';
 import 'v3-infinite-loading/lib/style.css'
-import { apiBaseURL } from '@/constants';
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '~~/store/auth';
+import { apiBaseURL } from '~~/constants';
 
 export type ImageObject = {
   id: string;

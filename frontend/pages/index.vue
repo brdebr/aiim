@@ -35,10 +35,7 @@
   </v-theme-provider>
 </template>
 <script lang="ts" setup>
-import { useLayoutStore } from "@/store/layout";
-import { storeToRefs } from "pinia";
 import { apiBaseURL } from "~~/constants";
-import { useAuthStore } from "~~/store/auth";
 import { ImageObject } from "./gallery.vue";
 
 const router = useRouter();

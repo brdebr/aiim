@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "rm -rf .nuxt .output && nuxt dev",
     "generate": "nuxt generate",
     "preview": "node .output/server/index.mjs",
     "prod": "npm run generate && npm run build && npm run preview",

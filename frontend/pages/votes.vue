@@ -22,11 +22,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
-import { apiBaseURL } from "@/constants";
 import { ImageObject } from "@/pages/gallery.vue";
-import { storeToRefs } from "pinia";
-import { useAuthStore } from "~~/store/auth";
+import { apiBaseURL } from "~~/constants";
 
 type Vote = {
   id: string;

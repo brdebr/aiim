@@ -43,7 +43,7 @@ export class AuthService {
   async generateJwt(email: string) {
     const user = await this.userService.getUserByEmail(email);
     this.logger.log(
-      `Generating JWT for user "${user.id}": "${user.email}" - "${user.name}"`,
+      `Generating JWT for user "${user.email}": "${user.name}" - "${user.id}"`,
     );
     const payload: JwtPayload = {
       id: user.id,

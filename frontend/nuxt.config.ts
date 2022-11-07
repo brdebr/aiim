@@ -2,7 +2,7 @@ import vuetify from 'vite-plugin-vuetify';
 
 export default defineNuxtConfig({
   imports: {
-    dirs: ['store']
+    dirs: ['store'],
   },
   css: ['vuetify/styles'],
   vite: {
@@ -24,6 +24,7 @@ export default defineNuxtConfig({
         autoImports: [
           // automatically imports `defineStore`
           'defineStore', // import { defineStore } from 'pinia'
+          'storeToRefs', // import { storeToRefs } from 'pinia'
           // automatically imports `defineStore` as `definePiniaStore`
           ['defineStore', 'definePiniaStore'], // import { defineStore as definePiniaStore } from 'pinia'
         ],

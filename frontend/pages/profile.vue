@@ -25,8 +25,6 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { useAuthStore } from "@/store/auth";
-import { storeToRefs } from 'pinia';
 
 const authStore = useAuthStore();
 const { loginInfo, token } = storeToRefs(authStore);
