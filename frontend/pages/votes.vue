@@ -15,8 +15,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ImageObject } from "@/pages/gallery.vue";
 import { apiBaseURL } from "~~/constants";
+import { ImageObject } from "~~/types";
 
 type Vote = {
   id: string;

@@ -36,7 +36,7 @@
 </template>
 <script lang="ts" setup>
 import { apiBaseURL } from "~~/constants";
-import { ImageObject } from "./gallery.vue";
+import { ImageObject } from "~~/types";
 
 const router = useRouter();
 const authStore = useAuthStore();
