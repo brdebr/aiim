@@ -1,9 +1,9 @@
 <template>
   <div>
     <h1>
-      Hi I'm your gallery - {{ totalImages }} images
+      Hi I'm your gallery - {{ imagesCount }} images
     </h1>
-    <div class="gallery-grid">
+    <div class="gallery-grid" v-if="allImages.length">
       <div
         v-for="image in allImages" :key="image.id"
         class="gallery-image-item"
@@ -16,10 +16,10 @@
           :src="`${apiBaseURL}/api/images/view/${image.id}`"
           loading="lazy"
           :title="image.prompt" :alt="image.prompt"
-          @click="vote(image)"
+          @click="voteImage(image)"
         />
       </div>
-      <InfiniteLoading :distance="650" @infinite="fetchMoreImages" />
+      <InfiniteLoading :distance="650" :firstload="false" @infinite="fetchMoreImages" />
     </div>
   </div>
 </template>
@@ -30,93 +30,24 @@ import 'v3-infinite-loading/lib/style.css'
 import { apiBaseURL } from '~~/constants';
 import { ImageObject } from '~~/types';
 
-type ImageObjectsPageResponse = ImageObject[]
-
-// API
 const router = useRouter();
-const pageId = ref(router.currentRoute.value.query.page as string || '');
-const pageSize = ref(25);
 
-const authStore = useAuthStore();
-const { authHeader } = storeToRefs(authStore);
+const gallery = useGallery();
+const { allImages, imagesCount } = gallery;
 
-// Fetching
-const { data: currentImagesFetched, refresh: refreshCurrentImages, pending: imagesPending } = await useFetch<ImageObjectsPageResponse>(() => {
-  const query = new URLSearchParams({
-    page: pageId.value,
-    size: pageId.value ? pageSize.value.toString() : (pageSize.value + 35).toString(),
-  });
-  const endpoint = `/api/images?${query.toString()}`;
-  console.log(`Fetching images -> ${endpoint}`);
+const votes = useVotes();
+const { isVoted, voteImage } = votes;
 
-  return endpoint;
-}, {
-  baseURL: apiBaseURL,
-  headers: authHeader.value,
-});
-const { data: votedImageIds, refresh: refreshVoted } = await useFetch<string[]>(() => {
-  const endpoint = `/api/vote/voted-image-ids`;
-  console.log(`Fetching voted image ids -> ${endpoint}`);
-  return endpoint;
-}, {
-  baseURL: apiBaseURL,
-  headers: authHeader.value,
-});
-
-const totalImages = ref('');
-
-onMounted(async () => {
-  totalImages.value = await $fetch('/api/images/total',{
-    baseURL: apiBaseURL,
-    headers: authHeader.value,
-  });
-});
-
-const vote = async (image: ImageObject) => {
-  console.log(`Voting for ${image.id}`);
-  await $fetch(`${apiBaseURL}/api/vote/${image.id}`, {
-    method: 'POST',
-    headers: authHeader.value,
-  });
-  votedImageIds.value?.push(image.id);
-}
-const isVoted = (id: string) => {
-  return votedImageIds.value?.includes(id);
-}
-
-// Infinite loading
-const allImages = ref<ImageObject[]>(currentImagesFetched.value || []);
-watch(currentImagesFetched, (newFetchedImages) => {
-  if (!newFetchedImages) {
-    return
-  }
-  if (!router.currentRoute.value.query.page) {
-    allImages.value = newFetchedImages;
-    return;
-  }
-  allImages.value = allImages.value.concat(newFetchedImages);
-});
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
-  if (!currentImagesFetched.value) {
-    return;
-  }
-  const lastImage = currentImagesFetched.value[currentImagesFetched.value.length - 1];
-  pageId.value = lastImage.id;
+  const lastImageId = await gallery.fetchNextImages();
   router.push({
     query: {
-      page: lastImage.id,
+      page: lastImageId
     },
   });
-
   $state?.loaded();
 };
-const refreshFirstPage = async () => {
-  pageId.value = '';
-}
-onMounted(() => {
-  refreshFirstPage();
-  refreshVoted();
-});
+
 
 // Image class
 const getImageClass = (image: ImageObject) => {
