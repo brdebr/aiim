@@ -4,7 +4,7 @@
       <template v-if="showDrawerIcon" v-slot:prepend>
           <v-app-bar-nav-icon @click="toggleDrawer"/>
       </template>
-      <v-app-bar-title class="qq--mx-4 qq--text-center qq--select-none">
+      <v-app-bar-title class="qw-mx-4 qw-text-center qw-select-none">
         AI-Image Manager
       </v-app-bar-title>
       <div v-show="showDrawerIcon" id="app-append-icon" class="app-bar-spacer">
@@ -27,7 +27,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-main>
-      <div class="qq--px-3">
+      <div class="qw-px-3">
         <slot/>
       </div>
     </v-main>

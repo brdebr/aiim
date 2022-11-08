@@ -1,14 +1,14 @@
 <template>
   <v-theme-provider theme="dark" with-background class="login-page">
     <div class="login-form">
-      <div class="text-h6 qq--text-center qq--mb-5">
+      <div class="text-h6 qw-text-center qw-mb-5">
         Login
       </div>
       <form @submit.prevent="executeLogin">
         <v-text-field
           v-model="loginEmail"
           type="text"
-          class="qq--mb-3"
+          class="qw-mb-3"
           name="email"
           label="Email"
           :disabled="loading"
@@ -18,7 +18,7 @@
           v-model="loginPassword"
           :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           :type="showPassword ? 'text' : 'password'"
-          class="qq--mb-3"
+          class="qw-mb-3"
           name="password"
           label="Password"
           variant="outlined"
@@ -27,7 +27,7 @@
           :disabled="loading"
           @click:append-inner="showPassword = !showPassword"
         />
-        <v-btn type="submit" variant="outlined" block size="large" class="qq--my-3" :loading="loading">
+        <v-btn type="submit" variant="outlined" block size="large" class="qw-my-3" :loading="loading">
           Login
         </v-btn>
       </form>
@@ -47,16 +47,16 @@ const { loginEmail, loginPassword, executeLogin, loading } = await useLogin()
   place-items: center;
   height: 100%;
   width: 100%;
-  @apply qq--pb-[85px] qq--px-3;
+  @apply qw-pb-[85px] qw-px-3;
   background: unset !important;
 }
 .login-form {
   background-color: rgba(34, 93, 165, 0.493);
-  @apply qq--w-full qq--max-w-[500px];
-  @apply qq--flex qq--flex-col qq--justify-center qq--gap-3;
+  @apply qw-w-full qw-max-w-[500px];
+  @apply qw-flex qw-flex-col qw-justify-center qw-gap-3;
 
-  @apply qq--pt-6 qq--pb-4 qq--px-5 qq--rounded-md;
+  @apply qw-pt-6 qw-pb-4 qw-px-5 qw-rounded-md;
 
-  @apply qq--backdrop-filter qq--backdrop-blur-xl;
+  @apply qw-backdrop-filter qw-backdrop-blur-xl;
 }
 </style>
