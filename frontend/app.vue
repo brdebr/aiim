@@ -8,6 +8,6 @@
 <script lang="ts" setup>
 const authStore = useAuthStore();
 onMounted(() => {
-  authStore.loadStoredIntoState();
+  authStore.loadStorageIntoState();
 })
 </script>

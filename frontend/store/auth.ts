@@ -1,72 +1,69 @@
-import { storeToRefs } from "pinia";
-import { apiBaseURL } from "~~/constants";
-import { useLayoutStore } from "./layout";
-import { useStorage } from '@vueuse/core'
+import { apiBaseURL, LOCAL_STORAGE_PREFIX as PREFIX } from "~~/constants";
+import { LoginInfo } from "~~/types";
 
-export type loginResponse = {
+export type LoginResponse = {
   token: string;
   payload: LoginInfo;
 };
 
-export type LoginInfo = {
-  id: string;
-  email: string;
-  name?: string;
-  role: string;
-}
-
 export const useAuthStore = definePiniaStore('auth', () => {
-  const storedUserId = useStorage('aiim-user-id', '');
-  const storedLoginInfo = useStorage<string>('aiim-login-info', '');
-  const storedToken = useStorage('aiim-api-token', '');
-
+  // Auth state
   const userId = ref('');
   const loginInfo = ref<LoginInfo | null>(null);
   const token = ref('');
 
-  const loadStoredIntoState = () => {
-    if (storedUserId.value) {
-      userId.value = storedUserId.value;
-    }
-    if (storedLoginInfo.value) {
-      loginInfo.value = JSON.parse(storedLoginInfo.value || '{}') as LoginInfo;
-    }
-    if (storedToken.value) {
-      token.value = storedToken.value;
-    }
-  }
+  // Local storage state
+  const storedUserId = useLocalStorage(`${PREFIX}user-id`, '');
+  const storedLoginInfo = useLocalStorage<string>(`${PREFIX}login-info`, '');
+  const storedToken = useLocalStorage(`${PREFIX}api-token`, '');
 
-  const authHeader = computed(() => ({
-    'Authorization': `Bearer ${token.value || storedToken.value}`
-  }));
-
-  const fetchUser = async () => {
-    const user = await $fetch<LoginInfo>('/api/users/me', { baseURL: apiBaseURL, headers: authHeader.value });
-    console.log('Fetched current user:',user);
-    return {...user, role: 'user'};
+  const loadStorageIntoState = () => {
+    if (storedUserId.value) userId.value = storedUserId.value;
+    if (storedLoginInfo.value) loginInfo.value = JSON.parse(storedLoginInfo.value || '{}') as LoginInfo;
+    if (storedToken.value) token.value = storedToken.value;
   }
+  const tokenOrStored = computed(() => token.value || storedToken.value);
 
   const login = async (email: string, password: string) => {
-    const loginResponse = await $fetch<loginResponse>('/api/auth/login', {
+    const loginResponse = await $fetch<LoginResponse>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
-      baseURL: apiBaseURL,
+      ...fetchOptions.value,
     });
     storedToken.value = loginResponse.token;
     storedLoginInfo.value = JSON.stringify(loginResponse.payload);
     storedUserId.value = loginResponse.payload.id;
+    loadStorageIntoState();
+  }
 
-    loadStoredIntoState();
-    return loginInfo;
-  };
+  const fetchCurrentUser = async () => {
+    const user = await $fetch<LoginInfo>('/api/users/me', fetchOptions.value);
+    console.log('Fetched current user:',user);
+    const userWithRole = {...user, role: 'user'};
+    return userWithRole;
+  }
+
+  const authHeader = computed(() => ({
+    'Authorization': `Bearer ${tokenOrStored.value}`
+  }));
+
+  const fetchOptions = computed(() => ({
+    baseURL: apiBaseURL,
+    headers: authHeader.value,
+  }));
 
   return {
+    // Auth state
     userId,
     loginInfo,
     token,
-    authHeader,
+    // Local storage state
+    loadStorageIntoState,
+    // Methods
     login,
-    loadStoredIntoState,
-    fetchUser,
+    fetchCurrentUser,
+    // Helpers
+    fetchOptions,
+    authHeader,
   }
 })

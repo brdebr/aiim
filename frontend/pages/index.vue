@@ -4,9 +4,9 @@
       <div class="text-h6 qq--text-center qq--mb-5">
         Login
       </div>
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="executeLogin">
         <v-text-field
-          v-model="email"
+          v-model="loginEmail"
           type="text"
           class="qq--mb-3"
           name="email"
@@ -15,7 +15,7 @@
           variant="outlined"
         />
         <v-text-field
-          v-model="password"
+          v-model="loginPassword"
           :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           :type="showPassword ? 'text' : 'password'"
           class="qq--mb-3"
@@ -35,35 +35,11 @@
   </v-theme-provider>
 </template>
 <script lang="ts" setup>
-import { apiBaseURL } from "~~/constants";
-import { ImageObject } from "~~/types";
 
-const router = useRouter();
-const authStore = useAuthStore();
+const showPassword = ref(false)
 
-const layoutStore = useLayoutStore();
-const { backgroundCover } = storeToRefs(layoutStore);
+const { loginEmail, loginPassword, executeLogin, loading } = await useLogin()
 
-const email = ref("");
-const password = ref("mypassucu");
-
-const showPassword = ref(false);
-const loading = ref(false);
-
-const handleLogin = async () => {
-  loading.value = true;
-  const loginInfo = await authStore.login(email.value, password.value);
-  console.log('Login info: ', loginInfo.value);
-  router.push("/gallery");
-  loading.value = false;
-};
-
-const { data: randomCovers } = await useAsyncData<ImageObject[]>('initial-login-cover-fetch', () => $fetch('/api/images/random-cover', { baseURL: apiBaseURL }))
-backgroundCover.value = randomCovers?.value?.[0].id || '';
-
-onUnmounted(() => {
-  backgroundCover.value = '';
-});
 </script>
 <style lang="scss">
 .login-page {

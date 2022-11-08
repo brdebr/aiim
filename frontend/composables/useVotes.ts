@@ -2,7 +2,8 @@ import { apiBaseURL } from "~~/constants";
 import { ImageObject } from "~~/types";
 
 export const useVotes = async () => {
-  const fetchOptions = useFetchOptions();
+  const authStore = useAuthStore();
+  const { fetchOptions } = storeToRefs(authStore);
 
   const fetchVotedImageIds = async () => {
     const endpoint = `/api/vote/voted-image-ids`;

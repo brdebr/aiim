@@ -24,3 +24,9 @@ export type ImageObject = {
   timeToGenerate: number;
 }
 
+export type LoginInfo = {
+  id: string;
+  email: string;
+  name?: string;
+  role: string;
+}

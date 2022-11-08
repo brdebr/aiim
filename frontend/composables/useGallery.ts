@@ -12,7 +12,8 @@ export const DEFAULT_GALLERY_PAGE_SIZE = 25;
 const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
 
 export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
-  const fetchOptions = useFetchOptions();
+  const authStore = useAuthStore();
+  const { fetchOptions } = storeToRefs(authStore);
 
   onMounted(async () => {
     Promise.all([
