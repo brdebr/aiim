@@ -1,8 +1,16 @@
 <template>
   <div>
-    <h1>
-      Hi I'm your gallery - {{ imagesCount }} images
-    </h1>
+    <ClientOnly>
+      <Teleport to='#app-append-icon'>
+        <v-chip v-if="imagesLeft">
+          <transition name="scroll-y" mode="out-in" >
+            <span :key="imagesLeft">
+              {{ imagesLeft }}
+            </span>
+          </transition>
+        </v-chip>
+      </Teleport>
+    </ClientOnly>
     <div class="gallery-grid" v-if="allImages.length">
       <div
         v-for="image in allImages" :key="image.id"
@@ -20,6 +28,9 @@
         />
       </div>
       <InfiniteLoading :distance="650" :firstload="false" @infinite="fetchMoreImages" />
+      <v-btn variant="text" @click="fetchMoreImages" :loading="btnLoading">
+        Load More
+      </v-btn>
     </div>
   </div>
 </template>
@@ -34,17 +45,24 @@ const router = useRouter();
 
 const gallery = useGallery();
 const { allImages, imagesCount } = gallery;
+const imagesLeft = computed(() => {
+  return imagesCount.value - allImages.value.length;
+});
+
+const btnLoading = ref(false);
 
 const votes = useVotes();
 const { isVoted, voteImage } = votes;
 
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
+  btnLoading.value = true;
   const lastImageId = await gallery.fetchNextImages();
   router.push({
     query: {
       page: lastImageId
     },
   });
+  btnLoading.value = false;
   $state?.loaded();
 };
 
@@ -97,4 +115,20 @@ const getImageClass = (image: ImageObject) => {
     }
   }
  }
+
+.scroll-y-enter-active {
+  transition: all 0.15s ease-out;
+}
+.scroll-y-leave-active {
+  transition: all 0.15s ease-in;
+}
+.scroll-y-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.scroll-y-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
 </style>

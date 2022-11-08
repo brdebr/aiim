@@ -7,17 +7,19 @@
       <v-app-bar-title class="qq--mx-4 qq--text-center qq--select-none">
         AI-Image Manager
       </v-app-bar-title>
-      <div v-show="showDrawerIcon" class="app-bar-spacer">
+      <div v-show="showDrawerIcon" id="app-append-icon" class="app-bar-spacer">
       </div>
     </v-app-bar>
     <v-navigation-drawer
       v-model="drawerActive"
+      temporary
     >
       <v-list>
         <v-list-item
           v-for="item in drawerItems"
           :key="item.label"
           :title="item.label"
+          :prepend-icon="item.icon"
           :to="item.route"
           nav
         >
@@ -99,8 +101,7 @@ html, body, .__nuxt, .v-application {
 
 .v-app-bar {
   .app-bar-spacer {
-    width: 48px;
-    height: 48px;
+    min-width: 48px;
     margin-right: 10px;
   }
 }

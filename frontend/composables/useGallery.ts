@@ -8,13 +8,22 @@ export type useGalleryConfig = Partial<{
 }>
 
 export const DEFAULT_GALLERY_PAGE_SIZE = 25;
-const DEFAULT_GALLERY_FIRST_PAGE_SIZE = DEFAULT_GALLERY_PAGE_SIZE + 35;
+const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
 
-export const useGallery = (config?: useGalleryConfig) => {
+export const useGallery = (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
   const fetchOptions = useFetchOptions();
   const route = useRoute();
 
+  // CHANGE CALLS TO USE - useAsyncData
+
   const pageFromRouteOrEmpty = computed<string>(() => ([route.query.page].flat().join("")));
+
+  watch(pageFromRouteOrEmpty, async (newPageQuery) => {
+    if (newPageQuery){
+      return;
+    }
+    await fetchInitialImages();
+  });
 
   const allImages = ref<ImageObject[]>([]);
 
@@ -29,7 +38,7 @@ export const useGallery = (config?: useGalleryConfig) => {
   };
 
   const fetchInitialImages = async () => {
-    const images = await getImagesPage(pageFromRouteOrEmpty.value, DEFAULT_GALLERY_FIRST_PAGE_SIZE);
+    const images = await getImagesPage(pageFromRouteOrEmpty.value, firstPageSize);
     allImages.value = images;
   };
 
@@ -38,17 +47,17 @@ export const useGallery = (config?: useGalleryConfig) => {
       return;
     }
     const lastImageId = allImages.value[allImages.value.length - 1].id;
-    const newPage = await getImagesPage(lastImageId);
+    const newPage = await getImagesPage(lastImageId, pageSize);
     allImages.value = allImages.value.concat(newPage);
     return lastImageId;
   };
 
   // Total Images
-  const imagesCount = ref('');
+  const imagesCount = ref(0);
   const fetchTotalImages = async () => {
     const endpoint = `/api/images/total`;
     const response = await $fetch<number>(endpoint, fetchOptions.value);
-    imagesCount.value = response.toString();
+    imagesCount.value = response;
     return response;
   };
 
