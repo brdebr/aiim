@@ -2,12 +2,6 @@ import { exec } from 'child_process';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// const matchImageDataImageMagick = (imageData) => {
-//   const regex = /\s{4}parameters:(.*(\r?\n).*(\r?\n).*)/gm;
-//   const matches = regex.exec(imageData);
-//   return matches?.[0].replace(/\s{4}parameters:/g, '').trim() || imageData;
-// };
-
 const findImageData = (imageData) => {
   const regexTimeModified = /File\sModification\sDate\/Time\s*:\s(.*)/gm;
   const matchesTimeModified = regexTimeModified.exec(imageData);
