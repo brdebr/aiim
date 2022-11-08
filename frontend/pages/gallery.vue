@@ -3,7 +3,7 @@
     <ClientOnly>
       <Teleport to='#app-append-icon'>
         <v-chip v-if="imagesLeft">
-          <transition name="scroll-y" mode="out-in" >
+          <transition name="scroll-y" mode="out-in">
             <span :key="imagesLeft">
               {{ imagesLeft }}
             </span>
@@ -11,7 +11,7 @@
         </v-chip>
       </Teleport>
     </ClientOnly>
-    <div class="gallery-grid" v-if="allImages.length">
+    <div class="gallery-grid" v-if="allImages.length && !loadingInitialImages">
       <div
         v-for="image in allImages" :key="image.id"
         class="gallery-image-item"
@@ -44,7 +44,7 @@ import { ImageObject } from '~~/types';
 const router = useRouter();
 
 const gallery = await useGallery();
-const { allImages, imagesCount } = gallery;
+const { allImages, imagesCount, loadingInitialImages } = gallery;
 const imagesLeft = computed(() => {
   return imagesCount.value ? imagesCount.value - allImages.value.length: 0;
 });

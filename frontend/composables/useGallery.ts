@@ -1,4 +1,3 @@
-import { useRouteQuery } from "@vueuse/router";
 import { ImageObject } from "~~/types";
 
 export type ImageObjectsPageResponse = ImageObject[]
@@ -21,7 +20,7 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     ]);
   });
 
-  const pageIdFromQuery = useRouteQuery("pageId", '');
+  const pageIdFromQuery = useRouteQry('page');
   watch(pageIdFromQuery, async (newPageQuery) => {
     if (newPageQuery){
       return;
@@ -30,6 +29,8 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
   });
 
   const allImages = ref<ImageObject[]>([]);
+
+  const loadingInitialImages = ref(false);
 
   const getImagesPage = async (pageId: string, pageSize: number = DEFAULT_GALLERY_PAGE_SIZE) => {
     const query = new URLSearchParams({
@@ -42,8 +43,10 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
   };
 
   const fetchInitialImages = async () => {
+    loadingInitialImages.value = true;
     const images = await getImagesPage(pageIdFromQuery.value, firstPageSize);
     allImages.value = images;
+    loadingInitialImages.value = false;
   };
 
   const fetchNextImages = async () => {
@@ -69,5 +72,6 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     fetchNextImages,
     imagesCount,
     pageIdFromQuery,
+    loadingInitialImages,
   }
 }
