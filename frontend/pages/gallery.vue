@@ -43,15 +43,15 @@ import { ImageObject } from '~~/types';
 
 const router = useRouter();
 
-const gallery = useGallery();
+const gallery = await useGallery();
 const { allImages, imagesCount } = gallery;
 const imagesLeft = computed(() => {
-  return imagesCount.value - allImages.value.length;
+  return imagesCount.value ? imagesCount.value - allImages.value.length: 0;
 });
 
 const btnLoading = ref(false);
 
-const votes = useVotes();
+const votes = await useVotes();
 const { isVoted, voteImage } = votes;
 
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {

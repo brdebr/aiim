@@ -58,12 +58,8 @@ const handleLogin = async () => {
   loading.value = false;
 };
 
-const { data: randomCovers } = useFetch<ImageObject[]>('/api/images/random-cover', { baseURL: apiBaseURL });
-watch(randomCovers, (newVal) => {
-  if (newVal) {
-    backgroundCover.value = newVal?.[0].id;
-  }
-}, { immediate: true });
+const { data: randomCovers } = await useAsyncData<ImageObject[]>('initial-login-cover-fetch', () => $fetch('/api/images/random-cover', { baseURL: apiBaseURL }))
+backgroundCover.value = randomCovers?.value?.[0].id || '';
 
 onUnmounted(() => {
   backgroundCover.value = '';

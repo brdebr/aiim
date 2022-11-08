@@ -18,6 +18,7 @@
     "@mdi/font": "^7.0.96",
     "@pinia/nuxt": "^0.4.3",
     "@vueuse/nuxt": "^9.4.0",
+    "@vueuse/router": "^9.4.0",
     "pinia": "^2.0.23",
     "sass": "^1.56.0",
     "sass-loader": "^13.1.0",

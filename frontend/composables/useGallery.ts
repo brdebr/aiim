@@ -1,3 +1,4 @@
+import { useRouteQuery } from "@vueuse/router";
 import { ImageObject } from "~~/types";
 
 export type ImageObjectsPageResponse = ImageObject[]
@@ -10,15 +11,17 @@ export type useGalleryConfig = Partial<{
 export const DEFAULT_GALLERY_PAGE_SIZE = 25;
 const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
 
-export const useGallery = (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
+export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
   const fetchOptions = useFetchOptions();
-  const route = useRoute();
 
-  // CHANGE CALLS TO USE - useAsyncData
+  onMounted(async () => {
+    Promise.all([
+      fetchInitialImages(),
+    ]);
+  });
 
-  const pageFromRouteOrEmpty = computed<string>(() => ([route.query.page].flat().join("")));
-
-  watch(pageFromRouteOrEmpty, async (newPageQuery) => {
+  const pageIdFromQuery = useRouteQuery("pageId", '');
+  watch(pageIdFromQuery, async (newPageQuery) => {
     if (newPageQuery){
       return;
     }
@@ -38,7 +41,7 @@ export const useGallery = (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize =
   };
 
   const fetchInitialImages = async () => {
-    const images = await getImagesPage(pageFromRouteOrEmpty.value, firstPageSize);
+    const images = await getImagesPage(pageIdFromQuery.value, firstPageSize);
     allImages.value = images;
   };
 
@@ -53,26 +56,17 @@ export const useGallery = (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize =
   };
 
   // Total Images
-  const imagesCount = ref(0);
   const fetchTotalImages = async () => {
     const endpoint = `/api/images/total`;
     const response = await $fetch<number>(endpoint, fetchOptions.value);
-    imagesCount.value = response;
     return response;
   };
-
-
-  onMounted(async () => {
-    Promise.all([
-      fetchTotalImages(),
-      fetchInitialImages(),
-    ]);
-  });
+  const { data: imagesCount } = await useAsyncData<number>('initial-gallery-image-count-fetch',fetchTotalImages);
 
   return {
     allImages,
     fetchNextImages,
     imagesCount,
-    pageFromRouteOrEmpty,
+    pageIdFromQuery,
   }
 }
