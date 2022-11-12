@@ -28,8 +28,12 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    await this.$connect();
-    this.logger.log(`Connected to MongoDB database 🍃`);
+    try {
+      await this.$connect();
+      this.logger.log(`Connected to MongoDB database 🍃`);
+    } catch (error) {
+      this.logger.error(`Error connecting to MongoDB database: ${error}`);
+    }
   }
 
   async onModuleDestroy() {

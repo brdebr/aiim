@@ -7,18 +7,26 @@ import {
   Body,
   UnauthorizedException,
   HttpCode,
+  Headers,
 } from '@nestjs/common';
 import { Public } from './auth.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private configService: ConfigService,
   ) {}
 
+  @Public()
   @Post('signup')
-  async signUp(@Body() body: SignUpDto) {
+  async signUp(@Body() body: SignUpDto, @Headers('sign-pass') signPassHeader) {
+    const signPass = this.configService.get<string>('SIGN_PASS');
+    if (signPassHeader !== signPass) {
+      throw new UnauthorizedException();
+    }
     const userCreated = await this.userService.create(
       body.email,
       body.password,
