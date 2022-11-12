@@ -1,7 +1,24 @@
-# docker compose to run a single container of mongo db with configs
 version: '3.1'
 
 services:
+  aiim-frontend:
+    container_name: aiim-frontend_container
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - aiim-backend
+  aiim-api:
+    container_name: aiim-api_container
+    build:
+      context: ./api/
+      dockerfile: Dockerfile
+    ports:
+      - 3005:3005
+    depends_on:
+      - aiim-db
   aiim-db:
     container_name: aiim-db_container
     image: 'prismagraphql/mongo-single-replica:4.4.3-bionic'
