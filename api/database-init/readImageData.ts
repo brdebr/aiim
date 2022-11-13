@@ -1,6 +1,16 @@
 import { exec } from 'child_process';
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+
+const dbURL =
+  'mongodb://aiim-admin:root-pass@localhost:27017/aiim-db?authSource=aiim-db&directConnection=true';
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: dbURL,
+    },
+  },
+});
 
 const findImageData = (imageData) => {
   const regexTimeModified = /File\sModification\sDate\/Time\s*:\s(.*)/gm;
@@ -150,7 +160,7 @@ const getImageObject = async (imageRoute) => {
 //----------------------------------
 
 const imagesPath =
-  '/home/bryan-ub/DEV/MULTIMEDIA/AI generated/Volumes/outputs_old_000/txt2img-images';
+  '/home/bryan-ub/DEV/MULTIMEDIA/AI generated/Volumes/outputs_old_001/txt2img-images';
 // const imagesPath = "D:\\dev\\git\\sd-webui\\log\\images\\";
 
 import { readdirSync, readFileSync, statSync } from 'fs';
@@ -160,6 +170,7 @@ const imagesRoutes = images.map((image) => `${imagesPath}/${image}`);
 console.log(`Processing ${imagesRoutes.length} images -->`);
 console.time('Processing images');
 let i = 0;
+const errors = [];
 (async () => {
   for await (const imageRoute of imagesRoutes) {
     console.time(`Image ${i}`);
@@ -170,38 +181,54 @@ let i = 0;
     );
     console.log(imageRoute);
     console.log('---------------------');
-    const imageObject = await getImageObject(imageRoute);
-    console.log(imageObject);
-    const imageBuffer = readFileSync(imageRoute);
-    const { size } = statSync(imageRoute);
-    imageObject['imageFile'] = imageBuffer;
-    imageObject['imageSize'] = size;
+    try {
+      const imageObject = await getImageObject(imageRoute);
+      console.log(imageObject);
+      const imageBuffer = readFileSync(imageRoute);
+      const { size } = statSync(imageRoute);
+      imageObject['imageFile'] = imageBuffer;
+      imageObject['imageSize'] = size;
 
-    await prisma.imageObject.create({
-      data: {
-        fileName: imageObject['filename'] as string,
-        number: imageObject['number'] as string,
-        prompt: imageObject['prompt'] as string,
-        negativePrompt: imageObject['negativePrompt'] as string,
-        steps: imageObject['steps'] as number,
-        sampler: imageObject['sampler'] as string,
-        cfg: imageObject['cfg'] as number,
-        seed: imageObject['seed'] as string,
-        width: imageObject['width'] as number,
-        height: imageObject['height'] as number,
-        modelHash: imageObject['modelHash'] as string,
-        model: imageObject['model'] as string,
-        denoisingHr: imageObject['denoisingHr'] as number,
-        firstPassHr: imageObject['firstPassHr'] as string,
-        faceRestoration: imageObject['faceRestoration'] as string,
-        rawParameters: imageObject['rawParameters'] as string,
-        generatedAt: new Date(imageObject['modifiedTime'] as string),
-        imageFile: imageBuffer,
-        imageSize: size,
-      },
-    });
-    console.timeEnd(`Image ${i}`);
-    i++;
+      if (!imageObject['prompt']) {
+        throw new Error('No prompt found');
+      }
+
+      console.log('Creating image object in database');
+      await prisma.imageObject.create({
+        data: {
+          fileName: imageObject['filename'] as string,
+          number: imageObject['number'] as string,
+          prompt: imageObject['prompt'] as string,
+          negativePrompt: imageObject['negativePrompt'] as string,
+          steps: imageObject['steps'] as number,
+          sampler: imageObject['sampler'] as string,
+          cfg: imageObject['cfg'] as number,
+          seed: imageObject['seed'] as string,
+          width: imageObject['width'] as number,
+          height: imageObject['height'] as number,
+          modelHash: imageObject['modelHash'] as string,
+          model: imageObject['model'] as string,
+          denoisingHr: imageObject['denoisingHr'] as number,
+          firstPassHr: imageObject['firstPassHr'] as string,
+          faceRestoration: imageObject['faceRestoration'] as string,
+          rawParameters: imageObject['rawParameters'] as string,
+          generatedAt: new Date(imageObject['modifiedTime'] as string),
+          imageFile: imageBuffer,
+          imageSize: size,
+        },
+      });
+      console.timeEnd(`Image ${i}`);
+      i++;
+    } catch (error) {
+      console.log(`Error processing image: \n${imageRoute}`);
+      console.log(error);
+      errors.push(imageRoute);
+
+      console.timeEnd(`Image ${i}`);
+      i++;
+    }
   }
   console.timeEnd('Processing images');
+  console.log(`Errors [${errors.length}] :`);
+  console.log(errors);
 })();
