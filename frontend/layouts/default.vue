@@ -36,14 +36,15 @@
 <script setup lang="ts">
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia';
-import { apiBaseURL } from '~~/constants';
+import { useApiBaseURL } from '~~/constants';
 
-const route = useRoute();
+const DEFAULT_GRADIENT = 'conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172))'
 
+const apiBaseURL = useApiBaseURL();
 const layoutStore = useLayoutStore();
 const { drawerActive, backgroundCover, drawerItems } = storeToRefs(layoutStore);
 const backgroundStyle = computed(() => {
-  if (!backgroundCover.value) return '';
+  if (!backgroundCover.value) return DEFAULT_GRADIENT;
   const url = `url(${apiBaseURL}/api/images/view/${backgroundCover.value})`
   return url
 });
@@ -94,7 +95,8 @@ html, body, .__nuxt, .v-application {
 .v-main {
   background-color: rgb(243, 243, 230);
 
-  background-image: v-bind(backgroundStyle);
+  // background: conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172));
+  background: v-bind(backgroundStyle);
   background-size: cover;
   background-position: center;
 }

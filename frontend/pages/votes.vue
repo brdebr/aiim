@@ -25,7 +25,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { apiBaseURL } from "~~/constants";
+import { useApiBaseURL } from "~~/constants";
 import { ImageObject } from "~~/types";
 
 type Vote = {
@@ -45,6 +45,7 @@ type VoteWithImage = Omit<Vote, "image"> & ImageObject;
 
 // API
 const authStore = useAuthStore();
+const apiBaseURL = useApiBaseURL();
 const { authHeader } = storeToRefs(authStore);
 
 // Fetching
@@ -97,8 +98,8 @@ const getImageClass = (image: ImageObject) => {
 <style lang="scss">
 .gallery-grid {
   display: grid;
-  grid-gap: 2px;
-  grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
+  grid-gap: 3px;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   img {
     width: 100%;
     height: 100%;
@@ -111,6 +112,11 @@ const getImageClass = (image: ImageObject) => {
     img.wide {
       grid-column-end: span 2 / auto;
     }
+  }
+}
+@media screen and (min-width: 600px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
   }
 }
 .pagination {

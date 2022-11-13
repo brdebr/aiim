@@ -38,10 +38,11 @@
 // @ts-expect-error - The component is not typed
 import InfiniteLoading from 'v3-infinite-loading';
 import 'v3-infinite-loading/lib/style.css'
-import { apiBaseURL } from '~~/constants';
+import { useApiBaseURL } from '~~/constants';
 import { ImageObject } from '~~/types';
 
 const router = useRouter();
+const apiBaseURL = useApiBaseURL();
 
 const gallery = await useGallery();
 const { allImages, imagesCount, loadingInitialImages } = gallery;
@@ -82,7 +83,7 @@ const getImageClass = (image: ImageObject) => {
 .gallery-grid {
   display: grid;
   grid-gap: 3px;
-  grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   
   .gallery-image-item {
     width: 100%;
@@ -104,7 +105,10 @@ const getImageClass = (image: ImageObject) => {
     }
   }
   
-  @media screen and (min-width: 600px) {
+ }
+ @media screen and (min-width: 600px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
     .gallery-image-item {
       &.tall {
         grid-row-end: span 2;
@@ -114,7 +118,7 @@ const getImageClass = (image: ImageObject) => {
       }
     }
   }
- }
+}
 
 .scroll-y-enter-active {
   transition: all 0.15s ease-out;

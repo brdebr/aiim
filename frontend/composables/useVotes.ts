@@ -1,8 +1,9 @@
-import { apiBaseURL } from "~~/constants";
+import { useApiBaseURL } from "~~/constants";
 import { ImageObject } from "~~/types";
 
 export const useVotes = async () => {
   const authStore = useAuthStore();
+  const apiBaseURL = useApiBaseURL();
   const { fetchOptions } = storeToRefs(authStore);
 
   const fetchVotedImageIds = async () => {
