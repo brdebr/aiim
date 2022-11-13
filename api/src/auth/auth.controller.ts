@@ -45,6 +45,7 @@ export class AuthController {
   @HttpCode(200)
   async login(@Body() loginDTO: LoginDto) {
     const { email, password } = loginDTO;
+    this.logger.log(`Logging User: "${email}"`);
     const userValidate = await this.authService.validateUser(email, password);
     if (!userValidate) {
       throw new UnauthorizedException();

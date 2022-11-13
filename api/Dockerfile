@@ -4,8 +4,6 @@ EXPOSE 3005
 
 COPY . /app
 
-COPY ../.env /app/.env
-
 WORKDIR /app
 
 RUN npm ci && npm run build

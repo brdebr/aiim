@@ -42,6 +42,8 @@ type ImageObjectFilter = {
     : ImageObject[key];
 };
 
+type ImageObjectKeyArray = (keyof ImageObject)[];
+
 @Injectable()
 export class ImageObjectService {
   constructor(private readonly prisma: PrismaService) {}
@@ -49,6 +51,14 @@ export class ImageObjectService {
   async allPrompts() {
     const queryResponse = await this.prisma.imageObject.groupBy({
       by: ['prompt'],
+      _count: true,
+    });
+    return queryResponse;
+  }
+
+  async groupedByCustom(keyArray: ImageObjectKeyArray) {
+    const queryResponse = await this.prisma.imageObject.groupBy({
+      by: keyArray,
       _count: true,
     });
     return queryResponse;
@@ -123,6 +133,9 @@ export class ImageObjectService {
   }
 
   async getImagesByIds(ids: string[], size = 20) {
+    if (!ids.length) {
+      return [];
+    }
     const queryResponse = await this.prisma.imageObject.findMany({
       take: size,
       where: {
@@ -136,6 +149,9 @@ export class ImageObjectService {
   }
 
   async getAmountOfRandomItems(array: Array<unknown>, size = 20) {
+    if (!array.length) {
+      return [];
+    }
     const randomSet = new Set();
     while (randomSet.size < size) {
       randomSet.add(array[Math.floor(Math.random() * array.length)]);
