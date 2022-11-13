@@ -23,16 +23,25 @@ export class PrismaService
         },
       },
     });
-    this.logger.log(`Connecting to database:`);
+    this.logger.log(`Using database:`);
     this.logger.log(`${url}`);
   }
 
   async onModuleInit() {
-    try {
-      await this.$connect();
-      this.logger.log(`Connected to MongoDB database 🍃`);
-    } catch (error) {
-      this.logger.error(`Error connecting to MongoDB database: ${error}`);
+    let retries = 5;
+    while (retries) {
+      try {
+        this.logger.log(`Connecting to MongoDB database...`);
+        await this.$connect();
+        this.logger.log(`Connected to MongoDB database 🍃`);
+        break;
+      } catch (error) {
+        this.logger.error(`Error connecting to MongoDB database: ${error}`);
+        this.logger.error(`Retrying in 1 second...`);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+      retries--;
+      this.logger.error(`Retries left: ${retries}`);
     }
   }
 

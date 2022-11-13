@@ -58,7 +58,7 @@ export class UserService {
     return hashedPassword;
   }
 
-  async comparePassword(password: string, hashedPassword: string) {
+  async validatePassword(password: string, hashedPassword: string) {
     const isPasswordCorrect = await compare(password, hashedPassword);
     return isPasswordCorrect;
   }

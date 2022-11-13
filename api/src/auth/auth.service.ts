@@ -22,9 +22,13 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<JwtPayload | null> {
+    this.logger.log(`Validating user "${email}"`);
     const user = await this.userService.getUserByEmail(email);
+    if (!user) {
+      throw new ForbiddenException('Invalid credentials');
+    }
 
-    const isPasswordCorrect = await this.userService.comparePassword(
+    const isPasswordCorrect = await this.userService.validatePassword(
       password,
       user.password,
     );
