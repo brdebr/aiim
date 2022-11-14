@@ -1,7 +1,8 @@
-export const apiBaseURL = import.meta.env.DEV ? 'http://192.168.1.132:3005' : 'https://ai.home.bryan-web.dev';
+const apiBaseUrlDev = import.meta.env.DEV ? 'http://192.168.1.132:3005' : '';
 export const LOCAL_STORAGE_PREFIX = 'aiim-';
 
 export const useApiBaseURL = () => {
   const config = useRuntimeConfig();
-  return config.public.apiBaseURL || apiBaseURL;
+  const apiBaseUrlEnv = config?.public?.apiBaseUrl;
+  return apiBaseUrlDev || apiBaseUrlEnv;
 }
