@@ -1,16 +1,11 @@
 <template>
-  <div class="mobile-layout">
-    <v-app-bar :elevation="0" :color="'indigo-lighten-1'" border="b-md t-md" density="compact">
-      <template v-if="showDrawerIcon" v-slot:prepend>
-          <v-app-bar-nav-icon @click="toggleDrawer"/>
-      </template>
+  <div class="layout-container mobile-layout">
+    <v-app-bar :elevation="0" :color="'indigo-darken-4'" border="t-md b-md s-lg e-lg" density="compact">
       <v-app-bar-title class="qw-mx-4 qw-text-center">
         <div class="qw-select-none">
           AI-Image Manager
         </div>
       </v-app-bar-title>
-      <div v-show="showDrawerIcon" id="app-append-icon" class="app-bar-spacer">
-      </div>
     </v-app-bar>
     <v-navigation-drawer
       v-model="drawerActive"
@@ -33,6 +28,16 @@
         <slot/>
       </div>
     </v-main>
+    <v-bottom-navigation mode="shift" :elevation="0" density="comfortable" border="t-md b-md s-lg e-lg" bg-color="indigo-darken-4" grow hide-on-scroll>
+      <v-btn v-for="item in bottomItems" :to="item.route" :key="item.route" :value="item.route">
+        <v-icon>
+          {{ item.icon }}
+        </v-icon>
+        <span class="!qw-text-[10px]">
+          {{ item.label }}
+        </span>
+      </v-btn>
+    </v-bottom-navigation>
   </div>
 </template>
 <script setup lang="ts">
@@ -71,6 +76,35 @@ useResizeObserver(doc, useThrottleFn(
     doc.value?.style.setProperty('--doc-height', `${window.innerHeight}px`)
   }, 100)
 );
+
+
+const bottomItems = [
+  {
+    label: 'Card game',
+    icon: 'mdi-cards-outline',
+    route: '/play'
+  },
+  {
+    label: 'Gallery',
+    icon: 'mdi-image-search',
+    route: '/gallery'
+  },
+  {
+    label: 'Generate',
+    icon: 'mdi-brain',
+    route: '/generate'
+  },
+  {
+    label: 'Extras',
+    icon: 'mdi-shimmer',
+    route: '/extras'
+  },
+  {
+    label: 'Profile',
+    icon: 'mdi-account',
+    route: '/profile'
+  },
+]
 
 </script>
 <style lang="scss">

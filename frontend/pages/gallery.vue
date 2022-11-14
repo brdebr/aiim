@@ -1,16 +1,5 @@
 <template>
   <div>
-    <ClientOnly>
-      <Teleport to='#app-append-icon'>
-        <v-chip v-if="imagesLeft">
-          <transition name="scroll-y" mode="out-in">
-            <span :key="imagesLeft">
-              {{ imagesLeft }}
-            </span>
-          </transition>
-        </v-chip>
-      </Teleport>
-    </ClientOnly>
     <div class="gallery-grid" v-if="allImages.length && !loadingInitialImages">
       <div
         v-for="image in allImages" :key="image.id"
@@ -28,7 +17,6 @@
           @click="voteImage(image)"
         />
       </div>
-      <InfiniteLoading :distance="650" :firstload="false" @infinite="fetchMoreImages" />
       <v-btn variant="text" @click="fetchMoreImages" :loading="btnLoading">
         Load More
       </v-btn>
@@ -36,9 +24,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-// @ts-expect-error - The component is not typed
-import InfiniteLoading from 'v3-infinite-loading';
-import 'v3-infinite-loading/lib/style.css'
 import { useApiBaseURL } from '~~/constants';
 import { ImageObject } from '~~/types';
 

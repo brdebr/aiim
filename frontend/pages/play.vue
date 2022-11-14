@@ -1,0 +1,3 @@
+<template>
+  Card game
+</template>
