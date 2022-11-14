@@ -114,7 +114,7 @@ const getImageClass = (image: ImageObject) => {
     }
   }
 }
-@media screen and (min-width: 600px) {
+@media screen and (max-width: 500px) {
   .gallery-grid {
     grid-template-columns: 1fr;
   }

@@ -1,11 +1,13 @@
 <template>
   <div class="mobile-layout">
-    <v-app-bar :elevation="0" :color="'indigo-lighten-1'" border="b-md">
+    <v-app-bar :elevation="0" :color="'indigo-lighten-1'" border="b-md t-md" density="compact">
       <template v-if="showDrawerIcon" v-slot:prepend>
           <v-app-bar-nav-icon @click="toggleDrawer"/>
       </template>
-      <v-app-bar-title class="qw-mx-4 qw-text-center qw-select-none">
-        AI-Image Manager
+      <v-app-bar-title class="qw-mx-4 qw-text-center">
+        <div class="qw-select-none">
+          AI-Image Manager
+        </div>
       </v-app-bar-title>
       <div v-show="showDrawerIcon" id="app-append-icon" class="app-bar-spacer">
       </div>
