@@ -197,4 +197,11 @@ export class ImageObjectService {
       return returnObj;
     });
   }
+
+  async cardGamePage(votedImageIds: string[], size = 10) {
+    const allIds = await this.getAllIds();
+    const filteredIds = allIds.filter((id) => !votedImageIds.includes(id));
+    const randomIdsArray = await this.getAmountOfRandomItems(filteredIds, size);
+    return this.getImagesByIds(randomIdsArray);
+  }
 }

@@ -1,10 +1,15 @@
+import { VoteService } from './../vote/vote.service';
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
-import { Public } from 'src/auth/auth.decorator';
+import { JwtObject, Public } from 'src/auth/auth.decorator';
 import { ImageObjectService } from './image-object.service';
+import { JwtPayload } from 'src/auth/auth.service';
 
 @Controller('images')
 export class ImageObjectController {
-  constructor(private readonly imageService: ImageObjectService) {}
+  constructor(
+    private readonly imageService: ImageObjectService,
+    private readonly voteService: VoteService,
+  ) {}
 
   @Public()
   @Get('view/:id')
@@ -74,5 +79,14 @@ export class ImageObjectController {
       total: results.reduce((acc, cur) => acc + cur._count, 0),
       results,
     };
+  }
+
+  @Get('card-game')
+  async cardGame(@JwtObject() loginInfo: JwtPayload) {
+    const votedImageIds = await this.voteService.getVotedImageIdsByUser(
+      loginInfo.id,
+    );
+    const results = await this.imageService.cardGamePage(votedImageIds);
+    return results;
   }
 }
