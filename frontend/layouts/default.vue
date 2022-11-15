@@ -2,7 +2,7 @@
   <div class="layout-container mobile-layout">
     <v-app-bar :elevation="0" :color="'indigo-darken-4'" border="t-md b-md s-lg e-lg" density="compact">
       <v-app-bar-title class="qw-mx-4 qw-text-center">
-        <div class="qw-select-none">
+        <div class="qw-select-none" @click="$router.push('/')">
           AI-Image Manager
         </div>
       </v-app-bar-title>
@@ -48,7 +48,7 @@ const apiBaseURL = useApiBaseURL();
 const layoutStore = useLayoutStore();
 const { drawerActive, backgroundCover, drawerItems } = storeToRefs(layoutStore);
 const backgroundStyle = computed(() => {
-  if (!backgroundCover.value) return DEFAULT_GRADIENT;
+  if (!backgroundCover.value) return '';
   const url = `url(${apiBaseURL}/api/images/view/${backgroundCover.value})`
   return url
 });
@@ -94,7 +94,7 @@ const bottomItems = [
   {
     label: 'Extras',
     icon: 'mdi-shimmer',
-    route: '/extras'
+    route: '/votes'
   },
   {
     label: 'Profile',
@@ -110,28 +110,34 @@ const bottomItems = [
 }
 html, body, .__nuxt, .v-application {
   height: 100vh;
-  height: var(--doc-height);
+  height: calc(var(--doc-height) - 48px);
   width: 100vw;
 }
 .v-application__wrap {
   min-height: unset !important;
 }
-.mobile-layout, .v-main, .v-main > div {
+.mobile-layout, .v-main > div {
   height: 100%;
   width: 100%;
 }
+.v-main {
+  height: calc(100% + var(--v-layout-bottom));
+}
 
-.v-toolbar {
+.v-toolbar, .v-bottom-navigation {
   width: 100%;
 }
 
 .v-main {
-  background-color: rgb(243, 243, 230);
+  // background-color: rgb(243, 243, 230);
+  // background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+  // background-image: linear-gradient(to top, #30cfd0 0%, #000640 100%);
+  background-image: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
 
-  // background: conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172));
-  background: v-bind(backgroundStyle);
-  background-size: cover;
-  background-position: center;
+  // // background: conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172));
+  // background: v-bind(backgroundStyle);
+  // background-size: cover;
+  // background-position: center;
 }
 
 .v-app-bar {
