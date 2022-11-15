@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { JwtObject } from 'src/auth/auth.decorator';
 import { JwtPayload } from 'src/auth/auth.service';
+import { shuffleArray } from 'src/utils';
 import { VoteService, VoteType } from './vote.service';
 
 @Controller('vote')
@@ -31,10 +32,11 @@ export class VoteController {
     @JwtObject() loginInfo: JwtPayload,
     @Query('type') type: VoteType,
   ) {
-    const voteImageIds = this.voteService.getVotedImageIdsByUser(
+    const voteImageIds = await this.voteService.getVotedImageIdsByUser(
       loginInfo.id,
       type,
     );
+    shuffleArray(voteImageIds);
     return voteImageIds;
   }
 }
