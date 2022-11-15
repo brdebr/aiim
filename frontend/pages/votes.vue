@@ -1,16 +1,5 @@
 <template>
   <div class="qw-pt-3" v-if="!imagesPending">
-    <ClientOnly>
-      <Teleport to='#app-append-icon'>
-        <v-chip v-if="currentImagesFetched?.count">
-          <transition name="scroll-y" mode="out-in">
-            <span :key="currentImagesFetched?.count">
-              {{ currentImagesFetched?.count }} 👍️
-            </span>
-          </transition>
-        </v-chip>
-      </Teleport>
-    </ClientOnly>
     <div class="gallery-grid" v-if="allVotedImages.length">
       <img
         v-for="image in allVotedImages" :key="image.id"

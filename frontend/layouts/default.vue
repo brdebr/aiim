@@ -24,9 +24,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-main>
-      <div class="qw-px-3">
         <slot/>
-      </div>
     </v-main>
     <v-bottom-navigation mode="shift" :elevation="0" density="comfortable" border="t-md b-md s-lg e-lg" bg-color="indigo-darken-4" grow hide-on-scroll>
       <v-btn v-for="item in bottomItems" :to="item.route" :key="item.route" :value="item.route">
