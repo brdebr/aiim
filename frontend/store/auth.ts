@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_PREFIX as PREFIX, useApiBaseURL } from "~~/constants";
+import { LOCAL_STORAGE_PREFIX as PREFIX } from "~~/constants";
 import { LoginInfo } from "~~/types";
 
 export type LoginResponse = {

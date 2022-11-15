@@ -43,7 +43,6 @@
 <script setup lang="ts">
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia';
-import { useApiBaseURL } from '~~/constants';
 
 const DEFAULT_GRADIENT = 'conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172))'
 

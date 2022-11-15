@@ -24,7 +24,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { useApiBaseURL } from '~~/constants';
 import { ImageObject } from '~~/types';
 
 const router = useRouter();

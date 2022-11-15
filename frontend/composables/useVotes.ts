@@ -1,4 +1,3 @@
-import { useApiBaseURL } from "~~/constants";
 import { ImageObject } from "~~/types";
 
 export const useVotes = async () => {
