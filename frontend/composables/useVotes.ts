@@ -1,8 +1,10 @@
 import { ImageObject } from "~~/types";
+import { VoteType } from "./useCardGame";
+import { useVoteImage } from "./useVoteImage";
 
 export const useVotes = async () => {
   const authStore = useAuthStore();
-  const apiBaseURL = useApiBaseURL();
+  const { voteImage: voteImageFetch } = useVoteImage();
   const { fetchOptions } = storeToRefs(authStore);
 
   onMounted(async () => {
@@ -21,9 +23,8 @@ export const useVotes = async () => {
   const { data: votedImageIdsResponse, refresh } = await useAsyncData<string[]>('initial-voted-ids-fetch', fetchVotedImageIds);
   const votedImageIds = ref<string[]>(votedImageIdsResponse.value || []);
 
-  const voteImage = async (image: ImageObject) => {
-    console.log(`Voting for ${image.id}`);
-    await $fetch(`${apiBaseURL}/api/vote/${image.id}`, {...fetchOptions.value, method: 'POST'});
+  const voteImage = async (image: ImageObject, type: VoteType = VoteType.UPVOTE) => {
+    voteImageFetch(image, type);
     votedImageIds.value.push(image.id);
   }
 
