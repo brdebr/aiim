@@ -7,7 +7,6 @@ export const useVoteImage = () => {
   const { fetchOptions } = storeToRefs(authStore);
 
   const voteImage = async (image: ImageObject, type: VoteType = VoteType.UPVOTE) => {
-    console.log(`Voting for ${image.id}`);
     const query = new URLSearchParams({
       type,
     });

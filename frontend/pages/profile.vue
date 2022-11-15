@@ -20,6 +20,5 @@
 <script lang="ts" setup>
 
 const authStore = useAuthStore();
-const { loginInfo, token } = storeToRefs(authStore);
-console.log(`Token for profile: ${loginInfo.value?.id}`, token.value);
+const { loginInfo } = storeToRefs(authStore);
 </script>

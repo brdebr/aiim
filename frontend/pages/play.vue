@@ -55,63 +55,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ImageObject } from '~~/types';
-const BUFFER_SIZE = 5;
+// const { getDimensions } = useImageUtils();
+const { firstImage, recoverLastFromBuffer, dislikeFn, favoriteFn, likeFn, extraFn } = await useCardGame();
 
-const { getDimensions } = useImageUtils();
-const { currentCards, rerollCards } = await useCardGame();
-const { voteImage } = useVoteImage();
-
-watch(currentCards, (newVal) => {
-  if (newVal.length > 3) return;
-  rerollCards();
-});
-
-const buffer = ref<ImageObject[]>([]);
-watch(buffer, (newBuffer) => {
-  console.log('buffer', newBuffer.length);
-  if (newBuffer.length > BUFFER_SIZE) {
-    newBuffer.pop();
-  }
-});
-
-const saveLastToBuffer = () => {
-  if(!currentCards.value.length) return;
-  const aux = currentCards.value.shift();
-  buffer.value.unshift(aux as ImageObject);
-};
-
-const recoverLastFromBuffer = () => {
-  if(!buffer.value.length) return;
-  const aux = buffer.value.shift();
-  currentCards.value.unshift(aux as ImageObject);
-};
-
-const likeFn = () => {
-  voteImage(firstImage.value, VoteType.UPVOTE);
-  saveLastToBuffer();
-};
-
-const dislikeFn = () => {
-  voteImage(firstImage.value, VoteType.DOWNVOTE);
-  saveLastToBuffer();
-};
-
-const favoriteFn = () => {
-  voteImage(firstImage.value, VoteType.FAVORITE);
-  saveLastToBuffer();
-};
-
-const extraFn = () => {
-  voteImage(firstImage.value, VoteType.TO_MODIFY);
-  saveLastToBuffer();
-};
-
-
-const firstImage = computed(() => currentCards.value?.[0]);
-const isWide = computed(() => {
-  return getDimensions(firstImage.value).isWide;
-});
+// const isWide = computed(() => {
+//   return getDimensions(firstImage.value).isWide;
+// });
 
 </script>
 <style lang="scss">
