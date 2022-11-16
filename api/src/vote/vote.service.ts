@@ -22,32 +22,21 @@ export class VoteService {
     this.logger.log(
       `Voting for image "${imageId}" by user "${userId}${voteStr}"`,
     );
-    const existingVote = await this.prisma.vote.findFirst({
+
+    const vote = await this.prisma.vote.upsert({
       where: {
-        imageId,
-        userId,
+        userId_imageId: {
+          userId,
+          imageId,
+        },
       },
-    });
-
-    if (existingVote) {
-      throw new Error(
-        `You've already voted for this image dummy! 😥 - ${userId} - ${imageId}`,
-      );
-    }
-
-    const vote = await this.prisma.vote.create({
-      data: {
-        vote: voteType || VoteType.UPVOTE,
-        image: {
-          connect: {
-            id: imageId,
-          },
-        },
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
+      create: {
+        userId,
+        imageId,
+        vote: voteType,
+      },
+      update: {
+        vote: voteType,
       },
     });
 
