@@ -23,8 +23,18 @@ export class VoteController {
     @JwtObject() loginInfo: JwtPayload,
     @Query('type') type: VoteType,
   ) {
-    const votes = this.voteService.getVotesByUserId(loginInfo.id, type);
+    const votes = await this.voteService.getVotesByUserIdIncludingImage(
+      loginInfo.id,
+      type,
+    );
+    votes.results = shuffleArray(votes.results);
     return votes;
+  }
+
+  @Get('my-vote-counts')
+  async voteCountsByUser(@JwtObject() loginInfo: JwtPayload) {
+    const result = await this.voteService.getVoteCountsByUser(loginInfo.id);
+    return result;
   }
 
   @Get('voted-image-ids')
@@ -36,7 +46,6 @@ export class VoteController {
       loginInfo.id,
       type,
     );
-    shuffleArray(voteImageIds);
-    return voteImageIds;
+    return shuffleArray(voteImageIds);
   }
 }

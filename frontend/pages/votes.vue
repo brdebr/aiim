@@ -1,87 +1,92 @@
 <template>
-  <div class="qw-pt-3" v-if="!imagesPending">
-    <div class="gallery-grid" v-if="allVotedImages.length">
-      <img
-        v-for="image in allVotedImages" :key="image.id"
-        :data-width="image.width" :data-height="image.height"
-        :data-id="image.id"
-        :src="`${apiBaseURL}/api/images/view/${image.id}`"
-        loading="lazy"
-        :class="getImageClass(image)"
-        :title="image.prompt" :alt="image.prompt"
-      />
+  <div class="" v-if="votedImages.length">
+    <v-tabs
+      v-model="currentFilter"
+      grow
+      bg-color="primary-darken-1"
+    >
+      <v-tab value="UPVOTE" color="secondary">
+        <v-icon start>
+          mdi-heart
+        </v-icon>
+        <div>
+          <span class="">
+            {{ voteCountsMap.UPVOTE }}
+          </span>
+        </div>
+      </v-tab>
+      <v-tab value="FAVORITE" color="blue-lighten-1">
+        <v-icon start>
+          mdi-star
+        </v-icon>
+        <div>
+          <span class="">
+            {{ voteCountsMap.FAVORITE }}
+          </span>
+        </div>
+      </v-tab>
+      <v-tab value="TO_MODIFY" color="purple-lighten-1">
+        <v-icon start>
+          mdi-shimmer
+        </v-icon>
+        <div>
+          <span class="">
+            {{ voteCountsMap.TO_MODIFY }}
+          </span>
+        </div>
+      </v-tab>
+    </v-tabs>
+    <div class="gallery-grid" v-if="votedImages.length">
+      <div v-for="vote in votedImages" :key="vote.id" :data-id="vote.image.id" class="qw-relative">
+        <div class="qw-absolute qw-right-1 qw-top-1">
+          <v-icon :color="mapVoteTypeToColor(vote.vote)">
+            {{ mapVoteTypeToIcon(vote.vote) }}
+          </v-icon>
+        </div>
+        <img
+          :data-width="vote.image.width" :data-height="vote.image.height"
+          :src="`${apiBaseURL}/api/images/view/${vote.image.id}`"
+          loading="lazy"
+          :title="vote.image.prompt" :alt="vote.image.prompt"
+        />
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { ImageObject } from "~~/types";
+import { VoteType } from '~~/composables/useCardGame';
 
-type Vote = {
-  id: string;
-  imageId: string;
-  userId: string;
-  createdAt: string;
-  image: ImageObject;
-}
+const { votedImages, currentFilter, voteCountsMap } = useVotesGallery();
 
-type ImageObjectsPageResponse = {
-  count: number;
-  results: Vote[];
+const mapVoteTypeToIcon = (type: VoteType) => {
+  switch (type) {
+    case VoteType.UPVOTE:
+      return 'mdi-heart';
+    case VoteType.FAVORITE:
+      return 'mdi-star';
+    case VoteType.TO_MODIFY:
+      return 'mdi-shimmer';
+    default:
+      return '';
+  }
 };
 
-type VoteWithImage = Omit<Vote, "image"> & ImageObject;
+const mapVoteTypeToColor = (type: VoteType) => {
+  switch (type) {
+    case VoteType.UPVOTE:
+      return 'secondary';
+    case VoteType.FAVORITE:
+      return 'blue-lighten-1';
+    case VoteType.TO_MODIFY:
+      return 'purple-lighten-1';
+    default:
+      return '';
+  }
+};
 
 // API
-const authStore = useAuthStore();
 const apiBaseURL = useApiBaseURL();
-const { authHeader } = storeToRefs(authStore);
 
-// Fetching
-const {
-  data: currentImagesFetched,
-  refresh,
-  pending: imagesPending,
-} = await useFetch<ImageObjectsPageResponse>('/api/vote/my-votes',
-  {
-    baseURL: apiBaseURL,
-    headers: authHeader.value
-  }
-);
-
-// Infinite loading
-const allVotedImages = ref<VoteWithImage[]>(currentImagesFetched.value?.results.map(el => {
-  const { image, ...rest } = el;
-  return {
-    ...rest,
-    ...image,
-  }
-}) || []);
-watch(currentImagesFetched, (newVal) => {
-  if (newVal) {
-    allVotedImages.value = newVal.results.map(el => {
-      const { image, ...rest } = el;
-      return {
-        ...rest,
-        ...image,
-      }
-    })
-  }
-});
-
-onMounted(() => {
-  refresh();
-});
-
-// Image class
-const getImageClass = (image: ImageObject) => {
-  if (image.width / image.height < 0.85) {
-    return "tall";
-  }
-  if (image.width / image.height > 1.15) {
-    return "wide";
-  }
-  return "";
-};
 </script>
 <style lang="scss">
 .gallery-grid {

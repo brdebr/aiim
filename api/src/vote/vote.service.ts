@@ -43,7 +43,11 @@ export class VoteService {
     return vote;
   }
 
-  async getVotesByUserId(userId: string, voteType?: VoteType, size = 150) {
+  async getVotesByUserIdIncludingImage(
+    userId: string,
+    voteType?: VoteType,
+    size = 20,
+  ) {
     const votes = await this.prisma.vote.findMany({
       where: {
         userId: userId,
@@ -64,6 +68,17 @@ export class VoteService {
       results: votes.map((vote) => excludeKeys(vote, 'userId', 'imageId')),
       count: length,
     };
+  }
+
+  async getVoteCountsByUser(userId: string) {
+    const votes = await this.prisma.vote.groupBy({
+      by: ['vote'],
+      _count: true,
+      where: {
+        userId,
+      },
+    });
+    return votes;
   }
 
   async getVotedImageIdsByUser(userId: string, voteType?: VoteType) {
