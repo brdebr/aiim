@@ -25,14 +25,6 @@ export type VoteCountsByUserResponseResults = {
   _count: number;
 }[]
 
-// const allVotedImages = ref<VoteWithImage[]>(currentImagesFetched.value?.results.map(el => {
-//   const { image, ...rest } = el;
-//   return {
-//     ...rest,
-//     ...image,
-//   }
-// }) || []);
-
 export const VotedResponseToVotes = (response: VotedImageObjectsPageResponse): Vote[] => {
   return response.results;
 };
@@ -44,23 +36,11 @@ export const useVotesGallery = () => {
   const { fetchOptions } = storeToRefs(authStore);
   const votedImages = ref<Vote[]>([]);
 
-  // const parseVotedResponse = (response: VotedImageObjectsPageResponse): Vote[] => {
-  //   const { results } = response;
-  //   const aux = results.map((el) => {
-  //     const { image, ...rest } = el;
-  //     return {
-  //       ...rest,
-  //       ...image,
-  //     };
-  //   });
-  //   return aux;
-  // };
-
   const fetchVotedImages = async (filterType? : VoteType) => {
     const query = new URLSearchParams({
       type: filterType || '',
     });
-    const endpoint = `/api/vote/my-votes?${query.toString()}`;
+    const endpoint = `/api/vote/my-votes?${filterType ? query.toString() : ''}`;
     const response = await $fetch<VotedImageObjectsPageResponse>(endpoint, fetchOptions.value);
     return response.results;
   }

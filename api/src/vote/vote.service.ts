@@ -51,7 +51,7 @@ export class VoteService {
     const votes = await this.prisma.vote.findMany({
       where: {
         userId: userId,
-        vote: voteType || VoteType.UPVOTE,
+        vote: voteType,
       },
       include: {
         image: {

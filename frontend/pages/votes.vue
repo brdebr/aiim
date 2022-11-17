@@ -5,53 +5,13 @@
       grow
       bg-color="primary-darken-1"
     >
-      <v-tab value="UPVOTE" color="secondary">
+      <v-tab v-for="tab in tabs" :key="tab.value" :value="tab.value" :color="tab.color">
         <v-icon start>
-          mdi-heart
+          {{ tab.icon }}
         </v-icon>
         <div>
           <span class="">
-            {{ voteCountsMap.UPVOTE }}
-          </span>
-        </div>
-      </v-tab>
-      <v-tab value="FAVORITE" color="blue-lighten-1">
-        <v-icon start>
-          mdi-star
-        </v-icon>
-        <div>
-          <span class="">
-            {{ voteCountsMap.FAVORITE }}
-          </span>
-        </div>
-      </v-tab>
-      <v-tab value="TO_MODIFY" color="purple-lighten-1">
-        <v-icon start>
-          mdi-shimmer
-        </v-icon>
-        <div>
-          <span class="">
-            {{ voteCountsMap.TO_MODIFY }}
-          </span>
-        </div>
-      </v-tab>
-      <v-tab value="DOWNVOTE" color="red">
-        <v-icon start>
-          mdi-window-close
-        </v-icon>
-        <div>
-          <span class="">
-            {{ voteCountsMap.DOWNVOTE }}
-          </span>
-        </div>
-      </v-tab>
-      <v-tab value="" color="white">
-        <v-icon start>
-          mdi-window-close
-        </v-icon>
-        <div>
-          <span class="">
-            {{ totalVotes }}
+            {{ voteCountsMap[tab.value as VoteType] || totalVotes }}
           </span>
         </div>
       </v-tab>
@@ -77,6 +37,34 @@
 import { VoteType } from '~~/composables/useCardGame';
 
 const { votedImages, currentFilter, voteCountsMap, totalVotes } = useVotesGallery();
+
+const tabs = [
+  {
+    value: 'FAVORITE',
+    color: 'blue-lighten-1',
+    icon: 'mdi-star',
+  },
+  {
+    value: 'UPVOTE',
+    color: 'secondary',
+    icon: 'mdi-heart',
+  },
+  {
+    value: 'TO_MODIFY',
+    color: 'purple-lighten-1',
+    icon: 'mdi-shimmer',
+  },
+  {
+    value: 'DOWNVOTE',
+    color: 'red',
+    icon: 'mdi-window-close',
+  },
+  {
+    value: '',
+    color: 'white',
+    icon: 'mdi-window-close',
+  },
+];
 
 const mapVoteTypeToIcon = (type: VoteType) => {
   switch (type) {
@@ -117,6 +105,7 @@ const apiBaseURL = useApiBaseURL();
   display: grid;
   grid-gap: 3px;
   grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  background-image: linear-gradient(to top, hsl(180deg, 63%, 25%) -15%, #000640 100%);
   img {
     width: 100%;
     height: 100%;
