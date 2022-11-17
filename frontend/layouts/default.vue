@@ -92,8 +92,8 @@ const bottomItems = [
     route: '/generate'
   },
   {
-    label: 'Extras',
-    icon: 'mdi-shimmer',
+    label: 'Votes',
+    icon: 'mdi-thumbs-up-down',
     route: '/votes'
   },
   {
@@ -129,15 +129,7 @@ html, body, .__nuxt, .v-application {
 }
 
 .v-main {
-  // background-color: rgb(243, 243, 230);
-  // background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-  // background-image: linear-gradient(to top, #30cfd0 0%, #000640 100%);
   background-image: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
-
-  // // background: conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172));
-  // background: v-bind(backgroundStyle);
-  // background-size: cover;
-  // background-position: center;
 }
 
 .v-app-bar {
