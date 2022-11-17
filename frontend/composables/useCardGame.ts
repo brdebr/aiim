@@ -19,7 +19,7 @@ export const useCardGame = async () => {
 
   const authStore = useAuthStore();
   const { fetchOptions } = storeToRefs(authStore);
-  const { voteImage } = useVoteImage();
+  const { voteImage, voteLoading } = useVoteImage();
 
   const fetchCardsPage = async () => {
     const endpoint = `/api/images/card-game`;
@@ -27,13 +27,13 @@ export const useCardGame = async () => {
     return response;
   };
 
-  const voteCard = async (image: ImageObject, vote: VoteType) => {
-    const query = new URLSearchParams({
-      type: vote,
-    });
-    const endpoint = `/api/vote/${image.id}${query.toString()}`;
-    await $fetch(endpoint, {...fetchOptions.value, method: 'POST'});
-  }
+  // const voteCard = async (image: ImageObject, vote: VoteType) => {
+  //   const query = new URLSearchParams({
+  //     type: vote,
+  //   });
+  //   const endpoint = `/api/vote/${image.id}${query.toString()}`;
+  //   await $fetch(endpoint, {...fetchOptions.value, method: 'POST'});
+  // }
 
   const rerollCards = async () => {
     const newCards = await fetchCardsPage();
@@ -91,7 +91,8 @@ export const useCardGame = async () => {
     rerollCards,
     fetchCardsPage,
     currentCards,
-    voteCard,
+    // voteCard,
+    voteLoading,
     recoverLastFromBuffer,
     likeFn,
     dislikeFn,
