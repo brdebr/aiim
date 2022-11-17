@@ -35,6 +35,26 @@
           </span>
         </div>
       </v-tab>
+      <v-tab value="DOWNVOTE" color="red">
+        <v-icon start>
+          mdi-window-close
+        </v-icon>
+        <div>
+          <span class="">
+            {{ voteCountsMap.DOWNVOTE }}
+          </span>
+        </div>
+      </v-tab>
+      <v-tab value="" color="white">
+        <v-icon start>
+          mdi-window-close
+        </v-icon>
+        <div>
+          <span class="">
+            {{ totalVotes }}
+          </span>
+        </div>
+      </v-tab>
     </v-tabs>
     <div class="gallery-grid" v-if="votedImages.length">
       <div v-for="vote in votedImages" :key="vote.id" :data-id="vote.image.id" class="qw-relative">
@@ -56,7 +76,7 @@
 <script lang="ts" setup>
 import { VoteType } from '~~/composables/useCardGame';
 
-const { votedImages, currentFilter, voteCountsMap } = useVotesGallery();
+const { votedImages, currentFilter, voteCountsMap, totalVotes } = useVotesGallery();
 
 const mapVoteTypeToIcon = (type: VoteType) => {
   switch (type) {
@@ -66,6 +86,8 @@ const mapVoteTypeToIcon = (type: VoteType) => {
       return 'mdi-star';
     case VoteType.TO_MODIFY:
       return 'mdi-shimmer';
+    case VoteType.DOWNVOTE:
+      return 'mdi-window-close';
     default:
       return '';
   }
@@ -79,6 +101,8 @@ const mapVoteTypeToColor = (type: VoteType) => {
       return 'blue-lighten-1';
     case VoteType.TO_MODIFY:
       return 'purple-lighten-1';
+    case VoteType.DOWNVOTE:
+      return 'red';
     default:
       return '';
   }

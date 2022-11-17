@@ -33,8 +33,12 @@ export class VoteController {
 
   @Get('my-vote-counts')
   async voteCountsByUser(@JwtObject() loginInfo: JwtPayload) {
-    const result = await this.voteService.getVoteCountsByUser(loginInfo.id);
-    return result;
+    const results = await this.voteService.getVoteCountsByUser(loginInfo.id);
+    const total = results.reduce((acc, cur) => acc + cur._count, 0);
+    return {
+      results,
+      count: total,
+    };
   }
 
   @Get('voted-image-ids')

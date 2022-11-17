@@ -15,12 +15,15 @@ export type VotedImageObjectsPageResponse = {
   results: Vote[];
 };
 
-export type VoteCountsByUserResponse = [
-  {
-    vote: VoteType;
-    _count: number;
-  }
-]
+export type VoteCountsByUserResponse = {
+  count: number,
+  results: VoteCountsByUserResponseResults
+}
+
+export type VoteCountsByUserResponseResults = {
+  vote: VoteType;
+  _count: number;
+}[]
 
 // const allVotedImages = ref<VoteWithImage[]>(currentImagesFetched.value?.results.map(el => {
 //   const { image, ...rest } = el;
@@ -67,7 +70,8 @@ export const useVotesGallery = () => {
     const response = await $fetch<VoteCountsByUserResponse>(endpoint, fetchOptions.value);
     return response;
   }
-  const voteCounts = ref<VoteCountsByUserResponse>();
+  const voteCounts = ref<VoteCountsByUserResponseResults>();
+  const totalVotes = ref(0);
   const voteCountsMap = computed(() => {
     if (!voteCounts.value) {
       return {
@@ -75,6 +79,7 @@ export const useVotesGallery = () => {
         [VoteType.DOWNVOTE]: 0,
         [VoteType.FAVORITE]: 0,
         [VoteType.TO_MODIFY]: 0,
+        [VoteType.TO_UPSCALE]: 0,
       } as Record<VoteType, number>;
     }
     return voteCounts.value.reduce((acc, el) => {
@@ -90,14 +95,13 @@ export const useVotesGallery = () => {
   });
 
   onMounted(async () => {
+    const voteCountsFetched = await fetchVoteCounts()
     if (votedImages.value.length) return;
-    const [votesFetched, voteCountsFetched] = await Promise.all([
-      fetchVotedImages(),
-      fetchVoteCounts(),
-    ]);
+    const votesFetched = await fetchVotedImages();
 
     votedImages.value = votesFetched;
-    voteCounts.value = voteCountsFetched;
+    totalVotes.value = voteCountsFetched.count;
+    voteCounts.value = voteCountsFetched.results;
   });
   
 
@@ -106,6 +110,7 @@ export const useVotesGallery = () => {
     fetchVotedImages,
     currentFilter,
     voteCounts,
+    totalVotes,
     fetchVoteCounts,
     voteCountsMap,
   }
