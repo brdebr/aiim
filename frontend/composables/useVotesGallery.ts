@@ -36,6 +36,13 @@ export const useVotesGallery = () => {
   const { fetchOptions } = storeToRefs(authStore);
   const votedImages = ref<Vote[]>([]);
 
+  const fetchTotalImages = async () => {
+    const endpoint = `/api/images/total`;
+    const response = await $fetch<number>(endpoint, fetchOptions.value);
+    return response;
+  };
+  const totalImages = ref<number>(0);
+
   const fetchVotedImages = async (filterType? : VoteType) => {
     const query = new URLSearchParams({
       type: filterType || '',
@@ -76,12 +83,13 @@ export const useVotesGallery = () => {
 
   onMounted(async () => {
     const voteCountsFetched = await fetchVoteCounts()
-    if (votedImages.value.length) return;
+    const totalImagesFetched = await fetchTotalImages();
     const votesFetched = await fetchVotedImages();
 
-    votedImages.value = votesFetched;
     totalVotes.value = voteCountsFetched.count;
     voteCounts.value = voteCountsFetched.results;
+    totalImages.value = totalImagesFetched;
+    votedImages.value = votesFetched;
   });
   
 
@@ -93,5 +101,7 @@ export const useVotesGallery = () => {
     totalVotes,
     fetchVoteCounts,
     voteCountsMap,
+    totalImages,
+    fetchTotalImages
   }
 };

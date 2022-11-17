@@ -11,7 +11,7 @@
         </v-icon>
         <div>
           <span class="">
-            {{ voteCountsMap[tab.value as VoteType] || totalVotes }}
+            {{ voteCountsMap[tab.value as VoteType] || `${totalVotes}/${totalImages} - ${percentage}%` }}
           </span>
         </div>
       </v-tab>
@@ -23,12 +23,7 @@
             {{ mapVoteTypeToIcon(vote.vote) }}
           </v-icon>
         </div>
-        <img
-          :data-width="vote.image.width" :data-height="vote.image.height"
-          :src="`${apiBaseURL}/api/images/view/${vote.image.id}`"
-          loading="lazy"
-          :title="vote.image.prompt" :alt="vote.image.prompt"
-        />
+        <IoView :image="vote.image"/>
       </div>
     </div>
   </div>
@@ -36,7 +31,8 @@
 <script lang="ts" setup>
 import { VoteType } from '~~/composables/useCardGame';
 
-const { votedImages, currentFilter, voteCountsMap, totalVotes } = useVotesGallery();
+const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages } = useVotesGallery();
+const percentage = computed(() => ((totalVotes.value / totalImages.value) * 100).toFixed(2));
 
 const tabs = [
   {
@@ -112,10 +108,10 @@ const apiBaseURL = useApiBaseURL();
     object-fit: contain;
   }
   @media screen and (min-width: 600px) {
-    img.tall {
+    .tall {
       grid-row-end: span 2;
     }
-    img.wide {
+    .wide {
       grid-column-end: span 2 / auto;
     }
   }
