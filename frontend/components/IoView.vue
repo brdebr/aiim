@@ -1,5 +1,5 @@
 <template>
-  <div class="io-view">
+  <div class="io-view" :class="classObject">
     <img
       ref="imageEl"
       :data-width="props.image.width" :data-height="props.image.height"
@@ -20,10 +20,17 @@ const props = defineProps<{
 }>();
 
 const imageEl = ref<HTMLImageElement | null>(null);
+const { isTall, isWide } = getDimensions(props.image);
+
+const classObject = computed(() => {
+  return {
+    'io-view--tall': isTall,
+    'io-view--wide': isWide,
+  };
+});
 
 const { toggle } = useFullscreen(imageEl);
 
-const { isTall, isWide } = getDimensions(props.image);
 </script>
 <style lang="scss">
 .io-view {
