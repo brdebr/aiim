@@ -84,7 +84,7 @@ export class VoteService {
   async getVotedImageIdsByUser(userId: string, voteType?: VoteType) {
     const votes = await this.prisma.vote.findMany({
       where: {
-        userId: userId || '',
+        userId: userId,
         vote: voteType,
       },
       select: {
