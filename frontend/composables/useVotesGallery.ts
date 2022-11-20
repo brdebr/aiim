@@ -82,9 +82,11 @@ export const useVotesGallery = () => {
   });
 
   onMounted(async () => {
-    const voteCountsFetched = await fetchVoteCounts()
-    const totalImagesFetched = await fetchTotalImages();
-    const votesFetched = await fetchVotedImages();
+    const [voteCountsFetched, totalImagesFetched, votesFetched] = await Promise.all([
+      fetchVoteCounts(),
+      fetchTotalImages(),
+      fetchVotedImages(),
+    ]);
 
     totalVotes.value = voteCountsFetched.count;
     voteCounts.value = voteCountsFetched.results;

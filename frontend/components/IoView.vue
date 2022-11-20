@@ -23,7 +23,7 @@ const imageEl = ref<HTMLImageElement | null>(null);
 
 const { toggle } = useFullscreen(imageEl);
 
-const { isTall, isWide,  } = getDimensions(props.image);
+const { isTall, isWide } = getDimensions(props.image);
 </script>
 <style lang="scss">
 .io-view {

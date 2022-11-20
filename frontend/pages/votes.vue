@@ -58,7 +58,7 @@ const tabs = [
   {
     value: '',
     color: 'white',
-    icon: 'mdi-window-close',
+    icon: 'mdi-image-check',
   },
 ];
 

@@ -61,7 +61,6 @@
         icon
         size="small"
         color="yellow"
-        :loading="voteLoading"
         @click="recoverLastFromBuffer"
       >
         <v-icon>mdi-replay</v-icon>
@@ -72,8 +71,7 @@
         size="large"
         color="red"
         class="qw-mx-2"
-        :loading="voteLoading"
-        @click="dislikeFn"
+        @click="voteFn(VoteType.DOWNVOTE)"
       >
         <v-icon>mdi-window-close</v-icon>
       </v-btn>
@@ -82,8 +80,7 @@
         icon
         size="small"
         color="blue-lighten-1"
-        :loading="voteLoading"
-        @click="favoriteFn"
+        @click="voteFn(VoteType.FAVORITE)"
       >
         <v-icon>mdi-star</v-icon>
       </v-btn>
@@ -93,8 +90,7 @@
         size="large"
         color="secondary"
         class="qw-mx-2"
-        :loading="voteLoading"
-        @click="likeFn"
+        @click="voteFn(VoteType.UPVOTE)"
       >
         <v-icon>mdi-heart</v-icon>
       </v-btn>
@@ -103,8 +99,7 @@
         icon
         size="small"
         color="purple-lighten-1"
-        :loading="voteLoading"
-        @click="extraFn"
+        @click="voteFn(VoteType.TO_MODIFY)"
       >
         <v-icon>mdi-shimmer</v-icon>
       </v-btn>
@@ -113,7 +108,7 @@
 </template>
 <script setup lang="ts">
 // const { getDimensions } = useImageUtils();
-const { firstImage: displayingImage, recoverLastFromBuffer, dislikeFn, favoriteFn, likeFn, extraFn, voteLoading } = await useCardGame();
+const { firstImage: displayingImage, recoverLastFromBuffer, voteFn } = await useCardGame();
 
 const showingInfo = ref(false);
 
@@ -138,7 +133,6 @@ const showingInfo = ref(false);
     @apply qw-w-full qw-flex qw-flex-col qw-gap-4;
     > div {
       @apply qw-bg-white/45 qw-p-2 qw-rounded qw-backdrop-filter qw-backdrop-blur-md;
-      // @apply qw-text-white;
     }
     @apply qw-text-sm;
   }

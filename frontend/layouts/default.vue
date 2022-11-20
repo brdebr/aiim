@@ -109,8 +109,9 @@ const bottomItems = [
  --doc-height: 100vh;
 }
 html, body, .__nuxt, .v-application {
-  height: 100vh;
-  height: calc(var(--doc-height) - 48px);
+  @apply qw-h-[calc(100vh-104px)] sm:qw-h-[calc(100vh-48px)];
+  // height: ;
+  // height: calc(var(--doc-height) - 48px);
   width: 100vw;
 }
 .v-application__wrap {

@@ -11,9 +11,6 @@ export enum VoteType {
 
 export const useCardGame = async () => {
   onMounted(async () => {
-    if (currentCards.value.length) {
-      return;
-    }
     currentCards.value = await fetchCardsPage();
   });
 
@@ -26,14 +23,6 @@ export const useCardGame = async () => {
     const response = await $fetch<ImageObject[]>(endpoint, fetchOptions.value);
     return response;
   };
-
-  // const voteCard = async (image: ImageObject, vote: VoteType) => {
-  //   const query = new URLSearchParams({
-  //     type: vote,
-  //   });
-  //   const endpoint = `/api/vote/${image.id}${query.toString()}`;
-  //   await $fetch(endpoint, {...fetchOptions.value, method: 'POST'});
-  // }
 
   const rerollCards = async () => {
     const newCards = await fetchCardsPage();
@@ -62,42 +51,29 @@ export const useCardGame = async () => {
     if(!currentCards.value.length) return;
     const aux = currentCards.value.shift();
     buffer.value.unshift(aux as ImageObject);
+    return aux;
   };
 
   const recoverLastFromBuffer = () => {
     if(!buffer.value.length) return;
     const aux = buffer.value.shift();
     currentCards.value.unshift(aux as ImageObject);
+    return aux;
   };
 
-  const likeFn = () => {
-    voteImage(firstImage.value, VoteType.UPVOTE);
-    saveLastToBuffer();
-  };
-  const dislikeFn = () => {
-    voteImage(firstImage.value, VoteType.DOWNVOTE);
-    saveLastToBuffer();
-  };
-  const favoriteFn = () => {
-    voteImage(firstImage.value, VoteType.FAVORITE);
-    saveLastToBuffer();
-  };
-  const extraFn = () => {
-    voteImage(firstImage.value, VoteType.TO_MODIFY);
-    saveLastToBuffer();
+  const voteFn = async (voteType: VoteType) => {
+    const image = saveLastToBuffer();
+    if (!image) return;
+    await voteImage(image, voteType);
   };
 
   return {
     rerollCards,
     fetchCardsPage,
     currentCards,
-    // voteCard,
     voteLoading,
     recoverLastFromBuffer,
-    likeFn,
-    dislikeFn,
-    favoriteFn,
-    extraFn,
+    voteFn,
     firstImage,
   };
 }
