@@ -9,7 +9,8 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "nuxt": "3.0.0-rc.13",
+    "@kevinmarrec/nuxt-pwa": "^0.11.1",
+    "nuxt": "3.0.0",
     "nuxt-windicss": "^2.5.3",
     "vite-plugin-vuetify": "^1.0.0",
     "vuetify": "^3.0.0"
