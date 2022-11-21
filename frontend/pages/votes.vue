@@ -1,5 +1,5 @@
 <template>
-  <div class="" v-if="votedImages.length">
+  <div class="votes-gallery-page" v-if="votedImages.length">
     <v-tabs
       v-model="currentFilter"
       grow
@@ -25,13 +25,15 @@
         </div>
         <IoView :image="vote.image"/>
       </div>
+      <div ref="bottomEl" class="qw-absolute qw-bottom-0 qw-h-[250px] qw-w-full">
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { VoteType } from '~~/composables/useCardGame';
 
-const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages } = useVotesGallery();
+const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages, fetchNextPage } = useVotesGallery();
 const percentage = computed(() => ((totalVotes.value / totalImages.value) * 100).toFixed(2));
 
 const tabs = [
@@ -92,8 +94,13 @@ const mapVoteTypeToColor = (type: VoteType) => {
   }
 };
 
-// API
-const apiBaseURL = useApiBaseURL();
+const bottomEl = ref<HTMLElement>();
+useIntersectionObserver(
+  bottomEl,
+  useThrottleFn(() => {
+    fetchNextPage();
+  }, 1000)
+)
 
 </script>
 <style lang="scss">
@@ -102,6 +109,8 @@ const apiBaseURL = useApiBaseURL();
   grid-gap: 3px;
   grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   background-image: linear-gradient(to top, hsl(180deg, 63%, 25%) -15%, #000640 100%);
+  margin-bottom: -6px;
+  position: relative;
   img {
     width: 100%;
     height: 100%;
@@ -120,16 +129,5 @@ const apiBaseURL = useApiBaseURL();
   .gallery-grid {
     grid-template-columns: 1fr;
   }
-}
-.pagination {
-  background-color: aquamarine;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  z-index: 1;
 }
 </style>

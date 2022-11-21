@@ -2,6 +2,7 @@ import { ImageObject } from '~~/types';
 
 
 export const useImageUtils = () => {
+  // TODO: move to utils folder
 
   const getDimensions = (image: ImageObject) => {
     const { width, height } = image;

@@ -14,10 +14,9 @@
           loading="lazy"
           :width="image.width" :height="image.height"
           :title="image.prompt" :alt="image.prompt"
-          @click="voteImage(image)"
         />
       </div>
-      <v-btn variant="text" @click="fetchMoreImages" :loading="btnLoading">
+      <v-btn class="load-more-btn" variant="tonal" block @click="fetchMoreImages" :loading="btnLoading">
         Load More
       </v-btn>
     </div>
@@ -30,15 +29,12 @@ const router = useRouter();
 const apiBaseURL = useApiBaseURL();
 
 const gallery = await useGallery();
-const { allImages, imagesCount, loadingInitialImages } = gallery;
-const imagesLeft = computed(() => {
-  return imagesCount.value ? imagesCount.value - allImages.value.length: 0;
-});
+const { allImages, loadingInitialImages } = gallery;
 
 const btnLoading = ref(false);
 
 const votes = await useVotes();
-const { isVoted, voteImage } = votes;
+const { isVoted } = votes;
 
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
   btnLoading.value = true;
@@ -47,6 +43,7 @@ const fetchMoreImages = async ($state: { loaded: () => void; }) => {
     query: {
       page: lastImageId
     },
+    replace: true
   });
   btnLoading.value = false;
   $state?.loaded();
@@ -88,6 +85,9 @@ const getImageClass = (image: ImageObject) => {
       object-fit: contain;
       z-index: 1;
     }
+  }
+  .load-more-btn {
+    grid-column: 1/3;
   }
   
  }

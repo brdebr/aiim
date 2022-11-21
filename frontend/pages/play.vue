@@ -57,64 +57,60 @@
     </div>
     <div class="card-game-buttons">
       <v-btn
+        v-for="button in actionButtons"
         variant="outlined"
         icon
-        size="small"
-        color="yellow"
-        @click="recoverLastFromBuffer"
+        :size="button.size"
+        :color="button.color"
+        @click="button.voteType ? voteFn(button.voteType) : button.fn()"
       >
-        <v-icon>mdi-replay</v-icon>
-      </v-btn>
-      <v-btn
-        variant="outlined"
-        icon
-        size="large"
-        color="red"
-        class="qw-mx-2"
-        @click="voteFn(VoteType.DOWNVOTE)"
-      >
-        <v-icon>mdi-window-close</v-icon>
-      </v-btn>
-      <v-btn
-        variant="outlined"
-        icon
-        size="small"
-        color="blue-lighten-1"
-        @click="voteFn(VoteType.FAVORITE)"
-      >
-        <v-icon>mdi-star</v-icon>
-      </v-btn>
-      <v-btn
-        variant="outlined"
-        icon
-        size="large"
-        color="secondary"
-        class="qw-mx-2"
-        @click="voteFn(VoteType.UPVOTE)"
-      >
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-      <v-btn
-        variant="outlined"
-        icon
-        size="small"
-        color="purple-lighten-1"
-        @click="voteFn(VoteType.TO_MODIFY)"
-      >
-        <v-icon>mdi-shimmer</v-icon>
+        <v-icon>{{ button.icon }}</v-icon>
       </v-btn>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-// const { getDimensions } = useImageUtils();
 const { firstImage: displayingImage, recoverLastFromBuffer, voteFn } = await useCardGame();
 
-const showingInfo = ref(false);
+const actionButtons = [
+  {
+    icon: 'mdi-replay',
+    color: 'yellow',
+    class: '',
+    size: 'small',
+    fn: recoverLastFromBuffer,
+  },
+  {
+    icon: 'mdi-window-close',
+    color: 'red',
+    size: 'large',
+    class: 'qw-mx-2',
+    voteType: VoteType.DOWNVOTE,
+  },
+  {
+    icon: 'mdi-star',
+    color: 'blue-lighten-1',
+    size: 'small',
+    class: '',
+    voteType: VoteType.FAVORITE,
+  },
+  {
+    icon: 'mdi-heart',
+    color: 'secondary',
+    size: 'large',
+    class: 'qw-mx-2',
+    voteType: VoteType.UPVOTE,
+  },
+  {
+    icon: 'mdi-shimmer',
+    color: 'purple-lighten-1',
+    size: 'small',
+    class: '',
+    voteType: VoteType.TO_MODIFY,
+  },
+]
 
-// const isWide = computed(() => {
-//   return getDimensions(firstImage.value).isWide;
-// });
+const showingInfo = ref(false);
 
 </script>
 <style lang="scss">
@@ -125,8 +121,11 @@ const showingInfo = ref(false);
     @apply qw-w-full qw-h-full;
   }
   .card-game-buttons {
-    @apply qw-absolute qw-bottom-20 qw-px-3;
+    @apply qw-absolute qw-bottom-[var(--v-layout-bottom)];
+    @apply qw-pb-8 qw-pt-9 qw-px-3;
     @apply qw-w-full qw-flex qw-justify-center qw-items-center qw-gap-4;
+    background: rgb(0,0,0);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 1) -0%, rgba(9,9,119,0) 100%);
   }
   .card-game-info {
     @apply qw-absolute qw-top-3 qw-px-3;

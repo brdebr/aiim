@@ -25,16 +25,14 @@ export type VoteCountsByUserResponseResults = {
   _count: number;
 }[]
 
-export const VotedResponseToVotes = (response: VotedImageObjectsPageResponse): Vote[] => {
-  return response.results;
-};
-
-export type VoteWithImage = Omit<Vote, "image"> & ImageObject;
-
 export const useVotesGallery = () => {
   const authStore = useAuthStore();
   const { fetchOptions } = storeToRefs(authStore);
   const votedImages = ref<Vote[]>([]);
+
+  const lastVoteImage = computed(() => {
+    return votedImages.value[votedImages.value.length - 1];
+  });
 
   const fetchTotalImages = async () => {
     const endpoint = `/api/images/total`;
@@ -43,13 +41,25 @@ export const useVotesGallery = () => {
   };
   const totalImages = ref<number>(0);
 
-  const fetchVotedImages = async (filterType? : VoteType) => {
-    const query = new URLSearchParams({
-      type: filterType || '',
-    });
-    const endpoint = `/api/vote/my-votes?${filterType ? query.toString() : ''}`;
+  const fetchVotedImages = async (filterType? : VoteType, page?: string) => {
+    const queryObj: Record<string, string> = {}
+    if (filterType) {
+      queryObj['type'] = filterType;
+    }
+    if (page) {
+      queryObj['page'] = page;
+    }
+
+    const query = new URLSearchParams(queryObj);
+    const endpoint = `/api/vote/my-votes?${query.toString()}`;
     const response = await $fetch<VotedImageObjectsPageResponse>(endpoint, fetchOptions.value);
     return response.results;
+  }
+
+  const fetchNextPage = async () => {
+    if (!lastVoteImage.value) return;
+    const response = await fetchVotedImages(currentFilter.value, lastVoteImage.value.id);
+    votedImages.value = votedImages.value.concat(response);
   }
 
   const fetchVoteCounts = async () => {
@@ -75,7 +85,7 @@ export const useVotesGallery = () => {
     }, {} as Record<VoteType, number>);
   });
 
-  const currentFilter = ref<VoteType>();
+  const currentFilter = ref<VoteType>(VoteType.FAVORITE);
   watch(currentFilter, async (newFilter) => {
     const results = await fetchVotedImages(newFilter);
     votedImages.value = results;
@@ -85,7 +95,7 @@ export const useVotesGallery = () => {
     const [voteCountsFetched, totalImagesFetched, votesFetched] = await Promise.all([
       fetchVoteCounts(),
       fetchTotalImages(),
-      fetchVotedImages(),
+      fetchVotedImages(currentFilter.value),
     ]);
 
     totalVotes.value = voteCountsFetched.count;
@@ -104,6 +114,7 @@ export const useVotesGallery = () => {
     fetchVoteCounts,
     voteCountsMap,
     totalImages,
-    fetchTotalImages
+    fetchTotalImages,
+    fetchNextPage,
   }
 };

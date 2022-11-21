@@ -8,26 +8,25 @@
       </v-app-bar-title>
     </v-app-bar>
     <v-navigation-drawer
-      v-model="drawerActive"
+      v-if="false"
       temporary
     >
       <v-list>
-        <v-list-item
-          v-for="item in drawerItems"
-          :key="item.label"
-          :title="item.label"
-          :prepend-icon="item.icon"
-          :to="item.route"
-          nav
-        >
-        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-main>
         <slot/>
     </v-main>
-    <v-bottom-navigation mode="shift" :elevation="0" density="comfortable" border="t-md b-md s-lg e-lg" bg-color="indigo-darken-4" grow hide-on-scroll>
-      <v-btn v-for="item in bottomItems" :to="item.route" :key="item.route" :value="item.route">
+    <v-bottom-navigation
+      class="bottom-bar"
+      mode="shift"
+      :elevation="0"
+      density="comfortable"
+      border="t-md b-md s-lg e-lg"
+      bg-color="indigo-darken-4"
+      grow hide-on-scroll
+    >
+      <v-btn v-for="item in bottomNavigationItems" :to="item.route" :key="item.route" :value="item.route">
         <v-icon>
           {{ item.icon }}
         </v-icon>
@@ -42,66 +41,8 @@
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia';
 
-const DEFAULT_GRADIENT = 'conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172))'
-
-const apiBaseURL = useApiBaseURL();
 const layoutStore = useLayoutStore();
-const { drawerActive, backgroundCover, drawerItems } = storeToRefs(layoutStore);
-const backgroundStyle = computed(() => {
-  if (!backgroundCover.value) return '';
-  const url = `url(${apiBaseURL}/api/images/view/${backgroundCover.value})`
-  return url
-});
-
-const authStore = useAuthStore();
-const { userId } = storeToRefs(authStore);
-
-const toggleDrawer = () => {
-  drawerActive.value = !drawerActive.value;
-}
-
-const showDrawerIcon = computed(() => {
-  return !!userId.value;
-});
-
-const doc = ref();
-onMounted(() => {
-  doc.value = document.documentElement;
-});
-useResizeObserver(doc, useThrottleFn(
-  () => {
-    doc.value?.style.setProperty('--doc-height', `${window.innerHeight}px`)
-  }, 100)
-);
-
-
-const bottomItems = [
-  {
-    label: 'Card game',
-    icon: 'mdi-cards-outline',
-    route: '/play'
-  },
-  {
-    label: 'Gallery',
-    icon: 'mdi-image-search',
-    route: '/gallery'
-  },
-  {
-    label: 'Generate',
-    icon: 'mdi-brain',
-    route: '/generate'
-  },
-  {
-    label: 'Votes',
-    icon: 'mdi-thumbs-up-down',
-    route: '/votes'
-  },
-  {
-    label: 'Profile',
-    icon: 'mdi-account',
-    route: '/profile'
-  },
-]
+const { bottomNavigationItems } = storeToRefs(layoutStore);
 
 </script>
 <style lang="scss">
@@ -110,8 +51,6 @@ const bottomItems = [
 }
 html, body, .__nuxt, .v-application {
   @apply qw-h-[calc(100vh-104px)] sm:qw-h-[calc(100vh-48px)];
-  // height: ;
-  // height: calc(var(--doc-height) - 48px);
   width: 100vw;
 }
 .v-application__wrap {
@@ -121,15 +60,13 @@ html, body, .__nuxt, .v-application {
   height: 100%;
   width: 100%;
 }
-.v-main {
-  height: calc(100% + var(--v-layout-bottom));
-}
 
+// Fix these first rendering with a lower width
 .v-toolbar, .v-bottom-navigation {
   width: 100%;
 }
 
-.v-main {
+.mobile-layout {
   background-image: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
 }
 
@@ -138,5 +75,16 @@ html, body, .__nuxt, .v-application {
     min-width: 48px;
     margin-right: 10px;
   }
+}
+
+// Add a little more separation between the selected item and the text from the v-bottom-navigation
+.bottom-bar {
+ .v-bottom-navigation__content {
+  .v-btn.v-btn--active {
+    .v-btn__content {
+      gap: 3px;
+    }
+  }
+ }
 }
 </style>
