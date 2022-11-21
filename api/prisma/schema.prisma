@@ -79,5 +79,5 @@ model Vote {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-   @@unique([userId, imageId])
+  @@unique([userId, imageId])
 }

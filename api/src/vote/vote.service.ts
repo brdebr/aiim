@@ -46,9 +46,15 @@ export class VoteService {
   async getVotesByUserIdIncludingImage(
     userId: string,
     voteType?: VoteType,
+    pageId?: string,
     size = 20,
   ) {
+    const cursor = pageId ? { id: pageId } : undefined;
+    const skip = pageId ? 1 : 0;
     const votes = await this.prisma.vote.findMany({
+      cursor,
+      skip,
+      take: size,
       where: {
         userId: userId,
         vote: voteType,
@@ -60,7 +66,9 @@ export class VoteService {
           },
         },
       },
-      take: size,
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
     const length = votes.length;
 

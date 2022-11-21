@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { JwtObject } from 'src/auth/auth.decorator';
 import { JwtPayload } from 'src/auth/auth.service';
-import { shuffleArray } from 'src/utils';
 import { VoteService, VoteType } from './vote.service';
 
 @Controller('vote')
@@ -22,12 +21,14 @@ export class VoteController {
   async votesByUser(
     @JwtObject() loginInfo: JwtPayload,
     @Query('type') type: VoteType,
+    @Query('page') pageId: string,
   ) {
     const votes = await this.voteService.getVotesByUserIdIncludingImage(
       loginInfo.id,
       type,
+      pageId,
+      20,
     );
-    votes.results = shuffleArray(votes.results);
     return votes;
   }
 
@@ -50,6 +51,6 @@ export class VoteController {
       loginInfo.id,
       type,
     );
-    return shuffleArray(voteImageIds);
+    return voteImageIds;
   }
 }
