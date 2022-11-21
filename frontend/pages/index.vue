@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider theme="dark" with-background class="login-page">
+  <v-theme-provider theme="dark" with-background class="login-page" tag="div">
     <div class="login-form">
       <div class="text-h6 qw-text-center qw-mb-5">
         Login
@@ -45,7 +45,7 @@ const { loginEmail, loginPassword, executeLogin, loading } = await useLogin()
 .login-page {
   display: grid;
   place-items: center;
-  height: 100%;
+  height: calc(100vh - var(--v-layout-bottom) - var(--v-layout-top)) !important;
   width: 100%;
   @apply qw-pb-[85px] qw-px-3;
   background: unset !important;

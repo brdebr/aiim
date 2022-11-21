@@ -1,115 +1,126 @@
 <template>
-  <div class="qw-pt-3" v-if="!imagesPending">
-    <ClientOnly>
-      <Teleport to='#app-append-icon'>
-        <v-chip v-if="currentImagesFetched?.count">
-          <transition name="scroll-y" mode="out-in">
-            <span :key="currentImagesFetched?.count">
-              {{ currentImagesFetched?.count }} 👍️
-            </span>
-          </transition>
-        </v-chip>
-      </Teleport>
-    </ClientOnly>
-    <div class="gallery-grid" v-if="allVotedImages.length">
-      <img
-        v-for="image in allVotedImages" :key="image.id"
-        :data-width="image.width" :data-height="image.height"
-        :data-id="image.id"
-        :src="`${apiBaseURL}/api/images/view/${image.id}`"
-        loading="lazy"
-        :class="getImageClass(image)"
-        :title="image.prompt" :alt="image.prompt"
-      />
+  <div class="votes-gallery-page" v-if="votedImages.length">
+    <v-tabs
+      v-model="currentFilter"
+      grow
+      bg-color="primary-darken-1"
+    >
+      <v-tab v-for="tab in tabs" :key="tab.value" :value="tab.value" :color="tab.color">
+        <v-icon start>
+          {{ tab.icon }}
+        </v-icon>
+        <div>
+          <span class="">
+            {{ voteCountsMap[tab.value as VoteType] || `${totalVotes}/${totalImages} - ${percentage}%` }}
+          </span>
+        </div>
+      </v-tab>
+    </v-tabs>
+    <div class="gallery-grid" v-if="votedImages.length">
+      <div v-for="vote in votedImages" :key="vote.id" :data-id="vote.image.id" class="qw-relative">
+        <div class="qw-absolute qw-right-1 qw-top-1">
+          <v-icon :color="mapVoteTypeToColor(vote.vote)">
+            {{ mapVoteTypeToIcon(vote.vote) }}
+          </v-icon>
+        </div>
+        <IoView :image="vote.image"/>
+      </div>
+      <div ref="bottomEl" class="qw-absolute qw-bottom-0 qw-h-[250px] qw-w-full">
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { useApiBaseURL } from "~~/constants";
-import { ImageObject } from "~~/types";
+import { VoteType } from '~~/composables/useCardGame';
 
-type Vote = {
-  id: string;
-  imageId: string;
-  userId: string;
-  createdAt: string;
-  image: ImageObject;
-}
+const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages, fetchNextPage } = useVotesGallery();
+const percentage = computed(() => ((totalVotes.value / totalImages.value) * 100).toFixed(2));
 
-type ImageObjectsPageResponse = {
-  count: number;
-  results: Vote[];
-};
-
-type VoteWithImage = Omit<Vote, "image"> & ImageObject;
-
-// API
-const authStore = useAuthStore();
-const apiBaseURL = useApiBaseURL();
-const { authHeader } = storeToRefs(authStore);
-
-// Fetching
-const {
-  data: currentImagesFetched,
-  refresh,
-  pending: imagesPending,
-} = await useFetch<ImageObjectsPageResponse>('/api/vote/my-votes',
+const tabs = [
   {
-    baseURL: apiBaseURL,
-    headers: authHeader.value
-  }
-);
+    value: 'FAVORITE',
+    color: 'blue-lighten-1',
+    icon: 'mdi-star',
+  },
+  {
+    value: 'UPVOTE',
+    color: 'secondary',
+    icon: 'mdi-heart',
+  },
+  {
+    value: 'TO_MODIFY',
+    color: 'purple-lighten-1',
+    icon: 'mdi-shimmer',
+  },
+  {
+    value: 'DOWNVOTE',
+    color: 'red',
+    icon: 'mdi-window-close',
+  },
+  {
+    value: '',
+    color: 'white',
+    icon: 'mdi-image-check',
+  },
+];
 
-// Infinite loading
-const allVotedImages = ref<VoteWithImage[]>(currentImagesFetched.value?.results.map(el => {
-  const { image, ...rest } = el;
-  return {
-    ...rest,
-    ...image,
+const mapVoteTypeToIcon = (type: VoteType) => {
+  switch (type) {
+    case VoteType.UPVOTE:
+      return 'mdi-heart';
+    case VoteType.FAVORITE:
+      return 'mdi-star';
+    case VoteType.TO_MODIFY:
+      return 'mdi-shimmer';
+    case VoteType.DOWNVOTE:
+      return 'mdi-window-close';
+    default:
+      return '';
   }
-}) || []);
-watch(currentImagesFetched, (newVal) => {
-  if (newVal) {
-    allVotedImages.value = newVal.results.map(el => {
-      const { image, ...rest } = el;
-      return {
-        ...rest,
-        ...image,
-      }
-    })
-  }
-});
-
-onMounted(() => {
-  refresh();
-});
-
-// Image class
-const getImageClass = (image: ImageObject) => {
-  if (image.width / image.height < 0.85) {
-    return "tall";
-  }
-  if (image.width / image.height > 1.15) {
-    return "wide";
-  }
-  return "";
 };
+
+const mapVoteTypeToColor = (type: VoteType) => {
+  switch (type) {
+    case VoteType.UPVOTE:
+      return 'secondary';
+    case VoteType.FAVORITE:
+      return 'blue-lighten-1';
+    case VoteType.TO_MODIFY:
+      return 'purple-lighten-1';
+    case VoteType.DOWNVOTE:
+      return 'red';
+    default:
+      return '';
+  }
+};
+
+const bottomEl = ref<HTMLElement>();
+useIntersectionObserver(
+  bottomEl,
+  useThrottleFn(() => {
+    fetchNextPage();
+  }, 1000)
+)
+
 </script>
 <style lang="scss">
 .gallery-grid {
   display: grid;
   grid-gap: 3px;
   grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  background-image: linear-gradient(to top, hsl(180deg, 63%, 25%) -15%, #000640 100%);
+  margin-bottom: -6px;
+  position: relative;
   img {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
   @media screen and (min-width: 600px) {
-    img.tall {
+    .tall {
       grid-row-end: span 2;
     }
-    img.wide {
+    .wide {
       grid-column-end: span 2 / auto;
     }
   }
@@ -118,16 +129,5 @@ const getImageClass = (image: ImageObject) => {
   .gallery-grid {
     grid-template-columns: 1fr;
   }
-}
-.pagination {
-  background-color: aquamarine;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  z-index: 1;
 }
 </style>

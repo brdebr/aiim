@@ -3,7 +3,7 @@ import { ImageObject, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { bytesToHuman } from 'src/utils';
 
-export const defaultImageFieldsSelect = {
+export const defaultImageFieldsSelect: Prisma.ImageObjectSelect = {
   id: true,
   // Prompt
   prompt: true,
@@ -27,9 +27,10 @@ export const defaultImageFieldsSelect = {
   generatedAt: true,
   imageSize: true,
   timeToGenerate: true,
+  fileName: true,
 };
 
-export const defaultsWithFile = {
+export const defaultsWithFile: Prisma.ImageObjectSelect = {
   ...defaultImageFieldsSelect,
   imageFile: true,
 };
@@ -196,5 +197,12 @@ export class ImageObjectService {
       const returnObj = { ...img, fileSize: sizeInHuman };
       return returnObj;
     });
+  }
+
+  async cardGamePage(votedImageIds: string[], size = 10) {
+    const allIds = await this.getAllIds();
+    const filteredIds = allIds.filter((id) => !votedImageIds.includes(id));
+    const randomIdsArray = await this.getAmountOfRandomItems(filteredIds, size);
+    return this.getImagesByIds(randomIdsArray);
   }
 }

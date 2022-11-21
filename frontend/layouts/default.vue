@@ -1,76 +1,48 @@
 <template>
-  <div class="mobile-layout">
-    <v-app-bar :elevation="0" :color="'indigo-lighten-1'" border="b-md t-md" density="compact">
-      <template v-if="showDrawerIcon" v-slot:prepend>
-          <v-app-bar-nav-icon @click="toggleDrawer"/>
-      </template>
+  <div class="layout-container mobile-layout">
+    <v-app-bar :elevation="0" :color="'indigo-darken-4'" border="t-md b-md s-lg e-lg" density="compact">
       <v-app-bar-title class="qw-mx-4 qw-text-center">
-        <div class="qw-select-none">
+        <div class="qw-select-none" @click="$router.push('/')">
           AI-Image Manager
         </div>
       </v-app-bar-title>
-      <div v-show="showDrawerIcon" id="app-append-icon" class="app-bar-spacer">
-      </div>
     </v-app-bar>
     <v-navigation-drawer
-      v-model="drawerActive"
+      v-if="false"
       temporary
     >
       <v-list>
-        <v-list-item
-          v-for="item in drawerItems"
-          :key="item.label"
-          :title="item.label"
-          :prepend-icon="item.icon"
-          :to="item.route"
-          nav
-        >
-        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-main>
-      <div class="qw-px-3">
         <slot/>
-      </div>
     </v-main>
+    <v-bottom-navigation
+      class="bottom-bar"
+      mode="shift"
+      :elevation="0"
+      density="comfortable"
+      border="t-md b-md s-lg e-lg"
+      bg-color="indigo-darken-4"
+      grow hide-on-scroll
+    >
+      <v-btn v-for="item in bottomNavigationItems" :to="item.route" :key="item.route" :value="item.route">
+        <v-icon>
+          {{ item.icon }}
+        </v-icon>
+        <span class="!qw-text-[10px]">
+          {{ item.label }}
+        </span>
+      </v-btn>
+    </v-bottom-navigation>
   </div>
 </template>
 <script setup lang="ts">
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia';
-import { useApiBaseURL } from '~~/constants';
 
-const DEFAULT_GRADIENT = 'conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172))'
-
-const apiBaseURL = useApiBaseURL();
 const layoutStore = useLayoutStore();
-const { drawerActive, backgroundCover, drawerItems } = storeToRefs(layoutStore);
-const backgroundStyle = computed(() => {
-  if (!backgroundCover.value) return DEFAULT_GRADIENT;
-  const url = `url(${apiBaseURL}/api/images/view/${backgroundCover.value})`
-  return url
-});
-
-const authStore = useAuthStore();
-const { userId } = storeToRefs(authStore);
-
-const toggleDrawer = () => {
-  drawerActive.value = !drawerActive.value;
-}
-
-const showDrawerIcon = computed(() => {
-  return !!userId.value;
-});
-
-const doc = ref();
-onMounted(() => {
-  doc.value = document.documentElement;
-});
-useResizeObserver(doc, useThrottleFn(
-  () => {
-    doc.value?.style.setProperty('--doc-height', `${window.innerHeight}px`)
-  }, 100)
-);
+const { bottomNavigationItems } = storeToRefs(layoutStore);
 
 </script>
 <style lang="scss">
@@ -78,29 +50,24 @@ useResizeObserver(doc, useThrottleFn(
  --doc-height: 100vh;
 }
 html, body, .__nuxt, .v-application {
-  height: 100vh;
-  height: var(--doc-height);
+  @apply qw-h-[calc(100vh-104px)] sm:qw-h-[calc(100vh-48px)];
   width: 100vw;
 }
 .v-application__wrap {
   min-height: unset !important;
 }
-.mobile-layout, .v-main, .v-main > div {
+.mobile-layout, .v-main > div {
   height: 100%;
   width: 100%;
 }
 
-.v-toolbar {
+// Fix these first rendering with a lower width
+.v-toolbar, .v-bottom-navigation {
   width: 100%;
 }
 
-.v-main {
-  background-color: rgb(243, 243, 230);
-
-  // background: conic-gradient(at right top, rgb(128 128 128), rgb(90 128 91), rgb(22 57 172));
-  background: v-bind(backgroundStyle);
-  background-size: cover;
-  background-position: center;
+.mobile-layout {
+  background-image: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
 }
 
 .v-app-bar {
@@ -108,5 +75,16 @@ html, body, .__nuxt, .v-application {
     min-width: 48px;
     margin-right: 10px;
   }
+}
+
+// Add a little more separation between the selected item and the text from the v-bottom-navigation
+.bottom-bar {
+ .v-bottom-navigation__content {
+  .v-btn.v-btn--active {
+    .v-btn__content {
+      gap: 3px;
+    }
+  }
+ }
 }
 </style>

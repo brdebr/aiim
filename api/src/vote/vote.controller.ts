@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { JwtObject } from 'src/auth/auth.decorator';
 import { JwtPayload } from 'src/auth/auth.service';
 import { VoteService, VoteType } from './vote.service';
@@ -21,9 +21,25 @@ export class VoteController {
   async votesByUser(
     @JwtObject() loginInfo: JwtPayload,
     @Query('type') type: VoteType,
+    @Query('page') pageId: string,
   ) {
-    const votes = this.voteService.getVotesByUserId(loginInfo.id, type);
+    const votes = await this.voteService.getVotesByUserIdIncludingImage(
+      loginInfo.id,
+      type,
+      pageId,
+      20,
+    );
     return votes;
+  }
+
+  @Get('my-vote-counts')
+  async voteCountsByUser(@JwtObject() loginInfo: JwtPayload) {
+    const results = await this.voteService.getVoteCountsByUser(loginInfo.id);
+    const total = results.reduce((acc, cur) => acc + cur._count, 0);
+    return {
+      results,
+      count: total,
+    };
   }
 
   @Get('voted-image-ids')
@@ -31,7 +47,7 @@ export class VoteController {
     @JwtObject() loginInfo: JwtPayload,
     @Query('type') type: VoteType,
   ) {
-    const voteImageIds = this.voteService.getVotedImageIdsByUser(
+    const voteImageIds = await this.voteService.getVotedImageIdsByUser(
       loginInfo.id,
       type,
     );

@@ -22,6 +22,8 @@ export type ImageObject = {
   generatedAt: string;
   imageSize: string;
   timeToGenerate: number;
+  fileName: string;
+  fileSize: string;
 }
 
 export type LoginInfo = {

@@ -10,4 +10,9 @@ const authStore = useAuthStore();
 onMounted(() => {
   authStore.loadStorageIntoState();
 })
+useHead({
+  link: [
+    { rel: 'icon', type: 'image/png', href: '/logo-min.png' },
+ ]
+})
 </script>

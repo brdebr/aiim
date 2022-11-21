@@ -1,42 +1,33 @@
-export type DrawerItem = {
-  label: string;
-  icon: string;
-  route: string;
-};
-
 export const useLayoutStore = definePiniaStore('layout', () => {
-  const drawerActive = ref(false)
-  const showingDrawerButton = ref(false);
-
-  const backgroundCover = ref('');
-
-  const drawerItems = ref<DrawerItem[]>([
+  const bottomNavigationItems = ref([
     {
-      label: 'Home',
-      icon: 'mdi-home',
-      route: '/',
+      label: 'Card game',
+      icon: 'mdi-cards-outline',
+      route: '/play'
     },
     {
       label: 'Gallery',
-      icon: 'mdi-image',
-      route: '/gallery',
+      icon: 'mdi-image-search',
+      route: '/gallery'
+    },
+    {
+      label: 'Generate',
+      icon: 'mdi-brain',
+      route: '/generate'
     },
     {
       label: 'Votes',
-      icon: 'mdi-vote',
-      route: '/votes',
+      icon: 'mdi-thumbs-up-down',
+      route: '/votes'
     },
     {
       label: 'Profile',
       icon: 'mdi-account',
-      route: '/profile',
+      route: '/profile'
     },
-  ]);
+  ])
 
   return {
-    drawerActive,
-    drawerItems,
-    showingDrawerButton,
-    backgroundCover
+    bottomNavigationItems,
   }
 })

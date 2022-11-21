@@ -22,43 +22,42 @@ export class VoteService {
     this.logger.log(
       `Voting for image "${imageId}" by user "${userId}${voteStr}"`,
     );
-    const existingVote = await this.prisma.vote.findFirst({
+
+    const vote = await this.prisma.vote.upsert({
       where: {
-        imageId,
-        userId,
+        userId_imageId: {
+          userId,
+          imageId,
+        },
       },
-    });
-
-    if (existingVote) {
-      throw new Error(
-        `You've already voted for this image dummy! 😥 - ${userId} - ${imageId}`,
-      );
-    }
-
-    const vote = await this.prisma.vote.create({
-      data: {
-        vote: voteType || VoteType.UPVOTE,
-        image: {
-          connect: {
-            id: imageId,
-          },
-        },
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
+      create: {
+        userId,
+        imageId,
+        vote: voteType,
+      },
+      update: {
+        vote: voteType,
       },
     });
 
     return vote;
   }
 
-  async getVotesByUserId(userId: string, voteType?: VoteType, size = 150) {
+  async getVotesByUserIdIncludingImage(
+    userId: string,
+    voteType?: VoteType,
+    pageId?: string,
+    size = 20,
+  ) {
+    const cursor = pageId ? { id: pageId } : undefined;
+    const skip = pageId ? 1 : 0;
     const votes = await this.prisma.vote.findMany({
+      cursor,
+      skip,
+      take: size,
       where: {
         userId: userId,
-        vote: voteType || VoteType.UPVOTE,
+        vote: voteType,
       },
       include: {
         image: {
@@ -67,7 +66,9 @@ export class VoteService {
           },
         },
       },
-      take: size,
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
     const length = votes.length;
 
@@ -77,11 +78,22 @@ export class VoteService {
     };
   }
 
+  async getVoteCountsByUser(userId: string) {
+    const votes = await this.prisma.vote.groupBy({
+      by: ['vote'],
+      _count: true,
+      where: {
+        userId,
+      },
+    });
+    return votes;
+  }
+
   async getVotedImageIdsByUser(userId: string, voteType?: VoteType) {
     const votes = await this.prisma.vote.findMany({
       where: {
-        userId: userId || '',
-        vote: voteType || VoteType.UPVOTE,
+        userId: userId,
+        vote: voteType,
       },
       select: {
         imageId: true,

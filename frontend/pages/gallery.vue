@@ -1,16 +1,5 @@
 <template>
   <div>
-    <ClientOnly>
-      <Teleport to='#app-append-icon'>
-        <v-chip v-if="imagesLeft">
-          <transition name="scroll-y" mode="out-in">
-            <span :key="imagesLeft">
-              {{ imagesLeft }}
-            </span>
-          </transition>
-        </v-chip>
-      </Teleport>
-    </ClientOnly>
     <div class="gallery-grid" v-if="allImages.length && !loadingInitialImages">
       <div
         v-for="image in allImages" :key="image.id"
@@ -25,36 +14,27 @@
           loading="lazy"
           :width="image.width" :height="image.height"
           :title="image.prompt" :alt="image.prompt"
-          @click="voteImage(image)"
         />
       </div>
-      <InfiniteLoading :distance="650" :firstload="false" @infinite="fetchMoreImages" />
-      <v-btn variant="text" @click="fetchMoreImages" :loading="btnLoading">
+      <v-btn class="load-more-btn" variant="tonal" block @click="fetchMoreImages" :loading="btnLoading">
         Load More
       </v-btn>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-// @ts-expect-error - The component is not typed
-import InfiniteLoading from 'v3-infinite-loading';
-import 'v3-infinite-loading/lib/style.css'
-import { useApiBaseURL } from '~~/constants';
 import { ImageObject } from '~~/types';
 
 const router = useRouter();
 const apiBaseURL = useApiBaseURL();
 
 const gallery = await useGallery();
-const { allImages, imagesCount, loadingInitialImages } = gallery;
-const imagesLeft = computed(() => {
-  return imagesCount.value ? imagesCount.value - allImages.value.length: 0;
-});
+const { allImages, loadingInitialImages } = gallery;
 
 const btnLoading = ref(false);
 
 const votes = await useVotes();
-const { isVoted, voteImage } = votes;
+const { isVoted } = votes;
 
 const fetchMoreImages = async ($state: { loaded: () => void; }) => {
   btnLoading.value = true;
@@ -63,6 +43,7 @@ const fetchMoreImages = async ($state: { loaded: () => void; }) => {
     query: {
       page: lastImageId
     },
+    replace: true
   });
   btnLoading.value = false;
   $state?.loaded();
@@ -104,6 +85,9 @@ const getImageClass = (image: ImageObject) => {
       object-fit: contain;
       z-index: 1;
     }
+  }
+  .load-more-btn {
+    grid-column: 1/3;
   }
   
  }

@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['store'],
   },
-  css: ['vuetify/styles'],
+  css: ['vuetify/styles', '@/assets/global-styles.scss'],
   vite: {
     ssr: {
         noExternal: ['vuetify'], // add the vuetify vite plugin
@@ -31,6 +31,7 @@ export default defineNuxtConfig({
       }
     ],
     '@vueuse/nuxt',
+    '@kevinmarrec/nuxt-pwa',
   ],
   devServer: {
     host: '0.0.0.0'
@@ -42,5 +43,22 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: '', // Overritten by environment variable => NUXT_PUBLIC_API_BASE_URL
     }
-  }
+  },
+  pwa: {
+    meta: {
+      name: 'AI Image Manager',
+      description: 'Application to manage images, vote on them and generate new images calling an API',
+      theme_color: '#1a237e',
+      lang: 'en',
+    },
+    manifest: {
+      name: 'AI Image Manager',
+      short_name: 'AI-IM',
+      theme_color: '#1a237e',
+
+    },
+    // workbox: {
+    //   enabled: true, // <-- for DEV
+    // },
+  },
 })
