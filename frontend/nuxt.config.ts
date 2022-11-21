@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['store'],
   },
-  css: ['vuetify/styles'],
+  css: ['vuetify/styles', '@/assets/global-styles.scss'],
   vite: {
     ssr: {
         noExternal: ['vuetify'], // add the vuetify vite plugin
