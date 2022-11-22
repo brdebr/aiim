@@ -27,6 +27,9 @@ import { ImageObject } from '~~/types';
 
 const router = useRouter();
 const apiBaseURL = useApiBaseURL();
+useHead({
+  title: 'Gallery',
+})
 
 const gallery = await useGallery();
 const { allImages, loadingInitialImages } = gallery;

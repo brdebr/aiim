@@ -18,6 +18,7 @@
         <slot/>
     </v-main>
     <v-bottom-navigation
+      v-if="userId"
       class="bottom-bar"
       mode="shift"
       :elevation="0"
@@ -38,25 +39,28 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useLayoutStore } from '@/store/layout'
-import { storeToRefs } from 'pinia';
 
 const layoutStore = useLayoutStore();
 const { bottomNavigationItems } = storeToRefs(layoutStore);
 
+const authStore = useAuthStore();
+const { userId } = storeToRefs(authStore);
+
+useHead({
+  meta: [
+    {
+      name: 'mobile-web-app-capable',
+      content: 'yes',
+    },
+  ],
+})
+
 </script>
 <style lang="scss">
-:root {
- --doc-height: 100vh;
+.v-application {
+  @apply qw-h-[calc(100vh-104px)] sm:qw-h-[calc(100vh-var(--v-layout-bottom))];
 }
-html, body, .__nuxt, .v-application {
-  @apply qw-h-[calc(100vh-104px)] sm:qw-h-[calc(100vh-48px)];
-  width: 100vw;
-}
-.v-application__wrap {
-  min-height: unset !important;
-}
-.mobile-layout, .v-main > div {
+.mobile-layout {
   height: 100%;
   width: 100%;
 }

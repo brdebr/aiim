@@ -64,6 +64,10 @@ const tabs = [
   },
 ];
 
+useHead({
+  title: 'Votes',
+})
+
 const mapVoteTypeToIcon = (type: VoteType) => {
   switch (type) {
     case VoteType.UPVOTE:

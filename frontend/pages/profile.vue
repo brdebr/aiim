@@ -43,4 +43,7 @@
 <script lang="ts" setup>
 const authStore = useAuthStore();
 const { loginInfo } = storeToRefs(authStore);
+useHead({
+  title: 'Profile',
+})
 </script>

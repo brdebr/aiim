@@ -11,6 +11,7 @@ onMounted(() => {
   authStore.loadStorageIntoState();
 })
 useHead({
+  titleTemplate: '%s - AI Image manager',
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo-min.png' },
  ]

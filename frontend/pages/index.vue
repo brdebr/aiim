@@ -39,6 +39,9 @@
 const showPassword = ref(false)
 
 const { loginEmail, loginPassword, executeLogin, loading } = await useLogin()
+useHead({
+  title: 'Login',
+})
 
 </script>
 <style lang="scss">

@@ -112,11 +112,16 @@ const actionButtons = [
 
 const showingInfo = ref(false);
 
+useHead({
+  title: 'Card Game',
+})
+
 </script>
 <style lang="scss">
 .card-game-container {
   @apply qw-absolute;
   @apply qw-pt-2 qw-pb-[52px];
+  @apply qw-w-full qw-h-[calc(100%-var(--v-layout-bottom))];
   .image-card, .io-view, .io-view > img {
     @apply qw-w-full qw-h-full;
   }
