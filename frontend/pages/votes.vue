@@ -17,21 +17,17 @@
       </v-tab>
     </v-tabs>
     <div class="gallery-grid" v-if="votedImages.length">
-      <div v-for="vote in votedImages" :key="vote.id" :data-id="vote.image.id" class="qw-relative">
-        <div class="qw-absolute qw-right-1 qw-top-1">
-          <v-icon :color="mapVoteTypeToColor(vote.vote)">
-            {{ mapVoteTypeToIcon(vote.vote) }}
-          </v-icon>
-        </div>
-        <IoView :image="vote.image"/>
+      <div v-for="vote in votedImages" :key="vote.id" :data-id="vote.image.id" class="voted-image-container" :class="getClassObject(vote)">
+        <ImageVoteCard :vote="vote" />
       </div>
-      <div ref="bottomEl" class="qw-absolute qw-bottom-0 qw-h-[250px] qw-w-full">
+      <div ref="bottomEl" class="qw-absolute qw-bottom-0 qw-h-[250px] qw-w-px">
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { VoteType } from '~~/composables/useCardGame';
+import { Vote } from '~~/composables/useVotesGallery';
 
 const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages, fetchNextPage } = useVotesGallery();
 const percentage = computed(() => ((totalVotes.value / totalImages.value) * 100).toFixed(2));
@@ -64,39 +60,18 @@ const tabs = [
   },
 ];
 
+const { getDimensions } = useImageUtils();
+const getClassObject = (vote: Vote) => {
+  const { isTall, isWide } = getDimensions(vote.image);
+  return {
+    tall: isTall,
+    wide: isWide,
+  };
+};
+
 useHead({
   title: 'Votes',
 })
-
-const mapVoteTypeToIcon = (type: VoteType) => {
-  switch (type) {
-    case VoteType.UPVOTE:
-      return 'mdi-heart';
-    case VoteType.FAVORITE:
-      return 'mdi-star';
-    case VoteType.TO_MODIFY:
-      return 'mdi-shimmer';
-    case VoteType.DOWNVOTE:
-      return 'mdi-window-close';
-    default:
-      return '';
-  }
-};
-
-const mapVoteTypeToColor = (type: VoteType) => {
-  switch (type) {
-    case VoteType.UPVOTE:
-      return 'secondary';
-    case VoteType.FAVORITE:
-      return 'blue-lighten-1';
-    case VoteType.TO_MODIFY:
-      return 'purple-lighten-1';
-    case VoteType.DOWNVOTE:
-      return 'red';
-    default:
-      return '';
-  }
-};
 
 const bottomEl = ref<HTMLElement>();
 useIntersectionObserver(
@@ -110,26 +85,20 @@ useIntersectionObserver(
 <style lang="scss">
 .gallery-grid {
   display: grid;
-  grid-gap: 3px;
+  grid-gap: 6px;
   grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   background-image: linear-gradient(to top, hsl(180deg, 63%, 25%) -15%, #000640 100%);
   margin-bottom: -6px;
-  position: relative;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  @media screen and (min-width: 600px) {
+  @media screen and (min-width: 915px) {
     .tall {
       grid-row-end: span 2;
     }
     .wide {
-      grid-column-end: span 2 / auto;
+      grid-column-end: span 2;
     }
   }
 }
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 915px) {
   .gallery-grid {
     grid-template-columns: 1fr;
   }
