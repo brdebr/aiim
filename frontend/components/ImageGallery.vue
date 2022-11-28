@@ -1,10 +1,11 @@
 <template>
-  <div class="image-gallery">
+  <div class="image-gallery" v-if="galleryObjects.length">
     <slot name="prepend" />
     <div
       v-for="vote in galleryObjects" :key="vote.id"
       :data-id="vote.id"
-      class="voted-image-container" :class="getClassObject(vote)">
+      class="voted-image-container" :class="getClassObject(vote)"
+    >
       <ImageVoteCard :vote="vote" />
     </div>
     <slot name="append" />
@@ -64,11 +65,13 @@ const emit = defineEmits<{
       grid-template-columns: 1fr;
     }
   }
-  .tall {
-    grid-row-end: span 2;
-  }
-  .wide {
-    grid-column-end: span 2;
+  @media screen and (min-width: 915px) {
+    .tall {
+      grid-row-end: span 2;
+    }
+    .wide {
+      grid-column-end: span 2;
+    }
   }
 }
 </style>
