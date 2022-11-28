@@ -7,21 +7,34 @@
       density="compact"
     >
       <template v-slot:prepend>
-        <v-btn size="x-small" icon="mdi-dots-vertical" />
+        <v-btn size="x-small" variant="outlined" icon="mdi-dots-vertical" @click.stop="displayingInfo = !displayingInfo" />
       </template>
-      <v-toolbar-title class="text-body-2">
-          {{ props.vote.image.height }} x {{ props.vote.image.width }}
+      <v-toolbar-title>
+        <div class="qw-flex qw-items-center qw-gap-4">
+          <div class="text-body-2">
+            {{ props.vote.image.height }} x {{ props.vote.image.width }}
+          </div>
+        </div>
       </v-toolbar-title>
       <template v-slot:append>
-        <v-btn size="small" class="qw-pointer-events-none" :color="mapVoteTypeToColor(props.vote.vote)" :icon="mapVoteTypeToIcon(props.vote.vote)"></v-btn>
+        <!-- <v-btn size="small" class="qw-pointer-events-none" :color="mapVoteTypeToColor(props.vote.vote)" :icon="mapVoteTypeToIcon(props.vote.vote)"></v-btn> -->
+        <v-progress-circular :size="32" color="blue" :model-value="percentageOfMaxSteps(props.vote.image.steps)" :width="2.5" :title="`${props.vote.image.steps} steps`">
+            <span class="qw-text-xs qw-text-white">
+              {{ props.vote.image.steps }}
+            </span>
+          </v-progress-circular>
       </template>
     </v-toolbar>
+    <div v-if="displayingInfo" class="qw-h-[calc(100%-48px)] qw-grid qw-place-items-center qw-bg-gradient-to-b qw-from-red-200 qw-to-blue-400 qw-whitespace-pre-line">
+      {{ JSON.stringify(props.vote.image, null, 2) }}
+    </div>
   </ImageCard>
 </template>
 <script setup lang="ts">
 import { VoteType } from '~~/composables/useCardGame';
 import { Vote } from '~~/composables/useVotesGallery';
 
+const displayingInfo = ref(false);
 
 const mapVoteTypeToIcon = (type: VoteType) => {
   switch (type) {
@@ -52,6 +65,10 @@ const mapVoteTypeToColor = (type: VoteType) => {
       return '';
   }
 };
+const MAX_STEPS = 300;
+const percentageOfMaxSteps = (val: number) => {
+  return (val / MAX_STEPS) * 100;
+};
 
 const props = defineProps<{
   vote: Vote;
@@ -59,6 +76,6 @@ const props = defineProps<{
 </script>
 <style lang="scss">
 .voted-img-toolbar {
-  background: linear-gradient(0deg, rgba(9, 9, 119, 0) 0%, rgba(0, 0, 0, 1) 100%) !important;
+  background: linear-gradient(0deg, rgba(9, 9, 119, 0) 0%, rgba(0, 0, 0, 1) 95%) !important;
 }
 </style>
