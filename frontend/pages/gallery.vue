@@ -90,7 +90,7 @@ const getImageClass = (image: ImageObject) => {
     }
   }
   .load-more-btn {
-    grid-column: 1/3;
+    grid-column: 1 / end;
   }
   
  }
