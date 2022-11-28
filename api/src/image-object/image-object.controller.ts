@@ -83,7 +83,7 @@ export class ImageObjectController {
 
   @Get('card-game')
   async cardGame(@JwtObject() loginInfo: JwtPayload) {
-    const votedImageIds = await this.voteService.getVotedImageIdsByUser(
+    const votedImageIds = await this.voteService.getAllVotedImageIdsByUser(
       loginInfo.id,
     );
     const results = await this.imageService.cardGamePage(votedImageIds);
