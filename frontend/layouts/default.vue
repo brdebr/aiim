@@ -15,7 +15,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-main>
-        <slot/>
+      <slot/>
     </v-main>
     <v-bottom-navigation
       v-if="userId"
@@ -63,32 +63,13 @@ useHead({
 .mobile-layout {
   height: 100%;
   width: 100%;
+  &, .v-main > * {
+    background: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
+  }
 }
 
 // Fix these first rendering with a lower width
 .v-toolbar, .v-bottom-navigation {
   width: 100%;
-}
-
-.mobile-layout {
-  background-image: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
-}
-
-.v-app-bar {
-  .app-bar-spacer {
-    min-width: 48px;
-    margin-right: 10px;
-  }
-}
-
-// Add a little more separation between the selected item and the text from the v-bottom-navigation
-.bottom-bar {
- .v-bottom-navigation__content {
-  .v-btn.v-btn--active {
-    .v-btn__content {
-      gap: 3px;
-    }
-  }
- }
 }
 </style>

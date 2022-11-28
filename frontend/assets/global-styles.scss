@@ -1,5 +1,16 @@
 
 
+// Add a little more separation between the selected item and the text from the v-bottom-navigation
+.bottom-bar {
+  .v-bottom-navigation__content {
+   .v-btn.v-btn--active {
+     .v-btn__content {
+       gap: 3px;
+     }
+   }
+  }
+ }
+
 
 // Scrollbar styles
 ::-webkit-scrollbar {
@@ -21,4 +32,23 @@
   &:hover {
     background: hsla(197, 81%, 22%, 0.897);
   }
+}
+
+
+// Transitions -->
+
+// Scroll-Y
+.scroll-y-enter-active {
+  transition: all 0.15s ease-out;
+}
+.scroll-y-leave-active {
+  transition: all 0.15s ease-in;
+}
+.scroll-y-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.scroll-y-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }

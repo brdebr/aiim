@@ -51,7 +51,6 @@ useHead({
   height: calc(100vh - var(--v-layout-bottom) - var(--v-layout-top)) !important;
   width: 100%;
   @apply qw-pb-[85px] qw-px-3;
-  background: unset !important;
 }
 .login-form {
   background-color: rgba(34, 93, 165, 0.493);

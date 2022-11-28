@@ -16,7 +16,9 @@
         </div>
       </v-tab>
     </v-tabs>
-    <ImageGallery :votes="votedImages" @more="fetchNextPage" />
+    <div class="qw-px-1 qw-pt-2 sm:(qw-px-3)">
+      <ImageGallery :votes="votedImages" @more="fetchNextPage" />
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
