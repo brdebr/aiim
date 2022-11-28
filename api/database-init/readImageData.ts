@@ -34,6 +34,7 @@ const modelHashes = {
   '1.4': '7460a6fa',
   'bryanwd-person': 'da781e47',
   '1.5-pruned': 'a9263745',
+  '2.0-768-v-ema': '2c02b20a',
 };
 
 const imageDataToObject = (imageData, imageRoute) => {
