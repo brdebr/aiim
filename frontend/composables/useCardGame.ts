@@ -7,6 +7,7 @@ export enum VoteType {
   FAVORITE = 'FAVORITE',
   TO_MODIFY = 'TO_MODIFY',
   TO_UPSCALE = 'TO_UPSCALE',
+  EMPTY = '',
 }
 
 export const useCardGame = async () => {
