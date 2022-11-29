@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GlobalJwtGuardProvider } from './auth/jwt.guard';
 import { ConfigurationModule } from './config';
+import { ImageGenerationModule } from './image-generation/image-generation.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ConfigurationModule } from './config';
     AuthModule,
     ImageObjectModule,
     VoteModule,
+    ImageGenerationModule,
   ],
   controllers: [],
   providers: [GlobalJwtGuardProvider],
