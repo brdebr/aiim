@@ -1,7 +1,9 @@
 import { HttpService } from '@nestjs/axios';
+import { InjectQueue } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 import { AxiosError } from 'axios';
-import { catchError, firstValueFrom, map } from 'rxjs';
+import { Queue } from 'bull';
+import { catchError, firstValueFrom } from 'rxjs';
 import { Text2ImageDto } from './dto/generateDto';
 
 type ImageGenerationResponse = {
@@ -63,7 +65,10 @@ export type generateImageParams = Partial<ImageGenerationRequest>;
 
 @Injectable()
 export class ImageGenerationService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @InjectQueue('generation') private generationQueue: Queue,
+  ) {}
   private logger = new Logger(ImageGenerationService.name);
 
   parseParams(params: Text2ImageDto): ImageGenerationRequest {
@@ -98,12 +103,18 @@ export class ImageGenerationService {
     };
   }
 
-  async generateImage(params: Text2ImageDto) {
+  async generateImage(params: Text2ImageDto, userId: string) {
     const endpoint = '/txt2img';
     const parsedParams = this.parseParams(params);
 
+    const startTime = Date.now();
     this.logger.log(
-      `Generating image with params: ${JSON.stringify(parsedParams)}`,
+      `Generating image with params:\n${JSON.stringify(parsedParams, null, 2)}`,
+    );
+    this.generationQueue.add(
+      'txt2img',
+      { params: parsedParams, user: userId },
+      { timeout: 0 },
     );
 
     const fetchObservable = this.httpService.post<ImageGenerationResponse>(
@@ -118,6 +129,9 @@ export class ImageGenerationService {
         }),
       ),
     );
+    const endTime = Date.now();
+    const timeInSeconds = ((endTime - startTime) / 1000).toFixed(2);
+    this.logger.log(`Image generated in ${timeInSeconds}s`);
     return data;
   }
 }

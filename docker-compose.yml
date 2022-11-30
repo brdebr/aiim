@@ -37,6 +37,10 @@ services:
       - 'aiim-db_data:/bitnami/mongodb'
     ports:
       - 27017:27017
+  aiim-redis:
+    image: redis:7.0.5
+    ports:
+      - 6379:6379
 
 volumes:
   aiim-db_data:

@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { GlobalJwtGuardProvider } from './auth/jwt.guard';
 import { ConfigurationModule } from './config';
 import { ImageGenerationModule } from './image-generation/image-generation.module';
+import { BullQueuesModule } from './redis';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ImageGenerationModule } from './image-generation/image-generation.modul
     ImageObjectModule,
     VoteModule,
     ImageGenerationModule,
+    BullQueuesModule,
   ],
   controllers: [],
   providers: [GlobalJwtGuardProvider],

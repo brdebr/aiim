@@ -3,6 +3,8 @@ import { ImageGenerationService } from './image-generation.service';
 import { ImageGenerationController } from './image-generation.controller';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bull';
+import { ImageGenerationProcessor } from './image-generation.processor';
 
 @Module({
   imports: [
@@ -15,8 +17,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
+    BullModule.registerQueue({
+      name: 'generation',
+    }),
   ],
-  providers: [ImageGenerationService],
+  providers: [ImageGenerationService, ImageGenerationProcessor],
   controllers: [ImageGenerationController],
 })
 export class ImageGenerationModule {}
