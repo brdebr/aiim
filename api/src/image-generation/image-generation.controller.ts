@@ -14,16 +14,13 @@ export class ImageGenerationController {
     @Body() params: Text2ImageDto,
     @Res() response,
   ) {
-    const firstImage = await this.imageGenService.generateImage(
+    const numberInQueue = await this.imageGenService.generateImage(
       params,
       loginInfo.id,
     );
 
-    response.set('Content-Type', 'image/png');
-    response.set(
-      'Content-Disposition',
-      `attachment; filename=${Date.now()}.png`,
-    );
-    response.send(Buffer.from(firstImage.images[0], 'base64'));
+    response
+      .status(200)
+      .send(`Your image is in queue. Number in queue: ${numberInQueue}`);
   }
 }

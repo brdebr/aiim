@@ -25,11 +25,11 @@ model ImageObject {
   id               String @id @default(auto()) @map("_id") @db.ObjectId
 
   // Metadata
-  number           String
-  fileName         String
-  imageFile        Bytes
-  imageSize        Int
-  rawParameters    String
+  number           String?
+  fileName         String?
+  imageFile        Bytes?
+  imageSize        Int?
+  rawParameters    String?
 
   // Time metadata
   createdAt        DateTime @default(now())

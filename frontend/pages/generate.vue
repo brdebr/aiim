@@ -17,8 +17,8 @@
             DO IT
           </v-btn>
         </div>
-        <div v-if="imageSrc">
-          <v-img :src="imageSrc" />
+        <div v-if="generateResponse">
+          {{ generateResponse }}
         </div>
       </div>
     </v-card>
@@ -37,7 +37,7 @@ const loading = ref(false)
 const prompt = ref('a fluffy cat sitting on top of a table')
 const negativePrompt = ref('ugly, disformed, cartoon, painting')
 
-const imageSrc = ref('')
+const generateResponse = ref('')
 
 const generateImage = async () => {
   if(loading.value) return;
@@ -53,16 +53,18 @@ const generateImage = async () => {
       width: 768,
       height: 768
     }
-    const imageResponseBlob = await $fetch<Blob>('/api/generate/txt2img', {
+    const response = await $fetch<string>('/api/generate/txt2img', {
       ...fetchOptions.value,
       method: 'POST',
       body: JSON.stringify(body),
     })
+    generateResponse.value = response
+    // if (!imageResponseBlob) return;
     // Turn blob from response into a URL
-    const imageResponseUrl = URL.createObjectURL(imageResponseBlob)
+    // const imageResponseUrl = window.URL.createObjectURL(new Blob([imageResponseBlob], {type: "image/png"}))
     
     // const imageParsedSrc = `data:image/jpeg;base64,${imageResponse}`
-    imageSrc.value = imageResponseUrl
+    // imageSrc.value = imageResponseUrl
   } catch (error) {
     console.log(error);
   } finally {

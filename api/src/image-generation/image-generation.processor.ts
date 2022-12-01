@@ -1,15 +1,226 @@
+import { HttpService } from '@nestjs/axios';
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
+import { ImageObject } from '@prisma/client';
+import { AxiosError } from 'axios';
 import { Job } from 'bull';
+import { catchError, firstValueFrom } from 'rxjs';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Text2ImageDto } from './dto/generateDto';
+
+export const modelHashes = {
+  '1.5-emaonly': '81761151',
+  '1.5-inpainting': '3e16efc8',
+  '1.4': '7460a6fa',
+  'bryanwd-person': 'da781e47',
+  '1.5-pruned': 'a9263745',
+  '2.0-768-v-ema': '2c02b20a',
+};
+
+export type TextToImageGenerationJobType = {
+  params: Text2ImageDto;
+  user: string;
+};
+
+export type ImageGenerationResponse = {
+  images: string[];
+  parameters: {
+    enable_hr: boolean;
+    denoising_strength: number;
+    firstphase_width: number;
+    firstphase_height: number;
+    prompt: string;
+    styles?: any;
+    seed: number;
+    subseed: number;
+    subseed_strength: number;
+    seed_resize_from_h: number;
+    seed_resize_from_w: number;
+    sampler_name: string;
+    batch_size: number;
+    n_iter: number;
+    steps: number;
+    cfg_scale: number;
+    width: number;
+    height: number;
+    restore_faces: boolean;
+    tiling: boolean;
+    negative_prompt: string;
+    eta?: any;
+    s_churn: number;
+    s_tmax?: any;
+    s_tmin: number;
+    s_noise: number;
+    override_settings?: any;
+    sampler_index: string;
+  };
+  info: string;
+};
+
+export type ImageGenerationRequest = {
+  prompt: string;
+  negative_prompt: string;
+  styles?: string[];
+  seed?: string | number;
+  sampler_name: string;
+  batch_size: number;
+  n_iter: number;
+  steps: number;
+  cfg_scale: number;
+  width: number;
+  height: number;
+  restore_faces?: boolean;
+  firstphase_width?: number;
+  firstphase_height?: number;
+  denoising_strength?: number;
+  tiling?: boolean;
+  enable_hr?: boolean;
+};
 
 @Processor('generation')
 export class ImageGenerationProcessor {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly prisma: PrismaService,
+  ) {}
+
   private readonly logger = new Logger(ImageGenerationProcessor.name);
 
+  parseResponseIntoImageObject(
+    response: ImageGenerationResponse,
+  ): Omit<
+    ImageObject,
+    | 'id'
+    | 'number'
+    | 'fileName'
+    | 'imageSize'
+    | 'rawParameters'
+    | 'createdAt'
+    | 'updatedAt'
+    | 'generatedAt'
+    | 'timeToGenerate'
+  > {
+    const { images, parameters, info } = response;
+    const {
+      prompt,
+      negative_prompt,
+      steps,
+      sampler_name,
+      cfg_scale,
+      width,
+      height,
+      restore_faces,
+      denoising_strength,
+      firstphase_width,
+      firstphase_height,
+    } = parameters;
+
+    const infoObject: Record<string, string> = JSON.parse(info);
+
+    const imageBuffer = Buffer.from(images[0], 'base64');
+
+    return {
+      prompt,
+      negativePrompt: negative_prompt,
+      steps,
+      seed: infoObject?.['seed'].toString() || undefined,
+      sampler: sampler_name,
+      cfg: cfg_scale,
+      width,
+      height,
+      faceRestoration: restore_faces ? 'Codeformer' : undefined,
+      denoisingHr: denoising_strength,
+      imageFile: imageBuffer,
+      modelHash: infoObject['sd_model_hash'],
+      model: modelHashes[infoObject['sd_model_hash']],
+      firstPassHr: null,
+    };
+  }
+
+  parseParams(params: Text2ImageDto): ImageGenerationRequest {
+    const {
+      prompt,
+      negativePrompt,
+      steps,
+      sampler,
+      cfg,
+      seed,
+      width,
+      height,
+      faceRestoration,
+      denoisingHr,
+      firstPassHr,
+    } = params;
+
+    return {
+      prompt,
+      negative_prompt: negativePrompt,
+      sampler_name: sampler,
+      cfg_scale: cfg,
+      seed: parseInt(`${seed}`),
+      width,
+      height,
+      restore_faces: faceRestoration,
+      denoising_strength: denoisingHr,
+      firstphase_width: firstPassHr,
+      steps,
+      batch_size: 1,
+      n_iter: 1,
+    };
+  }
+
   @Process('txt2img')
-  generateText2Image(job: Job) {
-    this.logger.log('Start transcoding...');
-    this.logger.log(job.data);
-    this.logger.log('Transcoding completed');
+  async generateText2Image(job: Job<TextToImageGenerationJobType>) {
+    const endpoint = '/txt2img';
+
+    const { params, user } = job.data;
+
+    const startTime = Date.now();
+    this.logger.log(
+      `Generating image by '${user}' with params:\n${JSON.stringify(
+        params,
+        null,
+        2,
+      )}`,
+    );
+
+    const fetchRequestAsObservable =
+      this.httpService.post<ImageGenerationResponse>(
+        endpoint,
+        this.parseParams(params),
+      );
+
+    const { data } = await firstValueFrom(
+      fetchRequestAsObservable.pipe(
+        catchError((error: AxiosError) => {
+          this.logger.error(error.response.data);
+          throw 'Ohh nooo, an error happened! :(';
+        }),
+      ),
+    );
+    // console.log('response', data);
+
+    const endTime = Date.now();
+    const timeToGenerate = endTime - startTime;
+
+    const timeInSeconds = (timeToGenerate / 1000).toFixed(2);
+    this.logger.log(`Image generated in ${timeInSeconds}s`);
+
+    try {
+      const imageObject = this.parseResponseIntoImageObject(
+        data,
+      ) as ImageObject;
+
+      imageObject.timeToGenerate = timeToGenerate;
+      imageObject.generatedAt = new Date();
+
+      this.logger.log(`Saving to database...`);
+      const generatedImageObject = await this.prisma.imageObject.create({
+        data: imageObject,
+      });
+      this.logger.log(`Generated image with ID: ${generatedImageObject.id}`);
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 }
