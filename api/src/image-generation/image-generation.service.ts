@@ -55,6 +55,8 @@ export class ImageGenerationService {
       { timeout: 0 },
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     const numberInQueue = await this.generationQueue.count();
 
     return numberInQueue;

@@ -7,7 +7,6 @@ import {
   IsIn,
   IsDivisibleBy,
   IsOptional,
-  IsBoolean,
   IsBooleanString,
 } from 'class-validator';
 

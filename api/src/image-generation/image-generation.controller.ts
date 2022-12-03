@@ -21,6 +21,6 @@ export class ImageGenerationController {
 
     response
       .status(200)
-      .send(`Your image is in queue. Number in queue: ${numberInQueue}`);
+      .send(`Your image is in queue. Number in queue: ${numberInQueue + 1}`);
   }
 }
