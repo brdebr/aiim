@@ -11,7 +11,7 @@
         </v-icon>
         <div>
           <span class="">
-            {{ voteCountsMap[tab.value] || `${totalVotes}/${totalImages} - ${percentage}%` }}
+            {{ voteCountsMap[tab.value] ? `${voteCountsMap[tab.value]} [ ${percentagesMap[tab.value]}% ]` : `${totalVotes}/${totalImages} - ${percentage}%` }}
           </span>
         </div>
       </v-tab>
@@ -26,6 +26,18 @@ import { VoteType } from '~~/composables/useCardGame';
 
 const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages, fetchNextPage } = useVotesGallery();
 const percentage = computed(() => ((totalVotes.value / totalImages.value) * 100).toFixed(2));
+
+const percentagesMap = computed(() => {
+  return tabs.reduce((acc, tab) => {
+    acc[tab.value] = ((voteCountsMap.value[tab.value] / totalVotes.value) * 100).toFixed(2);
+    return acc;
+  }, {} as Record<VoteType, string>);
+})
+
+const typePercentage = (type: VoteType) => {
+  const count = voteCountsMap.value[type];
+  return ((count / totalVotes.value) * 100).toFixed(2);
+};
 
 type Tab = {
   value: VoteType;

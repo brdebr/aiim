@@ -1,5 +1,5 @@
 <template>
-  <div class="gallery-page qw-px-1 qw-pt-3 sm:(qw-px-3)">
+  <div class="gallery-page qw-px-1 qw-pt-4 sm:(qw-px-3)">
     <ImageGallery :images="allImages" @more="fetchMoreImages" />
   </div>
 </template>

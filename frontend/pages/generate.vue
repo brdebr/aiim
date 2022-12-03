@@ -59,12 +59,6 @@ const generateImage = async () => {
       body: JSON.stringify(body),
     })
     generateResponse.value = response
-    // if (!imageResponseBlob) return;
-    // Turn blob from response into a URL
-    // const imageResponseUrl = window.URL.createObjectURL(new Blob([imageResponseBlob], {type: "image/png"}))
-    
-    // const imageParsedSrc = `data:image/jpeg;base64,${imageResponse}`
-    // imageSrc.value = imageResponseUrl
   } catch (error) {
     console.log(error);
   } finally {
