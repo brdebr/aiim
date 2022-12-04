@@ -1,4 +1,20 @@
 export const useLayoutStore = definePiniaStore('layout', () => {
+
+  const rightDrawerVisible = ref(false)
+
+  const rightDrawerActive = ref(false)
+
+  const breakpoints = useBreakpoints({
+    mobile: 915,
+    wide: 1080,
+  })
+  
+  const drawerWidth = computed(() => {
+    if(breakpoints.isSmallerOrEqual('mobile')) return 325;
+    if(breakpoints.isSmallerOrEqual('wide')) return 400;
+    return 500;
+  })
+
   const bottomNavigationItems = ref([
     {
       label: 'Card game',
@@ -29,5 +45,9 @@ export const useLayoutStore = definePiniaStore('layout', () => {
 
   return {
     bottomNavigationItems,
+    rightDrawerActive,
+    rightDrawerVisible,
+    drawerWidth,
+    breakpoints,
   }
 })
