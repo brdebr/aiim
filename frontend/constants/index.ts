@@ -1,5 +1,5 @@
-export const apiBaseUrlDev = import.meta.env.DEV ? 'http://192.168.1.132:3006' : '';
-export const apiWsBaseUrlDev = import.meta.env.DEV ? 'ws://192.168.1.132:3006/api/' : import.meta.env.VITE_WS_BASE_URL;
+export const apiBaseUrlDev = import.meta.env.VITE_API_BASE_URL;
+export const apiWsBaseUrlDev = import.meta.env.VITE_WS_BASE_URL;
 export const LOCAL_STORAGE_PREFIX = 'aiim-';
 
 export const Samplers = [
