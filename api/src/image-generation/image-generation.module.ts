@@ -5,6 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
 import { ImageGenerationProcessor } from './image-generation.processor';
+import { ImageGenerationGateway } from './image-generation-queue.gateway';
 
 const GenerationHttpModule = HttpModule.registerAsync({
   imports: [ConfigModule],
@@ -22,7 +23,11 @@ const GenerationQueue = BullModule.registerQueue({
 
 @Module({
   imports: [GenerationHttpModule, GenerationQueue],
-  providers: [ImageGenerationService, ImageGenerationProcessor],
+  providers: [
+    ImageGenerationService,
+    ImageGenerationProcessor,
+    ImageGenerationGateway,
+  ],
   controllers: [ImageGenerationController],
 })
 export class ImageGenerationModule {}

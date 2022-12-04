@@ -1,12 +1,15 @@
 import { HttpService } from '@nestjs/axios';
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ImageObject } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { Job } from 'bull';
 import { catchError, firstValueFrom } from 'rxjs';
+import { defaultImageFieldsSelect } from 'src/image-object/image-object.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Text2ImageDto } from './dto/generateDto';
+import { ImageGenerationGateway } from './image-generation-queue.gateway';
 
 export const modelHashes = {
   '1.5-emaonly': '81761151',
@@ -82,6 +85,7 @@ export class ImageGenerationProcessor {
   constructor(
     private readonly httpService: HttpService,
     private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   private readonly logger = new Logger(ImageGenerationProcessor.name);
@@ -174,14 +178,11 @@ export class ImageGenerationProcessor {
     const endpoint = '/txt2img';
 
     const { params, user } = job.data;
+    const paramsString = JSON.stringify(this.parseParams(params), null, 2);
 
     const startTime = Date.now();
     this.logger.log(
-      `Generating image by '${user}' with params:\n${JSON.stringify(
-        params,
-        null,
-        2,
-      )}`,
+      `Generating image by '${user}' with params:\n${paramsString}`,
     );
 
     const fetchRequestAsObservable =
@@ -198,7 +199,6 @@ export class ImageGenerationProcessor {
         }),
       ),
     );
-    // console.log('response', data);
 
     const endTime = Date.now();
     const timeToGenerate = endTime - startTime;
@@ -217,8 +217,38 @@ export class ImageGenerationProcessor {
       this.logger.log(`Saving to database...`);
       const generatedImageObject = await this.prisma.imageObject.create({
         data: imageObject,
+        select: {
+          id: true,
+          // Prompt
+          prompt: true,
+          negativePrompt: true,
+          // Configs
+          seed: true,
+          steps: true,
+          sampler: true,
+          cfg: true,
+          width: true,
+          height: true,
+          // Model
+          model: true,
+          modelHash: true,
+          // High res
+          denoisingHr: true,
+          firstPassHr: true,
+          // Face restoration
+          faceRestoration: true,
+          // Metadata
+          generatedAt: true,
+          imageSize: true,
+          timeToGenerate: true,
+          fileName: true,
+        },
       });
       this.logger.log(`Generated image with ID: ${generatedImageObject.id}`);
+      this.eventEmitter.emit('image-generated', {
+        image: generatedImageObject,
+        user,
+      });
     } catch (error) {
       this.logger.error(error);
     }
