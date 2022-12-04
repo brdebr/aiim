@@ -7,6 +7,7 @@ export const BullQueuesModule = BullModule.forRootAsync({
     redis: {
       host: configService.get<string>('QUEUE_HOST'),
       port: +configService.get<number>('QUEUE_PORT'),
+      db: +configService.get<number>('QUEUE_DB'),
     },
   }),
   inject: [ConfigService],
