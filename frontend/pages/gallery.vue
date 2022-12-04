@@ -109,13 +109,17 @@ const gallery = await useGallery();
 const { allImages } = gallery;
 
 const layout = useLayoutStore();
-const { rightDrawerVisible } = storeToRefs(layout);
+const { rightDrawerVisible, searchButtonsActive, rightDrawerActive } = storeToRefs(layout);
 
 onBeforeMount(() => {
   rightDrawerVisible.value = true;
+  searchButtonsActive.value = true;
+  rightDrawerActive.value = false;
 });
 onUnmounted(() => {
   rightDrawerVisible.value = false;
+  searchButtonsActive.value = false;
+  rightDrawerActive.value = false;
 });
 
 const btnLoading = ref(false);

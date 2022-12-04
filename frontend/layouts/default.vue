@@ -2,33 +2,28 @@
   <div class="layout-container mobile-layout">
     <v-app-bar :elevation="0" :color="'indigo-darken-4'" border="t-md b-md s-lg e-lg" density="compact">
       <v-app-bar-title class="!qw-mx-0">
-        <div class="qw-mx-2 qw-flex qw-items-center">
+        <div class="qw-mx-2 qw-flex qw-items-center qw-gap-4">
           <div class="qw-flex qw-gap-3 qw-items-center qw-select-none qw-mr-auto" @click="$router.push('/')">
             <img src="/logo-min.png" class="qw-h-6 qw-w-6"/>
             <span>
               AI Image Manager
             </span>
           </div>
-          <div class="qw-hidden sm:qw-block qw-mr-6">
-            <v-btn variant="outlined" size="x-small" icon>
-              <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-          </div>
-          <div class="qw-hidden sm:qw-block">
-            <v-btn variant="outlined" size="x-small" icon @click="rightDrawerActive = !rightDrawerActive">
-              <v-icon>mdi-magnify</v-icon>
-            </v-btn>
-          </div>
+          <template v-if="searchButtonsActive">
+            <div class="qw-hidden sm:qw-block">
+              <v-btn variant="outlined" size="x-small" icon>
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+            </div>
+            <div class="qw-hidden sm:qw-block">
+              <v-btn variant="outlined" size="x-small" icon @click="rightDrawerActive = !rightDrawerActive">
+                <v-icon>mdi-magnify</v-icon>
+              </v-btn>
+            </div>
+          </template>
         </div>
       </v-app-bar-title>
     </v-app-bar>
-    <v-navigation-drawer
-      v-if="false"
-      temporary
-    >
-      <v-list>
-      </v-list>
-    </v-navigation-drawer>
     <v-main>
       <slot/>
     </v-main>
@@ -66,7 +61,7 @@
 </template>
 <script setup lang="ts">
 const layoutStore = useLayoutStore();
-const { bottomNavigationItems, rightDrawerActive, rightDrawerVisible, drawerWidth } = storeToRefs(layoutStore);
+const { bottomNavigationItems, rightDrawerActive, rightDrawerVisible, drawerWidth, searchButtonsActive } = storeToRefs(layoutStore);
 
 const authStore = useAuthStore();
 const { userId } = storeToRefs(authStore);
