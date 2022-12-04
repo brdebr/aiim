@@ -6,10 +6,8 @@ import { ImageObject } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { Job } from 'bull';
 import { catchError, firstValueFrom } from 'rxjs';
-import { defaultImageFieldsSelect } from 'src/image-object/image-object.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Text2ImageDto } from './dto/generateDto';
-import { ImageGenerationGateway } from './image-generation-queue.gateway';
 
 export const modelHashes = {
   '1.5-emaonly': '81761151',
@@ -18,6 +16,15 @@ export const modelHashes = {
   'bryanwd-person': 'da781e47',
   '1.5-pruned': 'a9263745',
   '2.0-768-v-ema': '2c02b20a',
+};
+
+export const modelHashesNames = {
+  '81761151': '1.5-emaonly',
+  '3e16efc8': '1.5-inpainting',
+  '7460a6fa': '1.4',
+  da781e47: 'bryanwd-person',
+  a9263745: '1.5-pruned',
+  '2c02b20a': '2.0-768-v-ema',
 };
 
 export type TextToImageGenerationJobType = {
@@ -136,7 +143,7 @@ export class ImageGenerationProcessor {
       denoisingHr: denoising_strength,
       imageFile: imageBuffer,
       modelHash: infoObject['sd_model_hash'],
-      model: modelHashes[infoObject['sd_model_hash']],
+      model: modelHashesNames[infoObject['sd_model_hash']],
       firstPassHr: null,
     };
   }

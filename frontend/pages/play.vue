@@ -62,7 +62,7 @@
         icon
         :size="button.size"
         :color="button.color"
-        @click="button.voteType ? voteFn(button.voteType) : button.fn()"
+        @click="button.voteType ? voteFn(button.voteType) : button.fn?.()"
       >
         <v-icon>{{ button.icon }}</v-icon>
       </v-btn>
