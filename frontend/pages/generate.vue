@@ -17,14 +17,24 @@
             DO IT
           </v-btn>
         </div>
-        <div v-if="generateResponse">
-          {{ generateResponse }}
+        <div v-if="numberInQueue">
+          Your requests are in queue. Remaining [ {{ numberInQueue }} ] - Images: [ {{ generatedImages.length }} ]
+        </div>
+        <div class="qw-flex qw-flex-col qw-gap-3">
+          <ImageGallery :images="generatedImages" />
         </div>
       </div>
     </v-card>
   </v-container>
 </template>
 <script setup lang="ts">
+import { ImageObject } from '~~/types';
+
+type ImageGenerationEvent = {
+  image: ImageObject;
+  queuePosition?: number;
+};
+
 useHead({
   title: 'Generate',
 })
@@ -37,7 +47,15 @@ const loading = ref(false)
 const prompt = ref('a fluffy cat sitting on top of a table')
 const negativePrompt = ref('ugly, disformed, cartoon, painting')
 
-const generateResponse = ref('')
+const numberInQueue = ref(0)
+
+const generatedImages = ref<ImageObject[]>([])
+
+useUserQueueSocket((generationEvent: ImageGenerationEvent) => {
+  console.log('Generated Image id: ', generationEvent.image.id);
+  generatedImages.value.unshift(generationEvent.image)
+  numberInQueue.value = generationEvent.queuePosition || 0
+})
 
 const generateImage = async () => {
   if(loading.value) return;
@@ -46,19 +64,19 @@ const generateImage = async () => {
     loading.value = true
     const body = {
       prompt: prompt.value,
-      negativePrompt: "ugly",
+      negativePrompt: negativePrompt.value,
       sampler: "Euler a",
       steps: 28,
       cfg: 9,
       width: 768,
       height: 768
     }
-    const response = await $fetch<string>('/api/generate/txt2img', {
+    const response = await $fetch<{queuePosition: number}>('/api/generate/txt2img', {
       ...fetchOptions.value,
       method: 'POST',
       body: JSON.stringify(body),
     })
-    generateResponse.value = response
+    numberInQueue.value = response.queuePosition
   } catch (error) {
     console.log(error);
   } finally {

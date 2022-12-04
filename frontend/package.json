@@ -22,6 +22,7 @@
     "pinia": "^2.0.23",
     "sass": "^1.56.0",
     "sass-loader": "^13.1.0",
+    "socket.io-client": "^4.5.4",
     "v3-infinite-loading": "^1.2.1"
   }
 }
