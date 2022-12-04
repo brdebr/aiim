@@ -8,6 +8,7 @@ import { GlobalJwtGuardProvider } from './auth/jwt.guard';
 import { ConfigurationModule } from './config';
 import { ImageGenerationModule } from './image-generation/image-generation.module';
 import { BullQueuesModule } from './redis';
+import { EventEmmiter } from './events';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BullQueuesModule } from './redis';
     VoteModule,
     ImageGenerationModule,
     BullQueuesModule,
+    EventEmmiter,
   ],
   controllers: [],
   providers: [GlobalJwtGuardProvider],
