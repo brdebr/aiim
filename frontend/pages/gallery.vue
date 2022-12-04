@@ -3,7 +3,22 @@
     <ImageGallery :images="allImages" @more="fetchMoreImages" />
   </div>
   <ClientOnly>
+    <Teleport to="#toolbar-append">
+      <div class="qw-flex qw-gap-3 qw-items-center">
+        <div class="qw-hidden sm:qw-block">
+          <v-btn variant="outlined" size="x-small" icon @click="$router.push('/gallery')">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </div>
+        <div class="qw-hidden sm:qw-block">
+          <v-btn variant="outlined" size="x-small" icon @click="rightDrawerActive = !rightDrawerActive">
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+        </div>
+      </div>
+    </Teleport>
     <Teleport to="#right-drawer-content">
+    <div class="qw-flex qw-flex-col qw-gap-5 qw-px-3 qw-py-6">
       <div class="qw-text-center">
         Search
       </div>
@@ -95,6 +110,7 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>
+    </div>
     </Teleport>
   </ClientOnly>
 </template>
@@ -109,16 +125,14 @@ const gallery = await useGallery();
 const { allImages } = gallery;
 
 const layout = useLayoutStore();
-const { rightDrawerVisible, searchButtonsActive, rightDrawerActive } = storeToRefs(layout);
+const { rightDrawerVisible, rightDrawerActive } = storeToRefs(layout);
 
 onBeforeMount(() => {
   rightDrawerVisible.value = true;
-  searchButtonsActive.value = true;
   rightDrawerActive.value = false;
 });
 onUnmounted(() => {
   rightDrawerVisible.value = false;
-  searchButtonsActive.value = false;
   rightDrawerActive.value = false;
 });
 

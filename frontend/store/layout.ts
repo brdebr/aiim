@@ -1,7 +1,5 @@
 export const useLayoutStore = definePiniaStore('layout', () => {
 
-  const searchButtonsActive = ref(false)
-
   const rightDrawerVisible = ref(false)
 
   const rightDrawerActive = ref(false)
@@ -49,7 +47,6 @@ export const useLayoutStore = definePiniaStore('layout', () => {
     bottomNavigationItems,
     rightDrawerActive,
     rightDrawerVisible,
-    searchButtonsActive,
     drawerWidth,
     breakpoints,
   }
