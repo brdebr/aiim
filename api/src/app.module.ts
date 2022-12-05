@@ -7,7 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { GlobalJwtGuardProvider } from './auth/jwt.guard';
 import { ConfigurationModule } from './config';
 import { ImageGenerationModule } from './image-generation/image-generation.module';
-import { BullQueuesModule } from './redis';
+import { BullQueuesModule } from './queues';
 import { EventEmmiter } from './events';
 
 @Module({
