@@ -127,7 +127,7 @@ useHead({
   }
   .card-game-buttons {
     @apply qw-absolute qw-bottom-[var(--v-layout-bottom)];
-    @apply qw-pb-8 qw-pt-9 qw-px-3;
+    @apply qw-pb-5 qw-pt-8 qw-px-3;
     @apply qw-w-full qw-flex qw-justify-center qw-items-center qw-gap-4;
     background: rgb(0,0,0);
     background: linear-gradient(0deg, rgba(0, 0, 0, 1) -0%, rgba(9,9,119,0) 100%);

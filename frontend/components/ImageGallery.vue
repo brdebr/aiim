@@ -6,7 +6,7 @@
       :data-id="vote.id"
       class="voted-image-container" :class="getClassObject(vote)"
     >
-      <ImageVoteCard :vote="vote" />
+      <ImageCardDetailed :vote="vote" />
     </div>
     <slot name="append" />
     <div ref="bottomEl" class="qw-absolute qw-bottom-0 qw-h-[250px] qw-w-px" />

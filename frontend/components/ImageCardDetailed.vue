@@ -12,7 +12,7 @@
       </template>
       <v-toolbar-title>
         <div class="qw-flex qw-items-center qw-gap-4">
-          <v-chip class="!qw-px-[5px]" rounded="sm" color="indigo" size="small">
+          <v-chip label rounded="sm" color="indigo" size="small">
             <span class="qw-text-white">
               {{ imageToShow.height }} <small>px</small> <span class="qw-mx-2"><small>x</small></span> {{ imageToShow.width }} <small>px</small>
             </span>
@@ -21,12 +21,12 @@
       </v-toolbar-title>
       <template v-slot:append>
         <div class="qw-flex qw-items-center qw-gap-2">
-          <v-chip class="!qw-px-[5px]" rounded="sm" color="indigo" size="small">
+          <v-chip label rounded="sm" color="indigo" size="small">
             <span class="qw-text-white">
               {{ imageToShow.model || modelHashesNames[imageToShow.modelHash] }}
             </span>
           </v-chip>
-          <v-chip class="!qw-px-[5px]" rounded="sm" color="indigo" size="small">
+          <v-chip label rounded="sm" color="indigo" size="small">
             <span class="qw-text-white">
               {{ imageToShow.sampler }}
             </span>
