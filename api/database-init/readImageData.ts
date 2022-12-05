@@ -166,7 +166,12 @@ const imagesPath =
 
 import { readdirSync, readFileSync, statSync } from 'fs';
 const images = readdirSync(imagesPath);
-const imagesRoutes = images.map((image) => `${imagesPath}/${image}`);
+const imagesRoutes = images
+  .map((image) => `${imagesPath}/${image}`)
+  .filter(
+    (el) =>
+      !el.endsWith('-before-face-restoration.png'),
+  );
 
 console.log(`Processing ${imagesRoutes.length} images -->`);
 console.time('Processing images');

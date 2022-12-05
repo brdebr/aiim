@@ -12,7 +12,9 @@ services:
       NUXT_PUBLIC_API_BASE_URL: ${NUXT_PUBLIC_API_BASE_URL}
   aiim-api:
     container_name: aiim-api_container
-    build: ./api
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
     ports:
       - 3005:3005
     depends_on:

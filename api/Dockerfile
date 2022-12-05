@@ -2,7 +2,9 @@ FROM node:16.14.2
 
 EXPOSE 3005
 
-COPY . /app
+COPY ./api /app
+
+COPY .env /app
 
 WORKDIR /app
 
