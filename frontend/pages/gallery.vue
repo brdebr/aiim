@@ -5,12 +5,12 @@
   <ClientOnly>
     <Teleport to="#toolbar-append">
       <div class="qw-flex qw-gap-3 qw-items-center">
-        <div class="qw-hidden sm:qw-block">
-          <v-btn variant="outlined" size="x-small" icon @click="$router.push('/gallery')">
+        <div>
+          <v-btn variant="outlined" size="x-small" icon @click="refresh">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </div>
-        <div class="qw-hidden sm:qw-block">
+        <div>
           <v-btn variant="outlined" size="x-small" icon @click="rightDrawerActive = !rightDrawerActive">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
@@ -20,10 +20,10 @@
     <Teleport to="#right-drawer-content">
     <div class="qw-flex qw-flex-col qw-gap-5 qw-px-3 qw-py-6">
       <div class="qw-text-center">
-        Search
+        Search {{totalSearchResults ? `[ ${totalSearchResults} ]` : ''}}
       </div>
       <v-text-field
-        v-model="search.prompt"
+        v-model="searchObj.prompt"
         label="Prompt"
         class="qw-mb-3"
         variant="outlined"
@@ -32,7 +32,7 @@
         clearable
       />
       <v-text-field
-        v-model="search.negativePrompt"
+        v-model="searchObj.negativePrompt"
         label="Negative prompt"
         class="qw-mb-3"
         variant="outlined"
@@ -42,7 +42,7 @@
       />
       <div class="qw-flex qw-gap-4">
         <v-text-field
-          v-model.number="search.steps"
+          v-model.number="searchObj.steps"
           label="Steps"
           class="qw-mb-3"
           variant="outlined"
@@ -51,7 +51,7 @@
           clearable
         />
         <v-text-field
-          v-model.number="search.cfg"
+          v-model.number="searchObj.cfg"
           label="CFG"
           class="qw-mb-3"
           variant="outlined"
@@ -62,7 +62,7 @@
       </div>
       <div class="qw-flex qw-gap-4">
         <v-text-field
-          v-model.number="search.width"
+          v-model.number="searchObj.width"
           label="Width"
           class="qw-mb-3"
           variant="outlined"
@@ -71,7 +71,7 @@
           clearable
         />
         <v-text-field
-          v-model.number="search.height"
+          v-model.number="searchObj.height"
           label="Height"
           class="qw-mb-3"
           variant="outlined"
@@ -81,7 +81,7 @@
         />
       </div>
         <v-select
-          v-model="search.sampler"
+          v-model="searchObj.sampler"
           label="Sampler"
           class="qw-mb-3"
           variant="outlined"
@@ -91,7 +91,7 @@
           clearable
         />
         <v-select
-          v-model="search.model"
+          v-model="searchObj.model"
           label="Model"
           class="qw-mb-3"
           variant="outlined"
@@ -103,7 +103,7 @@
           clearable
         />
       <div class="qw-flex qw-gap-3 qw-items-center">
-        <v-btn variant="outlined" class="qw-flex-grow">
+        <v-btn variant="outlined" class="qw-flex-grow" @click="performSearch">
           Filter
         </v-btn>
         <v-btn @click="clearSearch" icon variant="outlined" size="x-small" class="!qw-rounded-sm">
@@ -116,13 +116,24 @@
 </template>
 <script lang="ts" setup>
 import { Samplers, modelHashesMap } from '~~/constants';
+
 const router = useRouter();
 useHead({
   title: 'Gallery',
 })
 
+const scrollToTop = () => {
+  window.scrollTo(0, 0);
+}
+
+const refresh = () => {
+  isSearchMode.value = false;
+  scrollToTop();
+  router.push('/gallery');
+}
+
 const gallery = await useGallery();
-const { allImages } = gallery;
+const { allImages, searchObj, isSearchMode, totalSearchResults } = gallery;
 
 const layout = useLayoutStore();
 const { rightDrawerVisible, rightDrawerActive } = storeToRefs(layout);
@@ -140,40 +151,38 @@ const btnLoading = ref(false);
 
 const fetchMoreImages = async () => {
   btnLoading.value = true;
-  const lastImageId = await gallery.fetchNextImages();
-  router.push({
-    query: {
-      page: lastImageId
-    },
-    replace: true
-  });
+  if (isSearchMode.value) {
+    await gallery.searchNextPage();
+  } else {
+    await gallery.fetchNextImages();
+  }
   btnLoading.value = false;
 };
 
 const modelsAsPairs = Object.entries(modelHashesMap);
 
-type ImageSearchType = {
-  prompt: string;
-  negativePrompt: string;
-  steps: number;
-  cfg: number;
-  width: number;
-  height: number;
-  sampler: typeof Samplers[number];
-  model: typeof modelsAsPairs[number][1];
-}
+const performSearch = async () => {
+  scrollToTop();
+  await router.push('/gallery');
+  allImages.value = await gallery.search(searchObj);
+};
 
-const search = reactive<Partial<ImageSearchType>>({});
+const clearSearch = async () => {
+  searchObj.prompt = undefined;
+  searchObj.negativePrompt = undefined;
+  searchObj.steps = undefined;
+  searchObj.cfg = undefined;
+  searchObj.width = undefined;
+  searchObj.height = undefined;
+  searchObj.sampler = undefined;
+  searchObj.model = undefined;
+  isSearchMode.value = false;
+  totalSearchResults.value = 0;
 
-const clearSearch = () => {
-  search.prompt = undefined;
-  search.negativePrompt = undefined;
-  search.steps = undefined;
-  search.cfg = undefined;
-  search.width = undefined;
-  search.height = undefined;
-  search.sampler = undefined;
-  search.model = undefined; 
+  await nextTick();
+
+  scrollToTop();
+  gallery.fetchInitialImages(true);
 }
 
 </script>

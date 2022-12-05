@@ -1,4 +1,5 @@
 import { ImageObject } from "~~/types";
+import { Samplers, modelHashesMap } from '~~/constants';
 
 export type ImageObjectsPageResponse = ImageObject[]
 
@@ -6,6 +7,19 @@ export type useGalleryConfig = Partial<{
   pageId: string;
   pageSize: number;
 }>
+
+const modelsAsPairs = Object.entries(modelHashesMap);
+
+export type ImageSearchType = {
+  prompt: string;
+  negativePrompt: string;
+  steps: number;
+  cfg: number;
+  width: number;
+  height: number;
+  sampler: typeof Samplers[number];
+  model: typeof modelsAsPairs[number][1];
+}
 
 export const DEFAULT_GALLERY_PAGE_SIZE = 25;
 const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
@@ -32,6 +46,10 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
 
   const loadingInitialImages = ref(false);
 
+  const isSearchMode = ref(false);
+  const searchObj = reactive<Partial<ImageSearchType>>({});
+  const totalSearchResults = ref(0);
+
   const getImagesPage = async (pageId: string, pageSize: number = DEFAULT_GALLERY_PAGE_SIZE) => {
     const query = new URLSearchParams({
       page: pageId,
@@ -42,9 +60,9 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     return response;
   };
 
-  const fetchInitialImages = async () => {
+  const fetchInitialImages = async (forceInitial?: boolean) => {
     loadingInitialImages.value = true;
-    const images = await getImagesPage(pageIdFromQuery.value, firstPageSize);
+    const images = await getImagesPage(forceInitial ? '' : pageIdFromQuery.value, firstPageSize);
     allImages.value = images;
     loadingInitialImages.value = false;
   };
@@ -58,6 +76,39 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     allImages.value = allImages.value.concat(newPage);
     return lastImageId;
   };
+
+  const search = async (search: Partial<ImageSearchType>) => {
+    isSearchMode.value = true;
+    const endpoint = '/api/images/search';
+
+    const searchObjFiltered = Object.fromEntries(Object.entries(search).filter(([_, v]) => v !== null));
+
+    const images = await $fetch<{result: ImageObject[], count: number}>(endpoint, {
+      ...fetchOptions.value,
+      method: 'POST',
+      body: JSON.stringify(searchObjFiltered),
+    });
+    totalSearchResults.value = images.count;
+    return images.result;
+  }
+
+  const searchNextPage = async () => {
+    const lastImageId = allImages.value[allImages.value.length - 1].id;
+    const query = new URLSearchParams({
+      page: lastImageId,
+      size: pageSize.toString(),
+    });
+    const endpoint = `/api/images/search?${query.toString()}`;
+
+    const searchObjFiltered = Object.fromEntries(Object.entries(searchObj).filter(([_, v]) => v !== null));
+    
+    const images = await $fetch<{result: ImageObject[], count: number}>(endpoint, {
+      ...fetchOptions.value,
+      method: 'POST',
+      body: JSON.stringify(searchObjFiltered),
+    });
+    allImages.value = allImages.value.concat(images.result);
+  }
 
   // Total Images
   const fetchTotalImages = async () => {
@@ -73,5 +124,11 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     imagesCount,
     pageIdFromQuery,
     loadingInitialImages,
+    fetchInitialImages,
+    search,
+    searchNextPage,
+    isSearchMode,
+    searchObj,
+    totalSearchResults,
   }
 }

@@ -10,7 +10,7 @@ import {
   IsBooleanString,
 } from 'class-validator';
 
-const Samplers = [
+export const Samplers = [
   'Euler a',
   'Euler',
   'LMS',

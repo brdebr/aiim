@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ImageObject, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { bytesToHuman } from 'src/utils';
+import { ImageSearchDto } from './dto/searchDto';
 
 export const defaultImageFieldsSelect: Prisma.ImageObjectSelect = {
   id: true,
@@ -87,6 +88,59 @@ export class ImageObjectService {
       select: defaultImageFieldsSelect,
     });
     return queryResponse;
+  }
+
+  async advancedSearch(params: ImageSearchDto, size = 20, cursorId?: string) {
+    const cursor = cursorId ? { id: cursorId } : undefined;
+    const skip = cursorId ? 1 : 0;
+    const whereObject: Prisma.ImageObjectWhereInput = {
+      prompt: {
+        contains: params.prompt,
+        mode: 'insensitive',
+      },
+      negativePrompt: {
+        contains: params.negativePrompt,
+        mode: 'insensitive',
+      },
+      modelHash: {
+        equals: params.model,
+      },
+      sampler: {
+        equals: params.sampler,
+      },
+      cfg: {
+        equals: params.cfg,
+      },
+      width: {
+        equals: params.width,
+      },
+      height: {
+        equals: params.height,
+      },
+      seed: {
+        equals: params.seed,
+      },
+      steps: {
+        equals: params.steps,
+      },
+    };
+
+    const count = await this.prisma.imageObject.count({
+      where: whereObject,
+    });
+
+    const queryResponse = await this.prisma.imageObject.findMany({
+      take: size,
+      skip,
+      cursor,
+      orderBy: {
+        id: 'desc',
+      },
+      where: whereObject,
+      select: defaultImageFieldsSelect,
+    });
+    const result = this.addHumanFileSize(queryResponse);
+    return { result, count };
   }
 
   async searchGroupedByPrompts(q: string) {

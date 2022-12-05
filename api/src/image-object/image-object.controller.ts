@@ -1,8 +1,9 @@
 import { VoteService } from './../vote/vote.service';
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { JwtObject, Public } from 'src/auth/auth.decorator';
 import { ImageObjectService } from './image-object.service';
 import { JwtPayload } from 'src/auth/auth.service';
+import { ImageSearchDto } from './dto/searchDto';
 
 @Controller('images')
 export class ImageObjectController {
@@ -59,6 +60,16 @@ export class ImageObjectController {
       count: results.length,
       results,
     };
+  }
+
+  @Post('search')
+  async searchPost(
+    @Body() params: ImageSearchDto,
+    @Query('size') size = '20',
+    @Query('page') page?: string,
+  ) {
+    const results = await this.imageService.advancedSearch(params, +size, page);
+    return results;
   }
 
   @Get('total')
