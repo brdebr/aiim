@@ -1,5 +1,6 @@
 <template>
   <div class="layout-container mobile-layout">
+  <!-- TOOLBAR -->
     <v-app-bar :elevation="0" :color="'indigo-darken-4'" border="t-md b-md s-lg e-lg" density="compact">
       <v-app-bar-title class="!qw-mx-0">
         <div class="qw-mx-2 qw-flex qw-items-center qw-gap-4">
@@ -14,20 +15,23 @@
         </div>
       </v-app-bar-title>
     </v-app-bar>
+    <!-- MAIN -->
     <v-main>
       <slot/>
     </v-main>
+    <!-- RIGHT DRAWER -->
     <v-navigation-drawer
       v-if="rightDrawerVisible"
       v-model="rightDrawerActive"
       location="right"
       color="indigo-darken-4"
       :width="drawerWidth"
-      temporary
+      :temporary="rightDrawerIsTemporary"
     >
       <div id="right-drawer-content">
       </div>
     </v-navigation-drawer>
+    <!-- BOTTOM NAV -->
     <v-bottom-navigation
       v-if="userId"
       class="bottom-bar"
@@ -51,7 +55,7 @@
 </template>
 <script setup lang="ts">
 const layoutStore = useLayoutStore();
-const { bottomNavigationItems, rightDrawerActive, rightDrawerVisible, drawerWidth } = storeToRefs(layoutStore);
+const { bottomNavigationItems, rightDrawerActive, rightDrawerVisible, drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
 
 const authStore = useAuthStore();
 const { userId } = storeToRefs(authStore);
@@ -73,6 +77,10 @@ useHead({
 .mobile-layout {
   height: 100%;
   width: 100%;
+  .v-main {
+    height: 100%;
+  }
+
   &, .v-main > * {
     background: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
   }

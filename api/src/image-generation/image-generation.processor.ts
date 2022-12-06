@@ -243,7 +243,7 @@ export class ImageGenerationProcessor {
             fetchRequestEnded.next(true);
           }),
         ),
-        interval(800).pipe(
+        interval(1000).pipe(
           takeUntil(fetchRequestEnded),
           map(() => this.fetchStatus(user)),
         ),

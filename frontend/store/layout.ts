@@ -1,7 +1,7 @@
 export const useLayoutStore = definePiniaStore('layout', () => {
 
+  const rightDrawerIsTemporary = ref(false)
   const rightDrawerVisible = ref(false)
-
   const rightDrawerActive = ref(false)
 
   const breakpoints = useBreakpoints({
@@ -44,10 +44,11 @@ export const useLayoutStore = definePiniaStore('layout', () => {
   ])
 
   return {
-    bottomNavigationItems,
+    rightDrawerIsTemporary,
     rightDrawerActive,
     rightDrawerVisible,
     drawerWidth,
     breakpoints,
+    bottomNavigationItems,
   }
 })
