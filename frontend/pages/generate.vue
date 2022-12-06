@@ -7,18 +7,21 @@
         </h1>
         <v-divider class="qw-my-3" />
         <div class="qw-my-3">
-          <v-textarea label="Prompt" variant="outlined" v-model="prompt" />
+          <v-textarea label="Prompt" variant="outlined" v-model="prompt" counter rows="3" />
         </div>
         <div class="qw-my-3">
-          <v-textarea label="Negative Prompt" variant="outlined" v-model="negativePrompt" />
+          <v-textarea label="Negative Prompt" variant="outlined" v-model="negativePrompt" rows="2" />
         </div>
         <div class="qw-my-3">
           <v-btn :loading="loading" variant="flat" block color="primary" @click="generateImage">
             DO IT
           </v-btn>
         </div>
+        <div class="qw-my-3" v-if="numberInQueue">
+          <v-progress-linear :model-value="progress" height="8" color="indigo-darken-3" striped />
+        </div>
         <div v-if="numberInQueue">
-          Your requests are in queue. Remaining [ {{ numberInQueue }} ] - Images: [ {{ generatedImages.length }} ]
+          Next image in [ {{ eta.toFixed(2) || '0' }}s ]. Images in your queue [ {{ numberInQueue }} ] - Generated images: [ {{ generatedImages.length }} ]
         </div>
         <div class="qw-flex qw-flex-col qw-gap-3">
           <ImageGallery :images="generatedImages" />
@@ -51,10 +54,12 @@ const numberInQueue = ref(0)
 
 const generatedImages = ref<ImageObject[]>([])
 
-useUserQueueSocket((generationEvent: ImageGenerationEvent) => {
+const { eta, progress, outputProgress, outputEta } = useUserQueueSocket((generationEvent: ImageGenerationEvent) => {
   console.log('Generated Image id: ', generationEvent.image.id);
   generatedImages.value.unshift(generationEvent.image)
-  numberInQueue.value = generationEvent.queuePosition || 0
+  numberInQueue.value = generationEvent.queuePosition || 0;
+  progress.value = 0;
+  eta.value = 0;
 })
 
 const generateImage = async () => {

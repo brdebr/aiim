@@ -12,12 +12,26 @@ import { Server, Socket } from 'socket.io';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { TextToImageGenerationJobType } from './image-generation.processor';
+import {
+  ProgressResponse,
+  TextToImageGenerationJobType,
+} from './image-generation.processor';
+import { Text2ImageDto } from './dto/generateDto';
 
 export type ImageGenerationEvent = {
   image: ImageObject;
   user: string;
   queuePosition?: number;
+};
+
+export type ImageOnQueueEvent = {
+  params: Text2ImageDto;
+  user: string;
+};
+
+export type ImageGenerationProgressEvent = {
+  response: ProgressResponse;
+  user: string;
 };
 
 @WebSocketGateway({
@@ -37,7 +51,7 @@ export class ImageGenerationGateway
 
   private readonly logger = new Logger(ImageGenerationGateway.name);
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.log('Websocket initialized!');
   }
 
@@ -48,6 +62,8 @@ export class ImageGenerationGateway
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: '${client.id}'`);
   }
+
+  // Client Emmited Event handlers
 
   @SubscribeMessage('user_queue_enter')
   handleJoinRoom(client: Socket, userId: string) {
@@ -61,6 +77,8 @@ export class ImageGenerationGateway
     client.leave(`user_${userId}`);
   }
 
+  // Server Emmited Event handlers
+
   @OnEvent('image-generated')
   async sendImageObjectGenerated(payload: ImageGenerationEvent) {
     this.logger.log(
@@ -71,5 +89,21 @@ export class ImageGenerationGateway
       image: payload.image,
       queuePosition: payload.queuePosition,
     });
+  }
+
+  @OnEvent('image-on-queue')
+  async sendImageOnQueue(payload: ImageGenerationEvent) {
+    payload.queuePosition = (await this.generationQueue.getJobCounts()).waiting;
+    this.server.to(`user_${payload.user}`).emit('image_on_queue', {
+      image: payload.image,
+      queuePosition: payload.queuePosition,
+    });
+  }
+
+  @OnEvent('image-progress')
+  async sendImageProgress(payload: ImageGenerationProgressEvent) {
+    this.server
+      .to(`user_${payload.user}`)
+      .emit('image_on_progress', payload.response);
   }
 }

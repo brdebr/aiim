@@ -7,6 +7,21 @@ type ImageGenerationEvent = {
   queuePosition?: number;
 };
 
+export type ProgressResponse = {
+  progress: number;
+  eta_relative: number;
+  state: {
+    skipped: boolean;
+    interrupted: boolean;
+    job: string;
+    job_count: number;
+    job_no: number;
+    sampling_step: number;
+    sampling_steps: number;
+  };
+  current_image?: string;
+};
+
 export const useUserQueueSocket = (
   callback: (generationEvent: ImageGenerationEvent) => void,
 ) => {
@@ -14,6 +29,17 @@ export const useUserQueueSocket = (
 
   const authStore = useAuthStore();
   const { userId } = storeToRefs(authStore);
+
+  const progress = ref(0);
+  const eta = ref(0);
+
+  const outputProgress = useTransition(progress, {
+    duration: 250,
+  })
+  const outputEta = useTransition(eta, {
+    duration: 250,
+  })
+
 
   onMounted(() => {
     socket = io(apiWsBaseUrlDev, {
@@ -31,6 +57,11 @@ export const useUserQueueSocket = (
     socket.on('image_finished', (generationEvent: ImageGenerationEvent) => {
       console.log(`Received image ${generationEvent.image.id} from socket server`);
       callback(generationEvent);
+    });
+
+    socket.on('image_on_progress', (progressEvent: ProgressResponse) => {
+      progress.value = (progressEvent.progress * 100);
+      eta.value = progressEvent.eta_relative;
     });
   
     joinQueue();
@@ -52,5 +83,9 @@ export const useUserQueueSocket = (
 
   return {
     socket,
+    progress,
+    eta,
+    outputProgress,
+    outputEta,
   }
 };

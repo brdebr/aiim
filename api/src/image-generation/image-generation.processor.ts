@@ -5,9 +5,35 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ImageObject } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { Job } from 'bull';
-import { catchError, firstValueFrom } from 'rxjs';
+import {
+  catchError,
+  firstValueFrom,
+  forkJoin,
+  interval,
+  lastValueFrom,
+  map,
+  Subject,
+  takeUntil,
+  tap,
+} from 'rxjs';
+import { defaultImageFieldsSelect } from 'src/image-object/image-object.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Text2ImageDto } from './dto/generateDto';
+
+export type ProgressResponse = {
+  progress: number;
+  eta_relative: number;
+  state: {
+    skipped: boolean;
+    interrupted: boolean;
+    job: string;
+    job_count: number;
+    job_no: number;
+    sampling_step: number;
+    sampling_steps: number;
+  };
+  current_image?: string;
+};
 
 export const modelHashes = {
   '1.5-emaonly': '81761151',
@@ -191,6 +217,10 @@ export class ImageGenerationProcessor {
     this.logger.log(
       `Generating image by '${user}' with params:\n${paramsString}`,
     );
+    this.eventEmitter.emit('image-on-queue', {
+      params,
+      user,
+    });
 
     const fetchRequestAsObservable =
       this.httpService.post<ImageGenerationResponse>(
@@ -198,13 +228,26 @@ export class ImageGenerationProcessor {
         this.parseParams(params),
       );
 
-    const { data } = await firstValueFrom(
-      fetchRequestAsObservable.pipe(
-        catchError((error: AxiosError) => {
-          this.logger.error(error.response.data);
-          throw 'Ohh nooo, an error happened! :(';
-        }),
-      ),
+    const fetchRequestEnded = new Subject();
+
+    const {
+      0: { data },
+    } = await lastValueFrom(
+      forkJoin([
+        fetchRequestAsObservable.pipe(
+          catchError((error: AxiosError) => {
+            this.logger.error(error.response.data);
+            throw 'Ohh nooo, an error happened! :(';
+          }),
+          tap(() => {
+            fetchRequestEnded.next(true);
+          }),
+        ),
+        interval(800).pipe(
+          takeUntil(fetchRequestEnded),
+          map(() => this.fetchStatus(user)),
+        ),
+      ]),
     );
 
     const endTime = Date.now();
@@ -224,31 +267,8 @@ export class ImageGenerationProcessor {
       this.logger.log(`Saving to database...`);
       const generatedImageObject = await this.prisma.imageObject.create({
         data: imageObject,
-        select: {
-          id: true,
-          // Prompt
-          prompt: true,
-          negativePrompt: true,
-          // Configs
-          seed: true,
-          steps: true,
-          sampler: true,
-          cfg: true,
-          width: true,
-          height: true,
-          // Model
-          model: true,
-          modelHash: true,
-          // High res
-          denoisingHr: true,
-          firstPassHr: true,
-          // Face restoration
-          faceRestoration: true,
-          // Metadata
-          generatedAt: true,
-          imageSize: true,
-          timeToGenerate: true,
-          fileName: true,
+        select: defaultImageFieldsSelect as {
+          [P in keyof ImageObject]: boolean;
         },
       });
       this.logger.log(`Generated image with ID: ${generatedImageObject.id}`);
@@ -256,8 +276,37 @@ export class ImageGenerationProcessor {
         image: generatedImageObject,
         user,
       });
+      const finalTime = Date.now();
+      const finalTimeInSeconds = (finalTime - startTime) / 1000;
+      this.logger.log(
+        `Time to generate and save: ${finalTimeInSeconds.toFixed(2)}s`,
+      );
     } catch (error) {
       this.logger.error(error);
     }
+  }
+
+  async fetchStatus(userId: string) {
+    const endpoint = '/progress';
+    const progressAsObservable = this.httpService
+      .get<ProgressResponse>(endpoint)
+      .pipe(
+        catchError((error: AxiosError) => {
+          this.logger.error(error.response.data);
+          throw 'Ohh nooo, an error happened fetching the status! :(';
+        }),
+      );
+
+    this.logger.log(`Fetching status...`);
+    const { data } = await firstValueFrom(progressAsObservable);
+    this.logger.log(
+      `Image generation: [ ${(data.progress * 100).toFixed(
+        2,
+      )}% ] - Remaining: ${data.eta_relative.toFixed(2)}s`,
+    );
+    this.eventEmitter.emit('image-progress', {
+      response: data,
+      user: userId,
+    });
   }
 }
