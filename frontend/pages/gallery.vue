@@ -86,9 +86,12 @@
           class="qw-mb-3"
           variant="outlined"
           density="compact"
+          theme="dark"
           hide-details
           :items="Samplers"
           clearable
+          transition="scroll-y-transition"
+          :menu-props="{ maxHeight: 400 }"
         />
         <v-select
           v-model="searchObj.model"
@@ -96,11 +99,14 @@
           class="qw-mb-3"
           variant="outlined"
           density="compact"
+          theme="dark"
           hide-details
           :items="modelsAsPairs"
           item-title="0"
           item-value="1"
           clearable
+          transition="scroll-y-transition"
+          :menu-props="{ maxHeight: 400 }"
         />
       <div class="qw-flex qw-gap-3 qw-items-center">
         <v-btn variant="outlined" class="qw-flex-grow" @click="performSearch">
