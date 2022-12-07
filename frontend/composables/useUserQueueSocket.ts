@@ -22,28 +22,26 @@ export type ProgressResponse = {
   current_image?: string;
 };
 
+export type useQueueSocketType = {
+  imageFinishedCallback?: (generationEvent: ImageGenerationEvent) => void;
+  progressCallback?: (progressEvent: ProgressResponse) => void;
+  errorCallback?: (error: any) => void;
+};
+
 export const useUserQueueSocket = (
-  callback: (generationEvent: ImageGenerationEvent) => void,
+  params?: useQueueSocketType,
 ) => {
   let socket: Socket | undefined;
 
   const authStore = useAuthStore();
-  const { userId } = storeToRefs(authStore);
+  const { token } = storeToRefs(authStore);
 
-  const progress = ref(0);
-  const eta = ref(0);
-
-  const outputProgress = useTransition(progress, {
-    duration: 250,
-  })
-  const outputEta = useTransition(eta, {
-    duration: 250,
-  })
-
-
-  onMounted(() => {
+  const initWsConnection = () => {
     socket = io(apiWsBaseUrlDev, {
       transports: ['websocket'],
+      auth: {
+        token: token.value,
+      },
     });
   
     socket.on('connect', () => {
@@ -56,36 +54,23 @@ export const useUserQueueSocket = (
 
     socket.on('image_finished', (generationEvent: ImageGenerationEvent) => {
       console.log(`Received image ${generationEvent.image.id} from socket server`);
-      callback(generationEvent);
+      params?.imageFinishedCallback?.(generationEvent);
     });
 
     socket.on('image_on_progress', (progressEvent: ProgressResponse) => {
-      progress.value = (progressEvent.progress * 100);
-      eta.value = progressEvent.eta_relative;
+      params?.progressCallback?.(progressEvent);
     });
+  }
   
-    joinQueue();
+  onMounted(() => {
+    initWsConnection();
   })
 
-  const joinQueue = () => {
-    console.log(`Joining queue for user: ${userId.value}`);
-    socket?.emit('user_queue_enter', userId.value);
-  }
-  const leaveQueue = () => {
-    console.log(`Leaving queue for user: ${userId.value}`);
-    socket?.emit('user_queue_leave', userId.value);
-  }
-
   onUnmounted(() => {
-    leaveQueue();
     socket?.disconnect()
   })
 
   return {
     socket,
-    progress,
-    eta,
-    outputProgress,
-    outputEta,
   }
 };

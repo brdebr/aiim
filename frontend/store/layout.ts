@@ -38,7 +38,7 @@ export const useLayoutStore = definePiniaStore('layout', () => {
     },
     {
       label: 'Profile',
-      icon: 'mdi-account',
+      icon: 'mdi-account-cog',
       route: '/profile'
     },
   ])

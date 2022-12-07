@@ -56,7 +56,7 @@
                   density="comfortable"
                   label="Sampler"
                   variant="outlined"
-                  :items="Samplers"
+                  :items="samplers"
                   v-model="sampler"
                   hide-details
                   transition="scroll-y-transition"
@@ -132,7 +132,7 @@
                   density="comfortable"
                   label="Width"
                   variant="outlined"
-                  :items="possibleSizes"
+                  :items="possibleImageSideSizes"
                   v-model="width"
                   hide-details
                   transition="scroll-y-transition"
@@ -152,7 +152,7 @@
                   density="comfortable"
                   label="Height"
                   variant="outlined"
-                  :items="possibleSizes"
+                  :items="possibleImageSideSizes"
                   v-model="height"
                   hide-details
                   transition="scroll-y-transition"
@@ -163,15 +163,15 @@
           </HelpLabel>
         </div>
         <div class="qw-mt-8 qw-mb-3">
-          <v-btn :loading="loading" variant="flat" border block color="blue-darken-4" @click="generateImage">
+          <v-btn variant="flat" border block color="blue-darken-4" @click="generateImage">
             DO IT
           </v-btn>
         </div>
-        <div class="qw-my-3" v-if="numberInQueue">
+        <div class="qw-my-3" v-if="imagesInQueue">
           <v-progress-linear :model-value="progress" height="16" color="amber" striped />
         </div>
-        <div v-if="numberInQueue">
-          Next image in [ {{ eta.toFixed(2) || '0' }}s ]. Images in your queue [ {{ numberInQueue }} ] - Generated images: [ {{ generatedImages.length }} ]
+        <div v-if="imagesInQueue">
+          Next image in [ {{ eta.toFixed(2) || '0' }}s ]. Images in your queue [ {{ imagesInQueue }} ] - Generated images: [ {{ generatedImages.length }} ]
         </div>
         <div class="qw-flex qw-flex-col qw-gap-3">
           <ImageGallery :images="generatedImages" />
@@ -181,88 +181,24 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import { Samplers } from '~~/constants';
-import { ImageObject } from '~~/types';
+const {
+  prompt,
+  negativePrompt,
+  seed,
+  sampler,
+  steps,
+  cfg,
+  width,
+  height,
+  imagesInQueue,
+  progress,
+  eta,
+  generatedImages,
+  generateImage,
+  possibleImageSideSizes,
+  samplers,
+} = useGenerate();
 
-type ImageGenerationEvent = {
-  image: ImageObject;
-  queuePosition?: number;
-};
-
-const favoriteSizes = [512, 768, 1472, 1408, 1600, 1920]
-
-const possibleSizes = Array.from(Array(32).keys()).map((_, i) => ({
-  title: `${(i + 1) * 64}px`,
-  value: (i + 1) * 64
-})).filter(el => el.value >= 512).map(el => {
-  if (favoriteSizes.includes(el.value)) {
-    el.title = `${el.title} ★`
-  }
-  return el
-});
-
-useHead({
-  title: 'Generate',
-})
-
-const authStore = useAuthStore();
-const { fetchOptions } = storeToRefs(authStore);
-
-const layoutStore = useLayoutStore();
-
-const loading = ref(false)
-
-const prompt = ref('a fluffy cat sitting on top of a table')
-const negativePrompt = ref('ugly, disformed, cartoon, painting')
-
-const seed = ref<string | null>(null)
-
-const sampler = ref<typeof Samplers[number]>('Euler a')
-const steps = ref(28)
-const cfg = ref(9)
-const width = ref(768)
-const height = ref(768)
-
-
-const numberInQueue = ref(0)
-
-const generatedImages = ref<ImageObject[]>([])
-
-const { eta, progress, outputProgress, outputEta } = useUserQueueSocket((generationEvent: ImageGenerationEvent) => {
-  console.log('Generated Image id: ', generationEvent.image.id);
-  generatedImages.value.unshift(generationEvent.image)
-  numberInQueue.value = generationEvent.queuePosition || 0;
-  progress.value = 0;
-  eta.value = 0;
-})
-
-const generateImage = async () => {
-  if(loading.value) return;
-
-  try {
-    loading.value = true
-    const body = {
-      prompt: prompt.value,
-      negativePrompt: negativePrompt.value,
-      sampler: "Euler a",
-      steps: steps.value,
-      cfg: cfg.value,
-      width: width.value,
-      height: height.value,
-      seed: seed.value || undefined,
-    }
-    const response = await $fetch<{queuePosition: number}>('/api/generate/txt2img', {
-      ...fetchOptions.value,
-      method: 'POST',
-      body: JSON.stringify(body),
-    })
-    numberInQueue.value = response.queuePosition
-  } catch (error) {
-    console.log(error);
-  } finally {
-    loading.value = false
-  }
-}
 </script>
 <style lang="scss">
 .copy-btn {

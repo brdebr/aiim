@@ -17,6 +17,8 @@ import {
   TextToImageGenerationJobType,
 } from './image-generation.processor';
 import { Text2ImageDto } from './dto/generateDto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/auth/auth.service';
 
 export type ImageGenerationEvent = {
   image: ImageObject;
@@ -44,6 +46,7 @@ export class ImageGenerationGateway
   constructor(
     @InjectQueue('generation')
     private generationQueue: Queue<TextToImageGenerationJobType>,
+    private jwtService: JwtService,
   ) {}
 
   @WebSocketServer()
@@ -56,25 +59,34 @@ export class ImageGenerationGateway
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: '${client.id}'`);
+    try {
+      const tokenFromHandshake = client.handshake?.auth?.token;
+      const userJwtDecoded =
+        this.jwtService.verify<JwtPayload>(tokenFromHandshake);
+
+      this.logger.log(
+        `User '${userJwtDecoded.id}' connected to WS as '${client.id}'`,
+      );
+
+      client.join(`user_${userJwtDecoded.id}`);
+      return !!userJwtDecoded;
+    } catch (error) {
+      this.logger.error(`Client '${client.id}' failed to connect: bad auth`);
+      client.disconnect(true);
+      return false;
+    }
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: '${client.id}'`);
-  }
-
-  // Client Emmited Event handlers
-
-  @SubscribeMessage('user_queue_enter')
-  handleJoinRoom(client: Socket, userId: string) {
-    this.logger.log(`Client '${client.id}' joined room for userID '${userId}'`);
-    client.join(`user_${userId}`);
-  }
-
-  @SubscribeMessage('user_queue_leave')
-  handleRoomLeave(client: Socket, userId: string) {
-    this.logger.log(`Client '${client.id}' left room for userID '${userId}'`);
-    client.leave(`user_${userId}`);
+    try {
+      const tokenFromHandshake = client.handshake?.auth?.token;
+      const jwtDecoded = this.jwtService.verify<JwtPayload>(tokenFromHandshake);
+      this.logger.log(
+        `User '${jwtDecoded.id}' disconnected from WS, was client '${client.id}'`,
+      );
+    } catch (error) {
+      this.logger.error(`Client '${client.id}' failed to disconnect: bad auth`);
+    }
   }
 
   // Server Emmited Event handlers
