@@ -182,41 +182,39 @@
       </div>
     </v-card>
   </v-container>
-  <ClientOnly>
-    <Teleport to="#toolbar-append">
-      <div class="qw-flex qw-gap-3 qw-items-center">
-        <div v-if="imagesInQueue" class="qw-flex qw-items-center qw-gap-2">
-          <span class="qw-text-xs qw-text-white">
-            {{ eta.toFixed(2) || '0' }}s
-          </span>
-          <v-progress-circular
-            :size="32"
-            :width="4"
-            color="amber"
-            v-if="progress"
-            :model-value="progress"
-          >
-          </v-progress-circular>
-        </div>
-        <div>
-          <v-btn variant="outlined" size="x-small" icon @click="toggleGalleryDrawer">
-            <v-icon>mdi-cog</v-icon>
-          </v-btn>
-        </div>
+  <ToolbarAppend>
+    <div class="qw-flex qw-gap-3 qw-items-center">
+      <div v-if="imagesInQueue" class="qw-flex qw-items-center qw-gap-2">
+        <span class="qw-text-xs qw-text-white">
+          {{ eta.toFixed(2) || '0' }}s
+        </span>
+        <v-progress-circular
+          :size="32"
+          :width="4"
+          color="amber"
+          v-if="progress"
+          :model-value="progress"
+        >
+        </v-progress-circular>
       </div>
-    </Teleport>
-    <Teleport to="#right-drawer">
-      <v-navigation-drawer
-        v-model="generateDrawer"
-        location="right"
-        color="indigo-darken-4"
-        :width="drawerWidth"
-        :temporary="rightDrawerIsTemporary"
-      >
-        Hola
-      </v-navigation-drawer>
-    </Teleport>
-  </ClientOnly>
+      <div>
+        <v-btn variant="outlined" size="x-small" icon @click="toggleGalleryDrawer">
+          <v-icon>mdi-cog</v-icon>
+        </v-btn>
+      </div>
+    </div>
+  </ToolbarAppend>
+  <RightDrawerTp>
+    <v-navigation-drawer
+      v-model="generateDrawer"
+      location="right"
+      color="indigo-darken-4"
+      :width="drawerWidth"
+      :temporary="rightDrawerIsTemporary"
+    >
+      Hola
+    </v-navigation-drawer>
+  </RightDrawerTp>
 </template>
 <script setup lang="ts">
 const {
