@@ -35,18 +35,6 @@ export const useGenerate = () => {
   const authStore = useAuthStore();
   const { fetchOptions } = storeToRefs(authStore);
 
-  const layoutStore = useLayoutStore();
-  const { rightDrawerActive, rightDrawerVisible } = storeToRefs(layoutStore);
-
-  onMounted(() => {
-    rightDrawerVisible.value = true;
-  });
-
-  onUnmounted(() => {
-    rightDrawerActive.value = false;
-    rightDrawerVisible.value = false;
-  });
-
   const prompt = ref(DEFAULT_PROMPT);
   const negativePrompt = ref(DEFAULT_NEGATIVE_PROMPT);
 
@@ -61,6 +49,7 @@ export const useGenerate = () => {
   const imagesInQueue = ref(0);
   const progress = ref(0);
   const eta = ref(0);
+  const previewImage = ref<string>("");
 
   const generatedImages = ref<ImageObject[]>([]);
 
@@ -69,14 +58,21 @@ export const useGenerate = () => {
       console.log('Generated Image id: ', generationEvent.image.id);
       generatedImages.value.unshift(generationEvent.image)
       imagesInQueue.value = generationEvent.queuePosition || 0;
-      progress.value = 0;
-      eta.value = 0;
+      resetProgressState();
     },
     progressCallback(progressEvent) {
       progress.value = progressEvent.progress * 100;
       eta.value = progressEvent.eta_relative;
+      previewImage.value = progressEvent.current_image ? `data:image/png;base64,${progressEvent.current_image}` : "";
     },
   });
+
+  const resetProgressState = () => {
+    progress.value = 0;
+    eta.value = 0;
+    previewImage.value = "";
+  };
+
 
   const generateImage = async () => {
     try {
@@ -116,6 +112,7 @@ export const useGenerate = () => {
     imagesInQueue,
     progress,
     eta,
+    previewImage,
     generatedImages,
     generateImage,
     possibleImageSideSizes: POSSIBLE_IMAGE_SIZES,

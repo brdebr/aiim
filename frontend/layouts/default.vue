@@ -20,17 +20,8 @@
       <slot/>
     </v-main>
     <!-- RIGHT DRAWER -->
-    <v-navigation-drawer
-      v-if="rightDrawerVisible"
-      v-model="rightDrawerActive"
-      location="right"
-      color="indigo-darken-4"
-      :width="drawerWidth"
-      :temporary="rightDrawerIsTemporary"
-    >
-      <div id="right-drawer-content">
-      </div>
-    </v-navigation-drawer>
+    <div id="right-drawer">
+    </div>
     <!-- BOTTOM NAV -->
     <v-bottom-navigation
       v-if="userId"
@@ -55,7 +46,7 @@
 </template>
 <script setup lang="ts">
 const layoutStore = useLayoutStore();
-const { bottomNavigationItems, rightDrawerActive, rightDrawerVisible, drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
+const { bottomNavigationItems } = storeToRefs(layoutStore);
 
 const authStore = useAuthStore();
 const { userId } = storeToRefs(authStore);
