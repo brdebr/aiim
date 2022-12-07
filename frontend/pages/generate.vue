@@ -3,152 +3,164 @@
     <v-card color="indigo-darken-4" :elevation="0" border="md" class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px]" theme="dark" >
       <div class="qw-px-5 qw-py-4">
         <div class="qw-mb-2 qw-flex qw-items-center">
-          <div class="qw-flex qw-items-center qw-gap-2 qw-mr-auto">
-            <Help>
+          <HelpLabel class="qw-mr-auto">
+            <template #default>
               The prompt is the text that the AI will use to generate the image.<br />
               You can be very specific or very vague.<br />
               The AI will try to generate an image that matches the prompt.<br />
-            </Help>
-            <span class="text-body-2">
-              Prompt
-            </span>
-          </div>
-          <div class="qw-flex qw-items-center qw-gap-2">
-            <Help>
+            </template>
+            <template #label>
+              <span class="text-body-2">
+                Prompt
+              </span>
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
               Copy the current prompt to the clipboard.<br />
-            </Help>
-            <v-btn prepend-icon="mdi-content-copy" size="x-small" variant="outlined" class="copy-btn text-caption">
-              Copy to clipboard
-            </v-btn>
-          </div>
+            </template>
+            <template #label>
+              <v-btn prepend-icon="mdi-content-copy" size="x-small" variant="outlined" class="copy-btn text-caption">
+                Copy to clipboard
+              </v-btn>
+            </template>
+          </HelpLabel>
         </div>
         <div class="qw-mt-3">
           <v-textarea variant="outlined" v-model="prompt" counter rows="2" />
         </div>
-        <div class="qw-mb-2 qw-flex qw-items-center">
-          <div class="qw-flex qw-items-center qw-gap-2 qw-mr-auto">
-            <Help>
-              The negative prompt is the text that the AI will try to avoid when generating the image.<br />
-              For example, if you want to generate an image of a forest and use "green" as negative prompt, the AI probably will try to generate a forest in autumn.<br />
-            </Help>
+        <HelpLabel>
+          <template #default>
+            The negative prompt is the text that the AI will try to avoid when generating the image.<br />
+            For example, if you want to generate an image of a forest and use "green" as negative prompt, the AI probably will try to generate a forest in autumn.<br />
+          </template>
+          <template #label>
             <span class="text-body-2">
               Negative prompt
             </span>
-          </div>
-        </div>
+          </template>
+        </HelpLabel>
         <div class="qw-mt-3">
           <v-textarea variant="outlined" v-model="negativePrompt" rows="2" />
         </div>
         <div class="qw-mt-3 qw-flex <lg:qw-flex-col qw-gap-3">
-          <div class="qw-flex qw-items-center qw-gap-2">
-            <ClientOnly>
-              <Help>
-                The sampler is the algorithm that the AI will use to generate the image.<br />
-                The "Euler a" sampler is the recommended one because it will work with 20-30 steps.<br />
-                Another good sampler is DDIM, but may require more steps (50-100) to generate a refined image.<br />
-              </Help>
-              <v-select
-                density="comfortable"
-                label="Sampler"
-                variant="outlined"
-                :items="Samplers"
-                v-model="sampler"
-                hide-details
-                transition="scroll-y-transition"
-                :menu-props="{ maxHeight: 400 }"
-              />
-            </ClientOnly>
-          </div>
-          <div class="qw-flex qw-items-center qw-gap-2">
-            <Help>
+          <HelpLabel>
+            <template #default>
+              The sampler is the algorithm that the AI will use to generate the image.<br />
+              The "Euler a" sampler is the recommended one because it will work with 20-30 steps.<br />
+              Another good sampler is DDIM, but may require more steps (50-100) to generate a refined image.<br />
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-select
+                  density="comfortable"
+                  label="Sampler"
+                  variant="outlined"
+                  :items="Samplers"
+                  v-model="sampler"
+                  hide-details
+                  transition="scroll-y-transition"
+                  :menu-props="{ maxHeight: 400 }"
+                />
+              </ClientOnly>
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
               The number of steps is the number of iterations that the AI will use to generate the image.<br />
               The more steps, the more refined the image will be, but after a certain point, the image will not change much.<br />
               It's recommended to start with 20-30 steps and increase it when you find a good seed.<br />
-            </Help>
-            <v-text-field
-              v-model.number="steps"
-              label="Steps"
-              variant="outlined"
-              density="comfortable"
-              type="number"
-              step="1"
-              max="300"
-              min="1"
-              hide-details
-            />
-          </div>
-          <div class="qw-flex qw-items-center qw-gap-2">
-            <Help>
+            </template>
+            <template #label>
+              <v-text-field
+                v-model.number="steps"
+                label="Steps"
+                variant="outlined"
+                density="comfortable"
+                type="number"
+                step="1"
+                max="300"
+                min="1"
+                hide-details
+              />
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
               The CFG (Classifier-free Guidance) is the amount of importance that the AI will give to the prompt.<br />
               The higher the CFG, the more the AI will try to match the prompt. But after a point it will generate glitchy images.<br />
               The UI constrains the value to 20 at max because of this.<br />
-            </Help>
-            <ClientOnly>
-              <v-slider
-                v-model.number="cfg"
-                class="align-center qw-w-full qw-min-w-60 lg:qw-min-w-[255px] 2xl:qw-min-w-[350px] !qw-mx-0"
-                :step="0.1"
-                :max="20"
-                :min="1"
-                color="teal-darken-3"
-                track-color="teal-darken-2"
-                thumb-color="indigo"
-                hide-details
-              >
-                <template #prepend>
-                  <v-text-field
-                    v-model.number="cfg"
-                    hide-details
-                    label="CFG"
-                    variant="outlined"
-                    density="comfortable"
-                    type="number"
-                    step="0.1"
-                    style="width: 90px"
-                  />
-                </template>
-              </v-slider>
-            </ClientOnly>
-          </div>
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-slider
+                  v-model.number="cfg"
+                  class="align-center qw-w-full qw-min-w-60 lg:qw-min-w-[255px] 2xl:qw-min-w-[350px] !qw-mx-0"
+                  :step="0.1"
+                  :max="20"
+                  :min="1"
+                  color="teal-darken-3"
+                  track-color="teal-darken-2"
+                  thumb-color="indigo"
+                  hide-details
+                >
+                  <template #prepend>
+                    <v-text-field
+                      v-model.number="cfg"
+                      hide-details
+                      label="CFG"
+                      variant="outlined"
+                      density="comfortable"
+                      type="number"
+                      step="0.1"
+                      style="width: 90px"
+                    />
+                  </template>
+                </v-slider>
+              </ClientOnly>
+            </template>
+          </HelpLabel>
           <v-spacer class="<lg:qw-hidden" />
-          <div class="qw-flex qw-items-center qw-gap-2">
-            <Help>
+          <HelpLabel>
+            <template #default>
               This will defines the width of the image that will be generated.<br />
               Those marked with ★ are the recommended to combine and create rectangular images<br />
-            </Help>
-            <ClientOnly>
-              <v-select
-                density="comfortable"
-                label="Width"
-                variant="outlined"
-                :items="possibleSizes"
-                v-model="width"
-                hide-details
-                transition="scroll-y-transition"
-                :menu-props="{ maxHeight: 400 }"
-              />
-            </ClientOnly>
-          </div>
-          <div class="qw-flex qw-items-center qw-gap-2">
-            <Help>
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-select
+                  density="comfortable"
+                  label="Width"
+                  variant="outlined"
+                  :items="possibleSizes"
+                  v-model="width"
+                  hide-details
+                  transition="scroll-y-transition"
+                  :menu-props="{ maxHeight: 400 }"
+                />
+              </ClientOnly>
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
               This will defines width of the image that will be generated.<br />
               Those marked with ★ are the recommended to combine and create rectangular images<br />
-            </Help>
-            <ClientOnly>
-              <v-select
-                density="comfortable"
-                label="Height"
-                variant="outlined"
-                :items="possibleSizes"
-                v-model="height"
-                hide-details
-                transition="scroll-y-transition"
-                :menu-props="{ maxHeight: 400 }"
-              />
-            </ClientOnly>
-          </div>
-
-
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-select
+                  density="comfortable"
+                  label="Height"
+                  variant="outlined"
+                  :items="possibleSizes"
+                  v-model="height"
+                  hide-details
+                  transition="scroll-y-transition"
+                  :menu-props="{ maxHeight: 400 }"
+                />
+              </ClientOnly>
+            </template>
+          </HelpLabel>
         </div>
         <div class="qw-mt-8 qw-mb-3">
           <v-btn :loading="loading" variant="flat" border block color="blue-darken-4" @click="generateImage">
