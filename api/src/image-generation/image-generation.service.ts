@@ -48,6 +48,13 @@ export class ImageGenerationService {
     };
   }
 
+  async getUserQueue(userId: string) {
+    const jobs = await this.generationQueue.getJobs(['waiting', 'active']);
+    const userJobs = jobs.filter((job) => job.data.user === userId);
+
+    return userJobs;
+  }
+
   async generateImage(params: Text2ImageDto, userId: string) {
     this.generationQueue.add(
       'txt2img',

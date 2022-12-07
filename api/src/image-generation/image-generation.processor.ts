@@ -113,6 +113,8 @@ export type ImageGenerationRequest = {
   enable_hr?: boolean;
 };
 
+export const PROGRESS_INTERVAL = 1000;
+
 @Processor('generation')
 export class ImageGenerationProcessor {
   constructor(
@@ -243,9 +245,9 @@ export class ImageGenerationProcessor {
             fetchRequestEnded.next(true);
           }),
         ),
-        interval(1000).pipe(
+        interval(PROGRESS_INTERVAL).pipe(
           takeUntil(fetchRequestEnded),
-          map(() => this.fetchStatus(user)),
+          map(() => this.fetchStatus(user, job)),
         ),
       ]),
     );
@@ -286,10 +288,10 @@ export class ImageGenerationProcessor {
     }
   }
 
-  async fetchStatus(userId: string) {
+  async fetchStatus(userId: string, job: Job<TextToImageGenerationJobType>) {
     const endpoint = '/progress';
     const progressAsObservable = this.httpService
-      .get<ProgressResponse>(endpoint)
+      .get<ProgressResponse>(endpoint, { timeout: PROGRESS_INTERVAL - 50 })
       .pipe(
         catchError((error: AxiosError) => {
           this.logger.error(error.response.data);
@@ -304,6 +306,7 @@ export class ImageGenerationProcessor {
         2,
       )}% ] - Remaining: ${data.eta_relative.toFixed(2)}s`,
     );
+    job.progress(data.progress * 100);
     this.eventEmitter.emit('image-progress', {
       response: data,
       user: userId,

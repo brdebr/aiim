@@ -1,4 +1,4 @@
-import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Res } from '@nestjs/common';
 import { JwtObject } from 'src/auth/auth.decorator';
 import { JwtPayload } from 'src/auth/auth.service';
 import { Text2ImageDto } from './dto/generateDto';
@@ -9,6 +9,13 @@ export class ImageGenerationController {
   constructor(private readonly imageGenService: ImageGenerationService) {}
 
   private readonly logger = new Logger(ImageGenerationController.name);
+
+  @Get('queue')
+  async getQueue(@JwtObject() loginInfo: JwtPayload) {
+    const userQueue = await this.imageGenService.getUserQueue(loginInfo.id);
+    this.logger.log(`User '${loginInfo.id}' has ${userQueue.length} jobs`);
+    return userQueue;
+  }
 
   @Post('txt2img')
   async generate(
