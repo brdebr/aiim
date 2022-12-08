@@ -255,6 +255,7 @@
       color="indigo-darken-4"
       :width="drawerWidth"
       :temporary="rightDrawerIsTemporary"
+      disable-resize-watcher
     >
       <div class="qw-flex qw-flex-col qw-gap-4 qw-px-3 qw-pt-5">
         <div class="qw-flex qw-w-full qw-justify-center">

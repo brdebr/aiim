@@ -28,6 +28,7 @@
       color="indigo-darken-4"
       :width="drawerWidth"
       :temporary="rightDrawerIsTemporary"
+      disable-resize-watcher
     >
       <ImagesSearch
         :search-obj="searchObj"
