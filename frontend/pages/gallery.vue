@@ -10,7 +10,12 @@
         </v-btn>
       </div>
       <div>
-        <v-btn variant="outlined" size="x-small" icon @click="toggleGalleryDrawer">
+        <v-btn
+          variant="outlined"
+          size="x-small"
+          icon
+          @click="toggleGalleryDrawer"
+        >
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
       </div>
@@ -26,7 +31,7 @@
     >
       <div class="qw-flex qw-flex-col qw-gap-5 qw-px-3 qw-py-6">
         <div class="qw-text-center">
-          Search {{totalSearchResults ? `[ ${totalSearchResults} ]` : ''}}
+          Search {{ totalSearchResults ? `[ ${totalSearchResults} ]` : "" }}
         </div>
         <v-text-field
           v-model="searchObj.prompt"
@@ -86,39 +91,45 @@
             clearable
           />
         </div>
-          <v-select
-            v-model="searchObj.sampler"
-            label="Sampler"
-            class="qw-mb-3"
-            variant="outlined"
-            density="compact"
-            theme="dark"
-            hide-details
-            :items="Samplers"
-            clearable
-            transition="scroll-y-transition"
-            :menu-props="{ maxHeight: 400 }"
-          />
-          <v-select
-            v-model="searchObj.model"
-            label="Model"
-            class="qw-mb-3"
-            variant="outlined"
-            density="compact"
-            theme="dark"
-            hide-details
-            :items="modelsAsPairs"
-            item-title="0"
-            item-value="1"
-            clearable
-            transition="scroll-y-transition"
-            :menu-props="{ maxHeight: 400 }"
-          />
+        <v-select
+          v-model="searchObj.sampler"
+          label="Sampler"
+          class="qw-mb-3"
+          variant="outlined"
+          density="compact"
+          theme="dark"
+          hide-details
+          :items="Samplers"
+          clearable
+          transition="scroll-y-transition"
+          :menu-props="{ maxHeight: 400 }"
+        />
+        <v-select
+          v-model="searchObj.model"
+          label="Model"
+          class="qw-mb-3"
+          variant="outlined"
+          density="compact"
+          theme="dark"
+          hide-details
+          :items="modelsAsPairs"
+          item-title="0"
+          item-value="1"
+          clearable
+          transition="scroll-y-transition"
+          :menu-props="{ maxHeight: 400 }"
+        />
         <div class="qw-flex qw-gap-3 qw-items-center">
           <v-btn variant="outlined" class="qw-flex-grow" @click="performSearch">
             Filter
           </v-btn>
-          <v-btn @click="clearSearch" icon variant="outlined" size="x-small" class="!qw-rounded-sm">
+          <v-btn
+            @click="clearSearch"
+            icon
+            variant="outlined"
+            size="x-small"
+            class="!qw-rounded-sm"
+          >
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </div>
@@ -127,12 +138,11 @@
   </RightDrawerTp>
 </template>
 <script lang="ts" setup>
-import { Samplers, modelHashesMap } from '~~/constants';
+import { Samplers, modelHashesMap } from "~~/constants";
 
-const router = useRouter();
 useHead({
-  title: 'Gallery',
-})
+  title: "Gallery",
+});
 
 const layoutStore = useLayoutStore();
 const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
@@ -142,55 +152,25 @@ const toggleGalleryDrawer = () => {
   galleryDrawer.value = !galleryDrawer.value;
 };
 
-const scrollToTop = () => {
-  window.scrollTo(0, 0);
-}
-
-const refresh = () => {
-  isSearchMode.value = false;
-  scrollToTop();
-  router.push('/gallery');
-}
-
-const gallery = await useGallery();
-const { allImages, searchObj, isSearchMode, totalSearchResults } = gallery;
+const {
+  allImages,
+  searchObj,
+  isSearchMode,
+  totalSearchResults,
+  performSearch,
+  clearSearch,
+  refresh,
+  fetchNextImages,
+  searchNextPage,
+} = await useGallery();
 
 const btnLoading = ref(false);
 
 const fetchMoreImages = async () => {
   btnLoading.value = true;
-  if (isSearchMode.value) {
-    await gallery.searchNextPage();
-  } else {
-    await gallery.fetchNextImages();
-  }
+  isSearchMode.value ? await searchNextPage() : await fetchNextImages();
   btnLoading.value = false;
 };
 
 const modelsAsPairs = Object.entries(modelHashesMap);
-
-const performSearch = async () => {
-  scrollToTop();
-  await router.push('/gallery');
-  allImages.value = await gallery.search(searchObj);
-};
-
-const clearSearch = async () => {
-  searchObj.prompt = undefined;
-  searchObj.negativePrompt = undefined;
-  searchObj.steps = undefined;
-  searchObj.cfg = undefined;
-  searchObj.width = undefined;
-  searchObj.height = undefined;
-  searchObj.sampler = undefined;
-  searchObj.model = undefined;
-  isSearchMode.value = false;
-  totalSearchResults.value = 0;
-
-  await nextTick();
-
-  scrollToTop();
-  gallery.fetchInitialImages(true);
-}
-
 </script>

@@ -1,5 +1,6 @@
 import { ImageObject } from "~~/types";
 import { Samplers, modelHashesMap } from '~~/constants';
+import { scrollToTop } from "~~/utils/general";
 
 export type ImageObjectsPageResponse = ImageObject[]
 
@@ -25,6 +26,7 @@ export const DEFAULT_GALLERY_PAGE_SIZE = 25;
 const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
 
 export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
+  const router = useRouter();
   const authStore = useAuthStore();
   const { fetchOptions } = storeToRefs(authStore);
 
@@ -118,6 +120,36 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
   };
   const { data: imagesCount } = await useAsyncData<number>('initial-gallery-image-count-fetch',fetchTotalImages);
 
+  const refresh = () => {
+    isSearchMode.value = false;
+    scrollToTop();
+    router.push('/gallery');
+  }
+
+  const performSearch = async () => {
+    scrollToTop();
+    await router.push('/gallery');
+    allImages.value = await search(searchObj);
+  };
+  
+  const clearSearch = async () => {
+    searchObj.prompt = undefined;
+    searchObj.negativePrompt = undefined;
+    searchObj.steps = undefined;
+    searchObj.cfg = undefined;
+    searchObj.width = undefined;
+    searchObj.height = undefined;
+    searchObj.sampler = undefined;
+    searchObj.model = undefined;
+    isSearchMode.value = false;
+    totalSearchResults.value = 0;
+  
+    await nextTick();
+  
+    scrollToTop();
+    fetchInitialImages(true);
+  }
+
   return {
     allImages,
     fetchNextImages,
@@ -130,5 +162,8 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     isSearchMode,
     searchObj,
     totalSearchResults,
+    clearSearch,
+    performSearch,
+    refresh,
   }
 }
