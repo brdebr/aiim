@@ -13,14 +13,13 @@
 </template>
 <script lang="ts" setup>
 import { ImageObject } from '~~/types';
-const { getDimensions } = useImageUtils();
 const apiBaseURL = useApiBaseURL();
 const props = defineProps<{
   image: ImageObject;
 }>();
 
 const imageEl = ref<HTMLImageElement | null>(null);
-const { isTall, isWide } = getDimensions(props.image);
+const { isTall, isWide } = getImageDimensions(props.image);
 
 const classObject = computed(() => {
   return {

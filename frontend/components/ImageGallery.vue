@@ -16,9 +16,8 @@
 import { Vote } from '~~/composables/useVotesGallery';
 import { ImageObject } from '~~/types';
 
-const { getDimensions } = useImageUtils();
 const getClassObject = (vote: Vote) => {
-  const { isTall, isWide } = getDimensions(vote.image);
+  const { isTall, isWide } = getImageDimensions(vote.image);
   return {
     tall: isTall,
     wide: isWide,
