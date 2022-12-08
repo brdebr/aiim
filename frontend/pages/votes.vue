@@ -1,6 +1,6 @@
 <template>
   <div class="votes-gallery-page" v-if="votedImages.length">
-    <v-tabs v-model="currentFilter" grow bg-color="primary-darken-1">
+    <v-tabs v-model="currentVoteTypeFilter" grow bg-color="primary-darken-1">
       <v-tab
         v-for="tab in tabs"
         :key="tab.value"
@@ -33,7 +33,7 @@ import { VoteType } from '~~/composables/useCardGame';
 
 const {
   votedImages,
-  currentFilter,
+  currentVoteTypeFilter,
   voteCountsMap,
   totalVotes,
   totalImages,

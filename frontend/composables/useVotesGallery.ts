@@ -62,11 +62,17 @@ export const useVotesGallery = () => {
   const fetchNextPage = async () => {
     if (!lastVoteImage.value) return;
     const response = await fetchVotedImages(
-      currentFilter.value,
+      currentVoteTypeFilter.value,
       lastVoteImage.value.id
     );
     votedImages.value = votedImages.value.concat(response);
   };
+
+  const currentVoteTypeFilter = ref<VoteType>(VoteType.FAVORITE);
+  watch(currentVoteTypeFilter, async (newFilter) => {
+    const results = await fetchVotedImages(newFilter);
+    votedImages.value = results;
+  });
 
   const fetchVoteCounts = async () => {
     const endpoint = `/api/vote/my-vote-counts`;
@@ -94,18 +100,12 @@ export const useVotesGallery = () => {
     }, {} as Record<VoteType, number>);
   });
 
-  const currentFilter = ref<VoteType>(VoteType.FAVORITE);
-  watch(currentFilter, async (newFilter) => {
-    const results = await fetchVotedImages(newFilter);
-    votedImages.value = results;
-  });
-
   onMounted(async () => {
     const [voteCountsFetched, totalImagesFetched, votesFetched] =
       await Promise.all([
         fetchVoteCounts(),
         fetchTotalImages(),
-        fetchVotedImages(currentFilter.value),
+        fetchVotedImages(currentVoteTypeFilter.value),
       ]);
 
     totalVotes.value = voteCountsFetched.count;
@@ -117,7 +117,7 @@ export const useVotesGallery = () => {
   return {
     votedImages,
     fetchVotedImages,
-    currentFilter,
+    currentVoteTypeFilter,
     voteCounts,
     totalVotes,
     fetchVoteCounts,
