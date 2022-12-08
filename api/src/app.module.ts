@@ -9,6 +9,7 @@ import { ConfigurationModule } from './config';
 import { ImageGenerationModule } from './image-generation/image-generation.module';
 import { BullQueuesModule } from './queues';
 import { EventEmmiter } from './events';
+import { SdConfigModule } from './sd-config/sd-config.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EventEmmiter } from './events';
     ImageGenerationModule,
     BullQueuesModule,
     EventEmmiter,
+    SdConfigModule,
   ],
   controllers: [],
   providers: [GlobalJwtGuardProvider],

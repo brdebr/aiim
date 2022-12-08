@@ -256,7 +256,57 @@
       :width="drawerWidth"
       :temporary="rightDrawerIsTemporary"
     >
-      Hola
+      <div class="qw-flex qw-flex-col qw-gap-4 qw-px-3 qw-pt-5">
+        <div class="qw-flex qw-w-full qw-justify-center">
+          Stable Diffusion Service [ {{ status }} ]
+        </div>
+        <div v-if="runningFrom" class="qw-flex qw-w-full qw-justify-center">
+          {{ runningFrom }}
+        </div>
+        <v-btn @click="startSd" variant="outlined" block>
+          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
+            <v-icon>
+              mdi-play
+            </v-icon>
+            <span>
+              Start - Stable Diffusion Container
+            </span>
+          </div>
+        </v-btn>
+        <v-btn @click="stopSd" variant="outlined" block>
+          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
+            <v-icon>
+              mdi-stop
+            </v-icon>
+            <span>
+              Stop - Stable Diffusion Container
+            </span>
+          </div>
+        </v-btn>
+        <v-btn @click="getSdStatus" variant="outlined" block>
+          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
+            <v-icon>
+              mdi-refresh
+            </v-icon>
+            <span>
+              Refresh status
+            </span>
+          </div>
+        </v-btn>
+        <v-btn @click="getSdLogs" variant="outlined" block>
+          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
+            <v-icon>
+              mdi-file-document-outline
+            </v-icon>
+            <span>
+              Logs - Stable Diffusion Container
+            </span>
+          </div>
+        </v-btn>
+        <div v-if="logs" class="text-caption qw-max-h-[450px] qw-overflow-y-scroll qw-whitespace-pre qw-font-sans">
+          {{ logs }}
+        </div>
+      </div>
     </v-navigation-drawer>
   </RightDrawerTp>
 </template>
@@ -279,6 +329,12 @@ const {
   possibleImageSideSizes,
   samplers,
 } = useGenerate();
+
+const { getSdLogs, getSdStatus, startSd, stopSd, status, runningFrom, logs } = useSdConfig();
+
+onMounted(async () => {
+  await getSdStatus();
+});
 
 const layoutStore = useLayoutStore();
 const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
