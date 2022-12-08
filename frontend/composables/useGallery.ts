@@ -73,10 +73,10 @@ export const useGallery = async (
   };
 
   // Search
-  const searchFn = async (params: ImageSearchType, query?: URLSearchParams): Promise<ImageSearchResultType> => {
+  const searchFn = async (params: ImageSearchType, query?: URLSearchParams) => {
     const endpoint = `/api/images/search${query ? `?${query.toString()}` : ''}`;
 
-    const searchImagesResult = await $fetch<ImageSearchResultType>(
+    const searchImagesResult = await $fetch<ImageSearchResultType<ImageObject>>(
       endpoint,
       {
         ...fetchOptions,
@@ -87,9 +87,9 @@ export const useGallery = async (
     return searchImagesResult;
   }
 
-  const { foundImages, searchFirstPage, searchNextPage, searchObj, totalSearchResults, clearSearchObj } = useSearchLogic({
+  const { foundImages, searchFirstPage, searchNextPage, searchObj, totalSearchResults, clearSearchObj, clearSearchResult } = useSearchLogic<ImageObject>({
     pageSize: DEFAULT_GALLERY_PAGE_SIZE,
-    searchFn: searchFn
+    searchFn,
   })
 
   const performSearch = async () => {
@@ -110,6 +110,7 @@ export const useGallery = async (
 
   const refresh = () => {
     scrollToTop();
+    clearSearchResult();
     router.push('/gallery');
   };
 

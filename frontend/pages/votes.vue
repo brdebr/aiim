@@ -24,13 +24,49 @@
       </v-tab>
     </v-tabs>
     <div class="qw-px-1 qw-pt-2 sm:(qw-px-3)">
-      <ImageGallery :votes="votedImages" @more="fetchNextPage" />
+      <ImageGallery :votes="votedImages" @more="fetchMoreImages" />
     </div>
   </div>
+  <ToolbarAppend>
+    <div class="qw-flex qw-gap-3 qw-items-center">
+      <div>
+        <v-btn variant="outlined" size="x-small" icon @click="refresh">
+          <v-icon>mdi-refresh</v-icon>
+        </v-btn>
+      </div>
+      <div>
+        <v-btn
+          variant="outlined"
+          size="x-small"
+          icon
+          @click="toggleVotesDrawer"
+        >
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+      </div>
+    </div>
+  </ToolbarAppend>
+  <RightDrawerTp>
+    <v-navigation-drawer
+      v-model="votesDrawer"
+      location="right"
+      color="indigo-darken-4"
+      :width="drawerWidth"
+      :temporary="rightDrawerIsTemporary"
+    >
+      <ImagesSearch
+        :search-obj="searchObj"
+        :total-search-results="totalSearchResults"
+        @perform-search="performSearch"
+        @clear-search="clearSearch"
+      />
+    </v-navigation-drawer>
+  </RightDrawerTp>
 </template>
 <script lang="ts" setup>
-import { VoteType } from '~~/composables/useCardGame';
-
+useHead({
+  title: 'Votes',
+});
 const {
   votedImages,
   currentVoteTypeFilter,
@@ -38,56 +74,29 @@ const {
   totalVotes,
   totalImages,
   fetchNextPage,
+  percentagesMap,
+  tabs,
+  foundImages,
+  refresh,
+  clearSearch,
+  performSearch,
+  searchObj,
+  totalSearchResults,
+  performSearchNextPage,
 } = useVotesGallery();
 const percentage = computed(() =>
   ((totalVotes.value / totalImages.value) * 100).toFixed(2)
 );
 
-const percentagesMap = computed(() => {
-  return tabs.reduce((acc, tab) => {
-    acc[tab.value] = (
-      (voteCountsMap.value[tab.value] / totalVotes.value) *
-      100
-    ).toFixed(2);
-    return acc;
-  }, {} as Record<VoteType, string>);
-});
+const layoutStore = useLayoutStore();
+const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
 
-type VoteTab = {
-  value: VoteType;
-  icon: string;
-  color: string;
+const votesDrawer = ref(false);
+const toggleVotesDrawer = () => {
+  votesDrawer.value = !votesDrawer.value;
 };
 
-const tabs: VoteTab[] = [
-  {
-    value: VoteType.FAVORITE,
-    color: 'blue-lighten-1',
-    icon: 'mdi-star',
-  },
-  {
-    value: VoteType.UPVOTE,
-    color: 'secondary',
-    icon: 'mdi-heart',
-  },
-  {
-    value: VoteType.TO_MODIFY,
-    color: 'purple-lighten-1',
-    icon: 'mdi-shimmer',
-  },
-  {
-    value: VoteType.DOWNVOTE,
-    color: 'red',
-    icon: 'mdi-window-close',
-  },
-  {
-    value: VoteType.EMPTY,
-    color: 'white',
-    icon: 'mdi-image-check',
-  },
-];
-
-useHead({
-  title: 'Votes',
-});
+const fetchMoreImages = async () => {
+  foundImages.value ? await performSearchNextPage() : await fetchNextPage();
+};
 </script>

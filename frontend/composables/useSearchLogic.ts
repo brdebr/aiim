@@ -1,4 +1,4 @@
-import { ImageObject } from '~~/types';
+import { Ref } from 'vue';
 import { Samplers, modelHashesMap } from '~~/constants';
 export const modelsAsPairs = Object.entries(modelHashesMap);
 
@@ -13,19 +13,19 @@ export type ImageSearchType = Partial<{
   model: typeof modelsAsPairs[number][1];
 }>;
 
-export type ImageSearchResultType = {
-  result: ImageObject[];
+export type ImageSearchResultType<T> = {
+  result: T[];
   count: number;
 };
 
-export type SearchFnType = (
+export type SearchFnType<T> = (
   params: ImageSearchType,
   query?: URLSearchParams
-) => Promise<ImageSearchResultType>;
+) => Promise<ImageSearchResultType<T>>;
 
-export type useSearchLogicConfig = {
+export type useSearchLogicConfig<T> = {
   pageSize: number;
-  searchFn: SearchFnType;
+  searchFn: SearchFnType<T>;
 };
 
 const filterObject = (obj: Record<string, any>) => {
@@ -34,27 +34,36 @@ const filterObject = (obj: Record<string, any>) => {
   );
 };
 
-export const useSearchLogic = (config: useSearchLogicConfig) => {
+export type classWithId = {
+  id: string;
+};
+
+export const useSearchLogic = <Generic extends classWithId>(config: useSearchLogicConfig<Generic>) => {
   const searchObj = reactive<ImageSearchType>({});
   const totalSearchResults = ref(0);
 
-  const foundImages = ref<ImageObject[] | null>(null);
+  const foundImages = ref<Generic[] | null>(null) as Ref<Generic[] | null>;
 
-  const searchFirstPage = async () => {
+  const searchFirstPage = async (queryExtras?: Record<string, string>) => {
     const searchObjFiltered = filterObject(searchObj);
+    const query = queryExtras ? new URLSearchParams({
+      ...queryExtras,
+    }) : undefined;
 
-    const images = await config.searchFn(searchObjFiltered)
+    const images = await config.searchFn(searchObjFiltered, query)
     totalSearchResults.value = images.count;
     foundImages.value = images.result;
   };
 
-  const searchNextPage = async () => {
+  const searchNextPage = async (queryExtras?: Record<string, string>) => {
     const lastImageId = foundImages.value?.[foundImages.value.length - 1].id;
     if (!lastImageId) return;
-    const query = new URLSearchParams({
+    const queryObj = {
       page: lastImageId,
       size: config.pageSize.toString(),
-    });
+      ...queryExtras,
+    };
+    const query = new URLSearchParams(queryObj);
     const searchObjFiltered = filterObject(searchObj);
 
     const images = await config.searchFn(searchObjFiltered, query)
@@ -74,7 +83,7 @@ export const useSearchLogic = (config: useSearchLogicConfig) => {
     totalSearchResults.value = 0;
   };
 
-  const clearSearch = async () => {
+  const clearSearchResult = async () => {
     foundImages.value = null;
     clearSearchObj();
   };
@@ -84,7 +93,7 @@ export const useSearchLogic = (config: useSearchLogicConfig) => {
     totalSearchResults,
     foundImages,
     clearSearchObj,
-    clearSearch,
+    clearSearchResult,
     searchFirstPage,
     searchNextPage,
   };

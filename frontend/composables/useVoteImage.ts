@@ -16,7 +16,7 @@ export const useVoteImage = () => {
     const query = new URLSearchParams({
       type,
     });
-    await $fetch(`${apiBaseURL}/api/vote/${image.id}?${query}`, {
+    await $fetch(`${apiBaseURL}/api/vote/image/${image.id}?${query}`, {
       ...fetchOptions,
       method: 'POST',
     });
