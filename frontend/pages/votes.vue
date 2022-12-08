@@ -1,17 +1,24 @@
 <template>
   <div class="votes-gallery-page" v-if="votedImages.length">
-    <v-tabs
-      v-model="currentFilter"
-      grow
-      bg-color="primary-darken-1"
-    >
-      <v-tab v-for="tab in tabs" :key="tab.value" :value="tab.value" :color="tab.color">
+    <v-tabs v-model="currentFilter" grow bg-color="primary-darken-1">
+      <v-tab
+        v-for="tab in tabs"
+        :key="tab.value"
+        :value="tab.value"
+        :color="tab.color"
+      >
         <v-icon start>
           {{ tab.icon }}
         </v-icon>
         <div>
           <span class="">
-            {{ voteCountsMap[tab.value] ? `${voteCountsMap[tab.value]} [ ${percentagesMap[tab.value]}% ]` : `${totalVotes}/${totalImages} - ${percentage}%` }}
+            {{
+              voteCountsMap[tab.value]
+                ? `${voteCountsMap[tab.value]} [ ${
+                    percentagesMap[tab.value]
+                  }% ]`
+                : `${totalVotes}/${totalImages} - ${percentage}%`
+            }}
           </span>
         </div>
       </v-tab>
@@ -24,28 +31,35 @@
 <script lang="ts" setup>
 import { VoteType } from '~~/composables/useCardGame';
 
-const { votedImages, currentFilter, voteCountsMap, totalVotes, totalImages, fetchNextPage } = useVotesGallery();
-const percentage = computed(() => ((totalVotes.value / totalImages.value) * 100).toFixed(2));
+const {
+  votedImages,
+  currentFilter,
+  voteCountsMap,
+  totalVotes,
+  totalImages,
+  fetchNextPage,
+} = useVotesGallery();
+const percentage = computed(() =>
+  ((totalVotes.value / totalImages.value) * 100).toFixed(2)
+);
 
 const percentagesMap = computed(() => {
   return tabs.reduce((acc, tab) => {
-    acc[tab.value] = ((voteCountsMap.value[tab.value] / totalVotes.value) * 100).toFixed(2);
+    acc[tab.value] = (
+      (voteCountsMap.value[tab.value] / totalVotes.value) *
+      100
+    ).toFixed(2);
     return acc;
   }, {} as Record<VoteType, string>);
-})
+});
 
-const typePercentage = (type: VoteType) => {
-  const count = voteCountsMap.value[type];
-  return ((count / totalVotes.value) * 100).toFixed(2);
-};
-
-type Tab = {
+type VoteTab = {
   value: VoteType;
   icon: string;
   color: string;
-}
+};
 
-const tabs: Tab[] = [
+const tabs: VoteTab[] = [
   {
     value: VoteType.FAVORITE,
     color: 'blue-lighten-1',
@@ -75,5 +89,5 @@ const tabs: Tab[] = [
 
 useHead({
   title: 'Votes',
-})
+});
 </script>

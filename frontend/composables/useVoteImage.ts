@@ -1,6 +1,6 @@
-import { ImageObject } from "~~/types";
-import { getApiBaseURL, getFetchOptions } from "~~/utils/general";
-import { VoteType } from "./useCardGame";
+import { ImageObject } from '~~/types';
+import { getApiBaseURL, getFetchOptions } from '~~/utils/general';
+import { VoteType } from './useCardGame';
 
 export const useVoteImage = () => {
   const apiBaseURL = getApiBaseURL();
@@ -8,17 +8,23 @@ export const useVoteImage = () => {
 
   const voteLoading = ref(false);
 
-  const voteImage = async (image: ImageObject, type: VoteType = VoteType.UPVOTE) => {
+  const voteImage = async (
+    image: ImageObject,
+    type: VoteType = VoteType.UPVOTE
+  ) => {
     voteLoading.value = true;
     const query = new URLSearchParams({
       type,
     });
-    await $fetch(`${apiBaseURL}/api/vote/${image.id}?${query}`, {...fetchOptions, method: 'POST'});
+    await $fetch(`${apiBaseURL}/api/vote/${image.id}?${query}`, {
+      ...fetchOptions,
+      method: 'POST',
+    });
     voteLoading.value = false;
-  }
+  };
 
   return {
     voteImage,
-    voteLoading
-  }
-}
+    voteLoading,
+  };
+};

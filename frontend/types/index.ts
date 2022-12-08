@@ -24,11 +24,11 @@ export type ImageObject = {
   timeToGenerate: number;
   fileName: string;
   fileSize: string;
-}
+};
 
 export type LoginInfo = {
   id: string;
   email: string;
   name?: string;
   role: string;
-}
+};

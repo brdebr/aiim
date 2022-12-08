@@ -1,5 +1,9 @@
 <template>
-  <ImageCard v-if="imageToShow" :image="imageToShow" :vote-type="props.vote?.vote">
+  <ImageCard
+    v-if="imageToShow"
+    :image="imageToShow"
+    :vote-type="props.vote?.vote"
+  >
     <v-toolbar
       color="rgba(0, 0, 0, 0)"
       theme="dark"
@@ -8,13 +12,20 @@
       @click.stop="false"
     >
       <template v-slot:prepend>
-        <v-btn size="x-small" variant="outlined" icon="mdi-dots-vertical" @click.stop="displayingInfo = !displayingInfo" />
+        <v-btn
+          size="x-small"
+          variant="outlined"
+          icon="mdi-dots-vertical"
+          @click.stop="displayingInfo = !displayingInfo"
+        />
       </template>
       <v-toolbar-title>
         <div class="qw-flex qw-items-center qw-gap-4">
           <v-chip label rounded="sm" color="indigo" size="small">
             <span class="qw-text-white">
-              {{ imageToShow.height }} <small>px</small> <span class="qw-mx-2"><small>x</small></span> {{ imageToShow.width }} <small>px</small>
+              {{ imageToShow.height }} <small>px</small>
+              <span class="qw-mx-2"><small>x</small></span>
+              {{ imageToShow.width }} <small>px</small>
             </span>
           </v-chip>
         </div>
@@ -45,7 +56,10 @@
         </div>
       </template>
     </v-toolbar>
-    <div v-if="displayingInfo" class="qw-h-[calc(100%-48px)] qw-grid qw-place-items-center qw-bg-gradient-to-b qw-from-red-200 qw-to-blue-400 qw-whitespace-pre-line">
+    <div
+      v-if="displayingInfo"
+      class="qw-h-[calc(100%-48px)] qw-grid qw-place-items-center qw-bg-gradient-to-b qw-from-red-200 qw-to-blue-400 qw-whitespace-pre-line"
+    >
       {{ JSON.stringify(imageToShow, null, 2) }}
     </div>
   </ImageCard>
@@ -59,7 +73,7 @@ const displayingInfo = ref(false);
 
 const modelHashesNames: Record<string, string> = Object.fromEntries(
   Object.entries(modelHashesMap).map(([key, value]) => [value, key])
-)
+);
 
 const MAX_STEPS = 300;
 const percentageOfMaxSteps = (val: number) => {
@@ -78,6 +92,10 @@ const props = defineProps<{
 </script>
 <style lang="scss">
 .voted-img-toolbar {
-  background: linear-gradient(0deg, rgba(9, 9, 119, 0) 0%, rgba(0, 0, 0, 1) 95%) !important;
+  background: linear-gradient(
+    0deg,
+    rgba(9, 9, 119, 0) 0%,
+    rgba(0, 0, 0, 1) 95%
+  ) !important;
 }
 </style>

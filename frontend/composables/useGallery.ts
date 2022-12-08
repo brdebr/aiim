@@ -1,13 +1,13 @@
-import { ImageObject } from "~~/types";
+import { ImageObject } from '~~/types';
 import { Samplers, modelHashesMap } from '~~/constants';
-import { getFetchOptions, getRouteQry, scrollToTop } from "~~/utils/general";
+import { getFetchOptions, getRouteQry, scrollToTop } from '~~/utils/general';
 
-export type ImageObjectsPageResponse = ImageObject[]
+export type ImageObjectsPageResponse = ImageObject[];
 
 export type useGalleryConfig = Partial<{
   pageId: string;
   pageSize: number;
-}>
+}>;
 
 const modelsAsPairs = Object.entries(modelHashesMap);
 
@@ -20,24 +20,25 @@ export type ImageSearchType = {
   height: number;
   sampler: typeof Samplers[number];
   model: typeof modelsAsPairs[number][1];
-}
+};
 
 export const DEFAULT_GALLERY_PAGE_SIZE = 25;
 const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
 
-export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
+export const useGallery = async (
+  pageSize = DEFAULT_GALLERY_PAGE_SIZE,
+  firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE
+) => {
   const router = useRouter();
   const fetchOptions = getFetchOptions();
 
   onMounted(async () => {
-    Promise.all([
-      fetchInitialImages(),
-    ]);
+    Promise.all([fetchInitialImages()]);
   });
 
   const pageIdFromQuery = getRouteQry('page');
   watch(pageIdFromQuery, async (newPageQuery) => {
-    if (newPageQuery){
+    if (newPageQuery) {
       return;
     }
     await fetchInitialImages();
@@ -51,19 +52,28 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
   const searchObj = reactive<Partial<ImageSearchType>>({});
   const totalSearchResults = ref(0);
 
-  const getImagesPage = async (pageId: string, pageSize: number = DEFAULT_GALLERY_PAGE_SIZE) => {
+  const getImagesPage = async (
+    pageId: string,
+    pageSize: number = DEFAULT_GALLERY_PAGE_SIZE
+  ) => {
     const query = new URLSearchParams({
       page: pageId,
       size: pageSize.toString(),
     });
     const endpoint = `/api/images?${query.toString()}`;
-    const response = await $fetch<ImageObjectsPageResponse>(endpoint, fetchOptions);
+    const response = await $fetch<ImageObjectsPageResponse>(
+      endpoint,
+      fetchOptions
+    );
     return response;
   };
 
   const fetchInitialImages = async (forceInitial?: boolean) => {
     loadingInitialImages.value = true;
-    const images = await getImagesPage(forceInitial ? '' : pageIdFromQuery.value, firstPageSize);
+    const images = await getImagesPage(
+      forceInitial ? '' : pageIdFromQuery.value,
+      firstPageSize
+    );
     allImages.value = images;
     loadingInitialImages.value = false;
   };
@@ -82,16 +92,21 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     isSearchMode.value = true;
     const endpoint = '/api/images/search';
 
-    const searchObjFiltered = Object.fromEntries(Object.entries(search).filter(([_, v]) => v !== null));
+    const searchObjFiltered = Object.fromEntries(
+      Object.entries(search).filter(([_, v]) => v !== null)
+    );
 
-    const images = await $fetch<{result: ImageObject[], count: number}>(endpoint, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(searchObjFiltered),
-    });
+    const images = await $fetch<{ result: ImageObject[]; count: number }>(
+      endpoint,
+      {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify(searchObjFiltered),
+      }
+    );
     totalSearchResults.value = images.count;
     return images.result;
-  }
+  };
 
   const searchNextPage = async () => {
     const lastImageId = allImages.value[allImages.value.length - 1].id;
@@ -101,15 +116,20 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     });
     const endpoint = `/api/images/search?${query.toString()}`;
 
-    const searchObjFiltered = Object.fromEntries(Object.entries(searchObj).filter(([_, v]) => v !== null));
-    
-    const images = await $fetch<{result: ImageObject[], count: number}>(endpoint, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(searchObjFiltered),
-    });
+    const searchObjFiltered = Object.fromEntries(
+      Object.entries(searchObj).filter(([_, v]) => v !== null)
+    );
+
+    const images = await $fetch<{ result: ImageObject[]; count: number }>(
+      endpoint,
+      {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify(searchObjFiltered),
+      }
+    );
     allImages.value = allImages.value.concat(images.result);
-  }
+  };
 
   // Total Images
   const fetchTotalImages = async () => {
@@ -117,20 +137,23 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     const response = await $fetch<number>(endpoint, fetchOptions);
     return response;
   };
-  const { data: imagesCount } = await useAsyncData<number>('initial-gallery-image-count-fetch',fetchTotalImages);
+  const { data: imagesCount } = await useAsyncData<number>(
+    'initial-gallery-image-count-fetch',
+    fetchTotalImages
+  );
 
   const refresh = () => {
     isSearchMode.value = false;
     scrollToTop();
     router.push('/gallery');
-  }
+  };
 
   const performSearch = async () => {
     scrollToTop();
     await router.push('/gallery');
     allImages.value = await search(searchObj);
   };
-  
+
   const clearSearch = async () => {
     searchObj.prompt = undefined;
     searchObj.negativePrompt = undefined;
@@ -142,12 +165,12 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     searchObj.model = undefined;
     isSearchMode.value = false;
     totalSearchResults.value = 0;
-  
+
     await nextTick();
-  
+
     scrollToTop();
     fetchInitialImages(true);
-  }
+  };
 
   return {
     allImages,
@@ -164,5 +187,5 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     clearSearch,
     performSearch,
     refresh,
-  }
-}
+  };
+};

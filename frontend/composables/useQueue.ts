@@ -1,4 +1,4 @@
-import { getFetchOptions } from "~~/utils/general";
+import { getFetchOptions } from '~~/utils/general';
 
 export type GenerationJob = {
   id: string;
@@ -18,7 +18,7 @@ export type GenerationJob = {
   returnvalue?: any;
   finishedOn?: any;
   processedOn?: number;
-}
+};
 
 export type GenerationJobData = {
   params: {
@@ -31,8 +31,7 @@ export type GenerationJobData = {
     height: number;
   };
   user: string;
-}
-
+};
 
 export const useQueue = () => {
   const fetchOptions = getFetchOptions();
@@ -45,16 +44,16 @@ export const useQueue = () => {
 
   const fetchQueue = async () => {
     const endpoint = `/api/generate/queue`;
-    return await $fetch<GenerationJob[]>(endpoint, fetchOptions)
-  }
+    return await $fetch<GenerationJob[]>(endpoint, fetchOptions);
+  };
 
   const fetchAndSetQueue = async () => {
     queue.value = await fetchQueue();
-  }
+  };
 
   return {
     queue,
     fetchQueue,
-    fetchAndSetQueue
-  }
+    fetchAndSetQueue,
+  };
 };

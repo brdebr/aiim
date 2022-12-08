@@ -1,6 +1,6 @@
-import { ImageObject } from "~~/types";
-import { getFetchOptions } from "~~/utils/general";
-import { useVoteImage } from "./useVoteImage";
+import { ImageObject } from '~~/types';
+import { getFetchOptions } from '~~/utils/general';
+import { useVoteImage } from './useVoteImage';
 
 export enum VoteType {
   UPVOTE = 'UPVOTE',
@@ -30,33 +30,44 @@ export const useCardGame = async () => {
     currentCards.value = currentCards.value.concat(newCards);
   };
 
-  const { data: initialImages } = await useAsyncData<ImageObject[]>('initial-card-game-fetch', fetchCardsPage);
+  const { data: initialImages } = await useAsyncData<ImageObject[]>(
+    'initial-card-game-fetch',
+    fetchCardsPage
+  );
 
   const currentCards = ref(initialImages.value || []);
-  watch(currentCards, (newVal) => {
-    if (newVal.length > 3) return;
-    rerollCards();
-  }, { deep: true });
+  watch(
+    currentCards,
+    (newVal) => {
+      if (newVal.length > 3) return;
+      rerollCards();
+    },
+    { deep: true }
+  );
 
   const firstImage = computed(() => currentCards.value?.[0]);
 
   const BUFFER_SIZE = 5;
   const buffer = ref<ImageObject[]>([]);
-  watch(buffer.value, (newBuffer) => {
-    if (newBuffer.length > BUFFER_SIZE) {
-      newBuffer.pop();
-    }
-  }, { deep: true });
+  watch(
+    buffer.value,
+    (newBuffer) => {
+      if (newBuffer.length > BUFFER_SIZE) {
+        newBuffer.pop();
+      }
+    },
+    { deep: true }
+  );
 
   const saveLastToBuffer = () => {
-    if(!currentCards.value.length) return;
+    if (!currentCards.value.length) return;
     const aux = currentCards.value.shift();
     buffer.value.unshift(aux as ImageObject);
     return aux;
   };
 
   const recoverLastFromBuffer = () => {
-    if(!buffer.value.length) return;
+    if (!buffer.value.length) return;
     const aux = buffer.value.shift();
     currentCards.value.unshift(aux as ImageObject);
     return aux;
@@ -77,4 +88,4 @@ export const useCardGame = async () => {
     voteFn,
     firstImage,
   };
-}
+};

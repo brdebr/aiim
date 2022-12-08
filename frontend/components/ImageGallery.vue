@@ -2,9 +2,11 @@
   <div class="image-gallery" v-if="galleryObjects.length">
     <slot name="prepend" />
     <div
-      v-for="vote in galleryObjects" :key="vote.id"
+      v-for="vote in galleryObjects"
+      :key="vote.id"
       :data-id="vote.id"
-      class="voted-image-container" :class="getClassObject(vote)"
+      class="voted-image-container"
+      :class="getClassObject(vote)"
     >
       <ImageCardDetailed :vote="vote" />
     </div>
@@ -40,7 +42,7 @@ useIntersectionObserver(
   useThrottleFn(() => {
     emit('more');
   }, 1000)
-)
+);
 
 const props = defineProps<{
   images?: ImageObject[];
@@ -48,9 +50,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'more'): void
-}>()
-
+  (event: 'more'): void;
+}>();
 </script>
 <style lang="scss" scoped>
 .image-gallery {

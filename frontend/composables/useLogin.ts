@@ -1,10 +1,9 @@
-
 export const useLogin = async () => {
   const router = useRouter();
   const authStore = useAuthStore();
 
-  const loginEmail = ref("");
-  const loginPassword = ref("");
+  const loginEmail = ref('');
+  const loginPassword = ref('');
 
   const loading = ref(false);
 
@@ -12,9 +11,9 @@ export const useLogin = async () => {
     loading.value = true;
     try {
       await authStore.login(loginEmail.value, loginPassword.value);
-      router.push("/play");
+      router.push('/play');
     } catch (error) {
-      console.log("Error logging in:", error);
+      console.log('Error logging in:', error);
     } finally {
       loading.value = false;
     }
@@ -27,5 +26,5 @@ export const useLogin = async () => {
     loading,
     // Methods
     executeLogin,
-  }
-}
+  };
+};

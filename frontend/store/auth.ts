@@ -1,6 +1,6 @@
-import { LOCAL_STORAGE_PREFIX as PREFIX } from "~~/constants";
-import { LoginInfo } from "~~/types";
-import { getApiBaseURL } from "~~/utils/general";
+import { LOCAL_STORAGE_PREFIX as PREFIX } from '~~/constants';
+import { LoginInfo } from '~~/types';
+import { getApiBaseURL } from '~~/utils/general';
 
 export type LoginResponse = {
   token: string;
@@ -8,7 +8,7 @@ export type LoginResponse = {
 };
 
 export const useAuthStore = definePiniaStore('auth', () => {
-  const apiBaseURL = getApiBaseURL()
+  const apiBaseURL = getApiBaseURL();
 
   // Auth state
   const userId = ref('');
@@ -22,9 +22,10 @@ export const useAuthStore = definePiniaStore('auth', () => {
 
   const loadStorageIntoState = () => {
     if (storedUserId.value) userId.value = storedUserId.value;
-    if (storedLoginInfo.value) loginInfo.value = JSON.parse(storedLoginInfo.value || '{}') as LoginInfo;
+    if (storedLoginInfo.value)
+      loginInfo.value = JSON.parse(storedLoginInfo.value || '{}') as LoginInfo;
     if (storedToken.value) token.value = storedToken.value;
-  }
+  };
   const tokenOrStored = computed(() => token.value || storedToken.value);
 
   const login = async (email: string, password: string) => {
@@ -37,17 +38,17 @@ export const useAuthStore = definePiniaStore('auth', () => {
     storedLoginInfo.value = JSON.stringify(loginResponse.payload);
     storedUserId.value = loginResponse.payload.id;
     loadStorageIntoState();
-  }
+  };
 
   const fetchCurrentUser = async () => {
     const user = await $fetch<LoginInfo>('/api/users/me', fetchOptions.value);
-    console.log('Fetched current user:',user);
-    const userWithRole = {...user, role: 'user'};
+    console.log('Fetched current user:', user);
+    const userWithRole = { ...user, role: 'user' };
     return userWithRole;
-  }
+  };
 
   const authHeader = computed(() => ({
-    'Authorization': `Bearer ${tokenOrStored.value}`
+    Authorization: `Bearer ${tokenOrStored.value}`,
   }));
 
   const fetchOptions = computed(() => ({
@@ -68,5 +69,5 @@ export const useAuthStore = definePiniaStore('auth', () => {
     // Helpers
     fetchOptions,
     authHeader,
-  }
-})
+  };
+});

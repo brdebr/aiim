@@ -1,7 +1,7 @@
 <template>
   <div class="images-search qw-flex qw-flex-col qw-gap-5 qw-px-3 qw-py-6">
     <div class="qw-text-center">
-      Search {{ totalSearchResults ? `[ ${totalSearchResults} ]` : "" }}
+      Search {{ totalSearchResults ? `[ ${totalSearchResults} ]` : '' }}
     </div>
     <v-text-field
       v-model="searchObj.prompt"
@@ -90,7 +90,11 @@
       :menu-props="{ maxHeight: 400 }"
     />
     <div class="qw-flex qw-gap-3 qw-items-center">
-      <v-btn variant="outlined" class="qw-flex-grow" @click="emit('performSearch')">
+      <v-btn
+        variant="outlined"
+        class="qw-flex-grow"
+        @click="emit('performSearch')"
+      >
         Filter
       </v-btn>
       <v-btn
@@ -106,8 +110,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ImageSearchType } from "~~/composables/useGallery";
-import { Samplers, modelHashesMap } from "~~/constants";
+import { ImageSearchType } from '~~/composables/useGallery';
+import { Samplers, modelHashesMap } from '~~/constants';
 
 const emit = defineEmits<{
   (event: 'performSearch'): () => void;

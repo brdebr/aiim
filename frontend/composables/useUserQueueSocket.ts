@@ -1,5 +1,5 @@
 import { ImageObject } from '~~/types';
-import { io, Socket } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client';
 import { apiWsBaseUrlDev } from '~~/constants';
 
 type ImageGenerationEvent = {
@@ -28,9 +28,7 @@ export type useQueueSocketType = {
   errorCallback?: (error: any) => void;
 };
 
-export const useUserQueueSocket = (
-  params?: useQueueSocketType,
-) => {
+export const useUserQueueSocket = (params?: useQueueSocketType) => {
   let socket: Socket | undefined;
 
   const authStore = useAuthStore();
@@ -43,34 +41,36 @@ export const useUserQueueSocket = (
         token: token.value,
       },
     });
-  
+
     socket.on('connect', () => {
       console.log(`Connected to socket server`);
     });
-  
+
     socket.on('disconnect', () => {
       console.log('Disconnected from socket server');
     });
 
     socket.on('image_finished', (generationEvent: ImageGenerationEvent) => {
-      console.log(`Received image ${generationEvent.image.id} from socket server`);
+      console.log(
+        `Received image ${generationEvent.image.id} from socket server`
+      );
       params?.imageFinishedCallback?.(generationEvent);
     });
 
     socket.on('image_on_progress', (progressEvent: ProgressResponse) => {
       params?.progressCallback?.(progressEvent);
     });
-  }
-  
+  };
+
   onMounted(() => {
     initWsConnection();
-  })
+  });
 
   onUnmounted(() => {
-    socket?.disconnect()
-  })
+    socket?.disconnect();
+  });
 
   return {
     socket,
-  }
+  };
 };

@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <Teleport to="#toolbar-append">
-      <slot/>
+      <slot />
     </Teleport>
   </ClientOnly>
 </template>

@@ -1,27 +1,31 @@
 <template>
   <div class="layout-container mobile-layout">
-  <!-- TOOLBAR -->
-    <v-app-bar :elevation="0" :color="'indigo-darken-4'" border="t-md b-md s-lg e-lg" density="compact">
+    <!-- TOOLBAR -->
+    <v-app-bar
+      :elevation="0"
+      :color="'indigo-darken-4'"
+      border="t-md b-md s-lg e-lg"
+      density="compact"
+    >
       <v-app-bar-title class="!qw-mx-0">
         <div class="qw-mx-2 qw-flex qw-items-center qw-gap-4">
-          <div class="qw-flex qw-gap-3 qw-items-center qw-select-none qw-mr-auto qw-flex-grow" @click="$router.push('/')">
-            <img src="/logo-min.png" class="qw-h-6 qw-w-6"/>
-            <span>
-              AI Image Manager
-            </span>
+          <div
+            class="qw-flex qw-gap-3 qw-items-center qw-select-none qw-mr-auto qw-flex-grow"
+            @click="$router.push('/')"
+          >
+            <img src="/logo-min.png" class="qw-h-6 qw-w-6" />
+            <span> AI Image Manager </span>
           </div>
-          <div id="toolbar-append">
-          </div>
+          <div id="toolbar-append"></div>
         </div>
       </v-app-bar-title>
     </v-app-bar>
     <!-- MAIN -->
     <v-main>
-      <slot/>
+      <slot />
     </v-main>
     <!-- RIGHT DRAWER -->
-    <div id="right-drawer">
-    </div>
+    <div id="right-drawer"></div>
     <!-- BOTTOM NAV -->
     <v-bottom-navigation
       v-if="userId"
@@ -31,9 +35,15 @@
       density="comfortable"
       border="t-md b-md s-lg e-lg"
       bg-color="indigo-darken-4"
-      grow hide-on-scroll
+      grow
+      hide-on-scroll
     >
-      <v-btn v-for="item in bottomNavigationItems" :to="item.route" :key="item.route" :value="item.route">
+      <v-btn
+        v-for="item in bottomNavigationItems"
+        :to="item.route"
+        :key="item.route"
+        :value="item.route"
+      >
         <v-icon>
           {{ item.icon }}
         </v-icon>
@@ -58,8 +68,7 @@ useHead({
       content: 'yes',
     },
   ],
-})
-
+});
 </script>
 <style lang="scss">
 .v-application {
@@ -72,13 +81,9 @@ useHead({
     height: 100%;
   }
 
-  &, .v-main > * {
+  &,
+  .v-main > * {
     background: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
   }
-}
-
-// Fix these first rendering with a lower width
-.v-toolbar, .v-bottom-navigation {
-  width: 100%;
 }
 </style>

@@ -1,9 +1,7 @@
 <template>
   <v-theme-provider theme="dark" with-background class="login-page" tag="div">
     <div class="login-form">
-      <div class="text-h6 qw-text-center qw-mb-5">
-        Login
-      </div>
+      <div class="text-h6 qw-text-center qw-mb-5">Login</div>
       <form @submit.prevent="executeLogin">
         <v-text-field
           v-model="loginEmail"
@@ -27,7 +25,14 @@
           :disabled="loading"
           @click:append-inner="showPassword = !showPassword"
         />
-        <v-btn type="submit" variant="outlined" block size="large" class="qw-my-3" :loading="loading">
+        <v-btn
+          type="submit"
+          variant="outlined"
+          block
+          size="large"
+          class="qw-my-3"
+          :loading="loading"
+        >
           Login
         </v-btn>
       </form>
@@ -35,14 +40,12 @@
   </v-theme-provider>
 </template>
 <script lang="ts" setup>
+const showPassword = ref(false);
 
-const showPassword = ref(false)
-
-const { loginEmail, loginPassword, executeLogin, loading } = await useLogin()
+const { loginEmail, loginPassword, executeLogin, loading } = await useLogin();
 useHead({
   title: 'Login',
-})
-
+});
 </script>
 <style lang="scss">
 .login-page {

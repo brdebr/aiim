@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <Teleport to="#right-drawer">
-      <slot/>
+      <slot />
     </Teleport>
   </ClientOnly>
 </template>

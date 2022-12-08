@@ -22,18 +22,18 @@ const isFullscreen = ref(false);
 const goFullscreen = () => {
   imageEl.value?.image?.requestFullscreen();
   isFullscreen.value = true;
-}
+};
 const exitFullscreen = () => {
   document.exitFullscreen();
   isFullscreen.value = false;
-}
+};
 const toggleFullscreen = () => {
   if (isFullscreen.value) {
     exitFullscreen();
   } else {
     goFullscreen();
   }
-}
+};
 
 const imageEl = ref<VImg>();
 

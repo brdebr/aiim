@@ -1,50 +1,49 @@
 export const useLayoutStore = definePiniaStore('layout', () => {
-
-  const rightDrawerIsTemporary = ref(false)
+  const rightDrawerIsTemporary = ref(false);
 
   const breakpoints = useBreakpoints({
     mobile: 915,
     wide: 1080,
-  })
-  
+  });
+
   const drawerWidth = computed(() => {
-    if(breakpoints.isSmallerOrEqual('mobile')) return 325;
-    if(breakpoints.isSmallerOrEqual('wide')) return 400;
+    if (breakpoints.isSmallerOrEqual('mobile')) return 325;
+    if (breakpoints.isSmallerOrEqual('wide')) return 400;
     return 500;
-  })
+  });
 
   const bottomNavigationItems = ref([
     {
       label: 'Card game',
       icon: 'mdi-cards-outline',
-      route: '/play'
+      route: '/play',
     },
     {
       label: 'Gallery',
       icon: 'mdi-image-search',
-      route: '/gallery'
+      route: '/gallery',
     },
     {
       label: 'Generate',
       icon: 'mdi-brain',
-      route: '/generate'
+      route: '/generate',
     },
     {
       label: 'Votes',
       icon: 'mdi-thumbs-up-down',
-      route: '/votes'
+      route: '/votes',
     },
     {
       label: 'Profile',
       icon: 'mdi-account-cog',
-      route: '/profile'
+      route: '/profile',
     },
-  ])
+  ]);
 
   return {
     rightDrawerIsTemporary,
     drawerWidth,
     breakpoints,
     bottomNavigationItems,
-  }
-})
+  };
+});

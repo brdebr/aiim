@@ -39,10 +39,10 @@
   </RightDrawerTp>
 </template>
 <script lang="ts" setup>
-import { Samplers, modelHashesMap } from "~~/constants";
+import { Samplers, modelHashesMap } from '~~/constants';
 
 useHead({
-  title: "Gallery",
+  title: 'Gallery',
 });
 
 const layoutStore = useLayoutStore();

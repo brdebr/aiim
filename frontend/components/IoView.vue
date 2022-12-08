@@ -2,11 +2,13 @@
   <div class="io-view" :class="classObject">
     <img
       ref="imageEl"
-      :data-width="props.image.width" :data-height="props.image.height"
+      :data-width="props.image.width"
+      :data-height="props.image.height"
       :data-id="props.image.id"
       :src="`${apiBaseURL}/api/images/view/${props.image.id}`"
       loading="lazy"
-      :title="props.image.prompt" :alt="props.image.prompt"
+      :title="props.image.prompt"
+      :alt="props.image.prompt"
       @click="toggle"
     />
   </div>
@@ -29,7 +31,6 @@ const classObject = computed(() => {
 });
 
 const { toggle } = useFullscreen(imageEl);
-
 </script>
 <style lang="scss">
 .io-view {

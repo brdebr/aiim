@@ -1,18 +1,27 @@
 <template>
-  <v-container class="<md:(!qw-px-2 !qw-pt-3)" style="background-image: unset; height: inherit;" fluid>
-    <v-card color="indigo-darken-4" :elevation="0" border="md" class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px]" theme="dark" >
+  <v-container
+    class="<md:(!qw-px-2 !qw-pt-3)"
+    style="background-image: unset; height: inherit"
+    fluid
+  >
+    <v-card
+      color="indigo-darken-4"
+      :elevation="0"
+      border="md"
+      class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px]"
+      theme="dark"
+    >
       <div class="qw-px-5 qw-py-4">
         <div class="qw-mb-2 qw-flex qw-items-center">
           <HelpLabel class="qw-mr-auto">
             <template #default>
-              The prompt is the text that the AI will use to generate the image.<br />
+              The prompt is the text that the AI will use to generate the
+              image.<br />
               You can be very specific or very vague.<br />
               The AI will try to generate an image that matches the prompt.<br />
             </template>
             <template #label>
-              <span class="text-body-2">
-                Prompt
-              </span>
+              <span class="text-body-2"> Prompt </span>
             </template>
           </HelpLabel>
           <HelpLabel>
@@ -20,7 +29,12 @@
               Copy the current prompt to the clipboard.<br />
             </template>
             <template #label>
-              <v-btn prepend-icon="mdi-content-copy" size="x-small" variant="outlined" class="copy-btn text-caption">
+              <v-btn
+                prepend-icon="mdi-content-copy"
+                size="x-small"
+                variant="outlined"
+                class="copy-btn text-caption"
+              >
                 Copy to clipboard
               </v-btn>
             </template>
@@ -31,13 +45,14 @@
         </div>
         <HelpLabel>
           <template #default>
-            The negative prompt is the text that the AI will try to avoid when generating the image.<br />
-            For example, if you want to generate an image of a forest and use "green" as negative prompt, the AI probably will try to generate a forest in autumn.<br />
+            The negative prompt is the text that the AI will try to avoid when
+            generating the image.<br />
+            For example, if you want to generate an image of a forest and use
+            "green" as negative prompt, the AI probably will try to generate a
+            forest in autumn.<br />
           </template>
           <template #label>
-            <span class="text-body-2">
-              Negative prompt
-            </span>
+            <span class="text-body-2"> Negative prompt </span>
           </template>
         </HelpLabel>
         <div class="qw-mt-3">
@@ -46,9 +61,12 @@
         <div class="qw-mt-3 qw-flex <lg:qw-flex-col qw-gap-3">
           <HelpLabel>
             <template #default>
-              The sampler is the algorithm that the AI will use to generate the image.<br />
-              The "Euler a" sampler is the recommended one because it will work with 20-30 steps.<br />
-              Another good sampler is DDIM, but may require more steps (50-100) to generate a refined image.<br />
+              The sampler is the algorithm that the AI will use to generate the
+              image.<br />
+              The "Euler a" sampler is the recommended one because it will work
+              with 20-30 steps.<br />
+              Another good sampler is DDIM, but may require more steps (50-100)
+              to generate a refined image.<br />
             </template>
             <template #label>
               <ClientOnly>
@@ -67,9 +85,12 @@
           </HelpLabel>
           <HelpLabel>
             <template #default>
-              The number of steps is the number of iterations that the AI will use to generate the image.<br />
-              The more steps, the more refined the image will be, but after a certain point, the image will not change much.<br />
-              It's recommended to start with 20-30 steps and increase it when you find a good seed.<br />
+              The number of steps is the number of iterations that the AI will
+              use to generate the image.<br />
+              The more steps, the more refined the image will be, but after a
+              certain point, the image will not change much.<br />
+              It's recommended to start with 20-30 steps and increase it when
+              you find a good seed.<br />
             </template>
             <template #label>
               <v-text-field
@@ -87,8 +108,10 @@
           </HelpLabel>
           <HelpLabel>
             <template #default>
-              The CFG (Classifier-free Guidance) is the amount of importance that the AI will give to the prompt.<br />
-              The higher the CFG, the more the AI will try to match the prompt. But after a point it will generate glitchy images.<br />
+              The CFG (Classifier-free Guidance) is the amount of importance
+              that the AI will give to the prompt.<br />
+              The higher the CFG, the more the AI will try to match the prompt.
+              But after a point it will generate glitchy images.<br />
               The UI constrains the value to 20 at max because of this.<br />
             </template>
             <template #label>
@@ -123,8 +146,10 @@
           <v-spacer class="<lg:qw-hidden" />
           <HelpLabel>
             <template #default>
-              This will defines the width of the image that will be generated.<br />
-              Those marked with ★ are the recommended to combine and create rectangular images<br />
+              This will defines the width of the image that will be
+              generated.<br />
+              Those marked with ★ are the recommended to combine and create
+              rectangular images<br />
             </template>
             <template #label>
               <ClientOnly>
@@ -144,7 +169,8 @@
           <HelpLabel>
             <template #default>
               This will defines width of the image that will be generated.<br />
-              Those marked with ★ are the recommended to combine and create rectangular images<br />
+              Those marked with ★ are the recommended to combine and create
+              rectangular images<br />
             </template>
             <template #label>
               <ClientOnly>
@@ -163,15 +189,28 @@
           </HelpLabel>
         </div>
         <div class="qw-mt-8 qw-mb-3">
-          <v-btn variant="flat" border block color="blue-darken-4" @click="generateImage">
+          <v-btn
+            variant="flat"
+            border
+            block
+            color="blue-darken-4"
+            @click="generateImage"
+          >
             DO IT
           </v-btn>
         </div>
         <div class="qw-my-3" v-if="imagesInQueue">
-          <v-progress-linear :model-value="progress" height="16" color="amber" striped />
+          <v-progress-linear
+            :model-value="progress"
+            height="16"
+            color="amber"
+            striped
+          />
         </div>
         <div v-if="imagesInQueue">
-          Next image in [ {{ eta.toFixed(2) || '0' }}s ]. Images in your queue [ {{ imagesInQueue }} ] - Generated images: [ {{ generatedImages.length }} ]
+          Next image in [ {{ eta.toFixed(2) || '0' }}s ]. Images in your queue [
+          {{ imagesInQueue }} ] - Generated images: [
+          {{ generatedImages.length }} ]
         </div>
         <div v-if="previewImage">
           <v-img :src="previewImage" :width="width" :height="height" rounded />
@@ -198,7 +237,12 @@
         </v-progress-circular>
       </div>
       <div>
-        <v-btn variant="outlined" size="x-small" icon @click="toggleGalleryDrawer">
+        <v-btn
+          variant="outlined"
+          size="x-small"
+          icon
+          @click="toggleGalleryDrawer"
+        >
           <v-icon>mdi-cog</v-icon>
         </v-btn>
       </div>
@@ -243,7 +287,6 @@ const generateDrawer = ref(false);
 const toggleGalleryDrawer = () => {
   generateDrawer.value = !generateDrawer.value;
 };
-
 </script>
 <style lang="scss">
 .copy-btn {
