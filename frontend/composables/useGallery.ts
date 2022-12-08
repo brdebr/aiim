@@ -1,6 +1,6 @@
 import { ImageObject } from '~~/types';
-import { Samplers, modelHashesMap } from '~~/constants';
 import { getFetchOptions, getRouteQry, scrollToTop } from '~~/utils/general';
+import { ImageSearchResultType, ImageSearchType, useSearchLogic } from './useSearchLogic';
 
 export type ImageObjectsPageResponse = ImageObject[];
 
@@ -9,18 +9,6 @@ export type useGalleryConfig = Partial<{
   pageSize: number;
 }>;
 
-const modelsAsPairs = Object.entries(modelHashesMap);
-
-export type ImageSearchType = {
-  prompt: string;
-  negativePrompt: string;
-  steps: number;
-  cfg: number;
-  width: number;
-  height: number;
-  sampler: typeof Samplers[number];
-  model: typeof modelsAsPairs[number][1];
-};
 
 export const DEFAULT_GALLERY_PAGE_SIZE = 25;
 const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
@@ -48,11 +36,7 @@ export const useGallery = async (
 
   const loadingInitialImages = ref(false);
 
-  const isSearchMode = ref(false);
-  const searchObj = reactive<Partial<ImageSearchType>>({});
-  const totalSearchResults = ref(0);
-
-  const getImagesPage = async (
+  const fetchImagesPage = async (
     pageId: string,
     pageSize: number = DEFAULT_GALLERY_PAGE_SIZE
   ) => {
@@ -70,7 +54,7 @@ export const useGallery = async (
 
   const fetchInitialImages = async (forceInitial?: boolean) => {
     loadingInitialImages.value = true;
-    const images = await getImagesPage(
+    const images = await fetchImagesPage(
       forceInitial ? '' : pageIdFromQuery.value,
       firstPageSize
     );
@@ -83,52 +67,50 @@ export const useGallery = async (
       return;
     }
     const lastImageId = allImages.value[allImages.value.length - 1].id;
-    const newPage = await getImagesPage(lastImageId, pageSize);
+    const newPage = await fetchImagesPage(lastImageId, pageSize);
     allImages.value = allImages.value.concat(newPage);
     return lastImageId;
   };
 
-  const search = async (search: Partial<ImageSearchType>) => {
-    isSearchMode.value = true;
-    const endpoint = '/api/images/search';
+  // Search
+  const searchFn = async (params: ImageSearchType, query?: URLSearchParams): Promise<ImageSearchResultType> => {
+    const endpoint = `/api/images/search${query ? `?${query.toString()}` : ''}`;
 
-    const searchObjFiltered = Object.fromEntries(
-      Object.entries(search).filter(([_, v]) => v !== null)
-    );
-
-    const images = await $fetch<{ result: ImageObject[]; count: number }>(
+    const searchImagesResult = await $fetch<ImageSearchResultType>(
       endpoint,
       {
         ...fetchOptions,
         method: 'POST',
-        body: JSON.stringify(searchObjFiltered),
+        body: JSON.stringify(params),
       }
     );
-    totalSearchResults.value = images.count;
-    return images.result;
+    return searchImagesResult;
+  }
+
+  const { foundImages, searchFirstPage, searchNextPage, searchObj, totalSearchResults, clearSearchObj } = useSearchLogic({
+    pageSize: DEFAULT_GALLERY_PAGE_SIZE,
+    searchFn: searchFn
+  })
+
+  const performSearch = async () => {
+    scrollToTop();
+    await searchFirstPage();
+    allImages.value = foundImages.value || [];
+  };
+  const performSearchNextPage = async () => {
+    await searchNextPage();
+    allImages.value = foundImages.value || [];
   };
 
-  const searchNextPage = async () => {
-    const lastImageId = allImages.value[allImages.value.length - 1].id;
-    const query = new URLSearchParams({
-      page: lastImageId,
-      size: pageSize.toString(),
-    });
-    const endpoint = `/api/images/search?${query.toString()}`;
+  const clearSearch = async () => {
+    clearSearchObj();
+    scrollToTop();
+    fetchInitialImages(true);
+  };
 
-    const searchObjFiltered = Object.fromEntries(
-      Object.entries(searchObj).filter(([_, v]) => v !== null)
-    );
-
-    const images = await $fetch<{ result: ImageObject[]; count: number }>(
-      endpoint,
-      {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify(searchObjFiltered),
-      }
-    );
-    allImages.value = allImages.value.concat(images.result);
+  const refresh = () => {
+    scrollToTop();
+    router.push('/gallery');
   };
 
   // Total Images
@@ -142,36 +124,6 @@ export const useGallery = async (
     fetchTotalImages
   );
 
-  const refresh = () => {
-    isSearchMode.value = false;
-    scrollToTop();
-    router.push('/gallery');
-  };
-
-  const performSearch = async () => {
-    scrollToTop();
-    await router.push('/gallery');
-    allImages.value = await search(searchObj);
-  };
-
-  const clearSearch = async () => {
-    searchObj.prompt = undefined;
-    searchObj.negativePrompt = undefined;
-    searchObj.steps = undefined;
-    searchObj.cfg = undefined;
-    searchObj.width = undefined;
-    searchObj.height = undefined;
-    searchObj.sampler = undefined;
-    searchObj.model = undefined;
-    isSearchMode.value = false;
-    totalSearchResults.value = 0;
-
-    await nextTick();
-
-    scrollToTop();
-    fetchInitialImages(true);
-  };
-
   return {
     allImages,
     fetchNextImages,
@@ -179,13 +131,12 @@ export const useGallery = async (
     pageIdFromQuery,
     loadingInitialImages,
     fetchInitialImages,
-    search,
-    searchNextPage,
-    isSearchMode,
+    refresh,
     searchObj,
     totalSearchResults,
     clearSearch,
     performSearch,
-    refresh,
+    performSearchNextPage,
+    foundImages,
   };
 };

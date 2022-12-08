@@ -39,8 +39,6 @@
   </RightDrawerTp>
 </template>
 <script lang="ts" setup>
-import { Samplers, modelHashesMap } from '~~/constants';
-
 useHead({
   title: 'Gallery',
 });
@@ -56,20 +54,17 @@ const toggleGalleryDrawer = () => {
 const {
   allImages,
   searchObj,
-  isSearchMode,
   totalSearchResults,
   performSearch,
+  performSearchNextPage,
   clearSearch,
   refresh,
   fetchNextImages,
-  searchNextPage,
+  foundImages,
 } = await useGallery();
 
-const btnLoading = ref(false);
 
 const fetchMoreImages = async () => {
-  btnLoading.value = true;
-  isSearchMode.value ? await searchNextPage() : await fetchNextImages();
-  btnLoading.value = false;
+  foundImages.value ? await performSearchNextPage() : await fetchNextImages();
 };
 </script>
