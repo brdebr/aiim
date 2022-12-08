@@ -146,7 +146,6 @@ export class VoteService {
         createdAt: 'desc',
       },
     });
-    console.log('votes', votes);
     const length = votes.length;
 
     return {
