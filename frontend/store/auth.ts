@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_PREFIX as PREFIX } from "~~/constants";
 import { LoginInfo } from "~~/types";
+import { getApiBaseURL } from "~~/utils/general";
 
 export type LoginResponse = {
   token: string;
@@ -7,7 +8,7 @@ export type LoginResponse = {
 };
 
 export const useAuthStore = definePiniaStore('auth', () => {
-  const apiBaseURL = useApiBaseURL();
+  const apiBaseURL = getApiBaseURL()
 
   // Auth state
   const userId = ref('');

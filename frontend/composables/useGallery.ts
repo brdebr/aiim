@@ -1,6 +1,6 @@
 import { ImageObject } from "~~/types";
 import { Samplers, modelHashesMap } from '~~/constants';
-import { getFetchOptions, scrollToTop } from "~~/utils/general";
+import { getFetchOptions, getRouteQry, scrollToTop } from "~~/utils/general";
 
 export type ImageObjectsPageResponse = ImageObject[]
 
@@ -35,7 +35,7 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     ]);
   });
 
-  const pageIdFromQuery = useRouteQry('page');
+  const pageIdFromQuery = getRouteQry('page');
   watch(pageIdFromQuery, async (newPageQuery) => {
     if (newPageQuery){
       return;

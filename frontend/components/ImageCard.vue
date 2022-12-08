@@ -16,7 +16,7 @@
 import { VImg } from 'vuetify/components';
 import { ImageObject } from '~~/types';
 
-const apiBaseURL = useApiBaseURL();
+const apiBaseURL = getApiBaseURL();
 
 const isFullscreen = ref(false);
 const goFullscreen = () => {

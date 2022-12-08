@@ -1,9 +1,9 @@
 import { ImageObject } from "~~/types";
-import { getFetchOptions } from "~~/utils/general";
+import { getApiBaseURL, getFetchOptions } from "~~/utils/general";
 import { VoteType } from "./useCardGame";
 
 export const useVoteImage = () => {
-  const apiBaseURL = useApiBaseURL();
+  const apiBaseURL = getApiBaseURL();
   const fetchOptions = getFetchOptions();
 
   const voteLoading = ref(false);

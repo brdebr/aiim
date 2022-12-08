@@ -13,7 +13,7 @@
 </template>
 <script lang="ts" setup>
 import { ImageObject } from '~~/types';
-const apiBaseURL = useApiBaseURL();
+const apiBaseURL = getApiBaseURL();
 const props = defineProps<{
   image: ImageObject;
 }>();

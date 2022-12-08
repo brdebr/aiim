@@ -1,4 +1,5 @@
 import { ImageObject } from "~~/types";
+import { apiBaseUrlDev } from "~~/constants";
 
 export const scrollToTop = () => {
   window.scrollTo(0, 0);
@@ -10,6 +11,19 @@ export const getFetchOptions = () => {
   return fetchOptions.value;
 }
 
+
+export const getApiBaseURL = () => {
+  const config = useRuntimeConfig();
+  const apiBaseUrlEnv = config?.public?.apiBaseUrl;
+  return apiBaseUrlDev || apiBaseUrlEnv;
+}
+
+export const getRouteQry = (prop: string) => {
+  const route = useRoute();
+  return computed<string>(() => {
+    return [route.query[prop]].flat().join("");
+  })
+}
 
 export const getImageDimensions = (image: ImageObject) => {
   const { width, height } = image;
