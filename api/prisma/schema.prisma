@@ -68,11 +68,11 @@ model Vote {
 
   // User
   user             User   @relation(fields: [userId], references: [id])
-  userId           String
+  userId           String @db.ObjectId
 
   // Image
   image            ImageObject @relation(fields: [imageId], references: [id])
-  imageId          String
+  imageId          String @db.ObjectId
 
   // Vote
   vote             String
