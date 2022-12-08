@@ -1,4 +1,5 @@
 import { ImageObject } from "~~/types";
+import { getFetchOptions } from "~~/utils/general";
 import { useVoteImage } from "./useVoteImage";
 
 export enum VoteType {
@@ -15,13 +16,12 @@ export const useCardGame = async () => {
     currentCards.value = await fetchCardsPage();
   });
 
-  const authStore = useAuthStore();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions();
   const { voteImage, voteLoading } = useVoteImage();
 
   const fetchCardsPage = async () => {
     const endpoint = `/api/images/card-game`;
-    const response = await $fetch<ImageObject[]>(endpoint, fetchOptions.value);
+    const response = await $fetch<ImageObject[]>(endpoint, fetchOptions);
     return response;
   };
 

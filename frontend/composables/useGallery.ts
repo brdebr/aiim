@@ -1,6 +1,6 @@
 import { ImageObject } from "~~/types";
 import { Samplers, modelHashesMap } from '~~/constants';
-import { scrollToTop } from "~~/utils/general";
+import { getFetchOptions, scrollToTop } from "~~/utils/general";
 
 export type ImageObjectsPageResponse = ImageObject[]
 
@@ -27,8 +27,7 @@ const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
 
 export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE) => {
   const router = useRouter();
-  const authStore = useAuthStore();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions();
 
   onMounted(async () => {
     Promise.all([
@@ -58,7 +57,7 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
       size: pageSize.toString(),
     });
     const endpoint = `/api/images?${query.toString()}`;
-    const response = await $fetch<ImageObjectsPageResponse>(endpoint, fetchOptions.value);
+    const response = await $fetch<ImageObjectsPageResponse>(endpoint, fetchOptions);
     return response;
   };
 
@@ -86,7 +85,7 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     const searchObjFiltered = Object.fromEntries(Object.entries(search).filter(([_, v]) => v !== null));
 
     const images = await $fetch<{result: ImageObject[], count: number}>(endpoint, {
-      ...fetchOptions.value,
+      ...fetchOptions,
       method: 'POST',
       body: JSON.stringify(searchObjFiltered),
     });
@@ -105,7 +104,7 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
     const searchObjFiltered = Object.fromEntries(Object.entries(searchObj).filter(([_, v]) => v !== null));
     
     const images = await $fetch<{result: ImageObject[], count: number}>(endpoint, {
-      ...fetchOptions.value,
+      ...fetchOptions,
       method: 'POST',
       body: JSON.stringify(searchObjFiltered),
     });
@@ -115,7 +114,7 @@ export const useGallery = async (pageSize = DEFAULT_GALLERY_PAGE_SIZE, firstPage
   // Total Images
   const fetchTotalImages = async () => {
     const endpoint = `/api/images/total`;
-    const response = await $fetch<number>(endpoint, fetchOptions.value);
+    const response = await $fetch<number>(endpoint, fetchOptions);
     return response;
   };
   const { data: imagesCount } = await useAsyncData<number>('initial-gallery-image-count-fetch',fetchTotalImages);

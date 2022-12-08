@@ -1,11 +1,11 @@
 import { ImageObject } from "~~/types";
+import { getFetchOptions } from "~~/utils/general";
 import { VoteType } from "./useCardGame";
 import { useVoteImage } from "./useVoteImage";
 
 export const useVotes = async () => {
-  const authStore = useAuthStore();
   const { voteImage: voteImageFetch } = useVoteImage();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions();
 
   onMounted(async () => {
     if (votedImageIds.value.length) {
@@ -17,7 +17,7 @@ export const useVotes = async () => {
 
   const fetchVotedImageIds = async () => {
     const endpoint = `/api/vote/voted-image-ids`;
-    const response = await $fetch<string[]>(endpoint, fetchOptions.value);
+    const response = await $fetch<string[]>(endpoint, fetchOptions);
     return response;
   };
   const { data: votedImageIdsResponse, refresh } = await useAsyncData<string[]>('initial-voted-ids-fetch', fetchVotedImageIds);

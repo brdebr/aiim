@@ -1,10 +1,10 @@
 import { ImageObject } from "~~/types";
+import { getFetchOptions } from "~~/utils/general";
 import { VoteType } from "./useCardGame";
 
 export const useVoteImage = () => {
-  const authStore = useAuthStore();
   const apiBaseURL = useApiBaseURL();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions();
 
   const voteLoading = ref(false);
 
@@ -13,7 +13,7 @@ export const useVoteImage = () => {
     const query = new URLSearchParams({
       type,
     });
-    await $fetch(`${apiBaseURL}/api/vote/${image.id}?${query}`, {...fetchOptions.value, method: 'POST'});
+    await $fetch(`${apiBaseURL}/api/vote/${image.id}?${query}`, {...fetchOptions, method: 'POST'});
     voteLoading.value = false;
   }
 

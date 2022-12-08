@@ -1,5 +1,6 @@
 import { Samplers } from "~~/constants";
 import { ImageObject } from "~~/types";
+import { getFetchOptions } from "~~/utils/general";
 
 export type ImageGenerationEvent = {
   image: ImageObject;
@@ -32,8 +33,7 @@ const DEFAULT_HEIGHT = 768;
 
 export const useGenerate = () => {
 
-  const authStore = useAuthStore();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions()
 
   const prompt = ref(DEFAULT_PROMPT);
   const negativePrompt = ref(DEFAULT_NEGATIVE_PROMPT);
@@ -89,7 +89,7 @@ export const useGenerate = () => {
       const response = await $fetch<{ queuePosition: number }>(
         "/api/generate/txt2img",
         {
-          ...fetchOptions.value,
+          ...fetchOptions,
           method: "POST",
           body: JSON.stringify(body),
         }

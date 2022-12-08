@@ -1,3 +1,5 @@
+import { getFetchOptions } from "~~/utils/general";
+
 export type GenerationJob = {
   id: string;
   name: string;
@@ -33,8 +35,7 @@ export type GenerationJobData = {
 
 
 export const useQueue = () => {
-  const authStore = useAuthStore();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions();
 
   onMounted(async () => {
     await fetchAndSetQueue();
@@ -44,7 +45,7 @@ export const useQueue = () => {
 
   const fetchQueue = async () => {
     const endpoint = `/api/generate/queue`;
-    return await $fetch<GenerationJob[]>(endpoint, fetchOptions.value)
+    return await $fetch<GenerationJob[]>(endpoint, fetchOptions)
   }
 
   const fetchAndSetQueue = async () => {

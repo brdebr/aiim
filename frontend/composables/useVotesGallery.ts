@@ -1,4 +1,5 @@
 import { ImageObject } from "~~/types";
+import { getFetchOptions } from "~~/utils/general";
 import { VoteType } from "./useCardGame";
 
 export type Vote = {
@@ -26,8 +27,7 @@ export type VoteCountsByUserResponseResults = {
 }[]
 
 export const useVotesGallery = () => {
-  const authStore = useAuthStore();
-  const { fetchOptions } = storeToRefs(authStore);
+  const fetchOptions = getFetchOptions();
   const votedImages = ref<Vote[]>([]);
 
   const lastVoteImage = computed(() => {
@@ -36,7 +36,7 @@ export const useVotesGallery = () => {
 
   const fetchTotalImages = async () => {
     const endpoint = `/api/images/total`;
-    const response = await $fetch<number>(endpoint, fetchOptions.value);
+    const response = await $fetch<number>(endpoint, fetchOptions);
     return response;
   };
   const totalImages = ref<number>(0);
@@ -52,7 +52,7 @@ export const useVotesGallery = () => {
 
     const query = new URLSearchParams(queryObj);
     const endpoint = `/api/vote/my-votes?${query.toString()}`;
-    const response = await $fetch<VotedImageObjectsPageResponse>(endpoint, fetchOptions.value);
+    const response = await $fetch<VotedImageObjectsPageResponse>(endpoint, fetchOptions);
     return response.results;
   }
 
@@ -64,7 +64,7 @@ export const useVotesGallery = () => {
 
   const fetchVoteCounts = async () => {
     const endpoint = `/api/vote/my-vote-counts`;
-    const response = await $fetch<VoteCountsByUserResponse>(endpoint, fetchOptions.value);
+    const response = await $fetch<VoteCountsByUserResponse>(endpoint, fetchOptions);
     return response;
   }
   const voteCounts = ref<VoteCountsByUserResponseResults>();
