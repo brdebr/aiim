@@ -130,7 +130,7 @@ export class SdConfigService {
 
     const { data } = await firstValueFrom(
       this.httpService.get(
-        `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/logs?since=0&stderr=1&stdout=1&tail=100&timestamps=0`,
+        `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/logs?stderr=1&stdout=1&tail=10&timestamps=1`,
         {
           baseURL: this.configService.get('PORTAINER_URL'),
           headers: {
