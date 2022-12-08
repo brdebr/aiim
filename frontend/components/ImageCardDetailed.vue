@@ -52,18 +52,14 @@
 </template>
 <script setup lang="ts">
 import { Vote } from '~~/composables/useVotesGallery';
+import { modelHashesMap } from '~~/constants';
 import { ImageObject } from '~~/types';
 
 const displayingInfo = ref(false);
 
-const modelHashesNames: Record<string, string> = {
-  '81761151': '1.5-emaonly',
-  '3e16efc8': '1.5-inpainting',
-  '7460a6fa': '1.4',
-  'da781e47': 'bryanwd-person',
-  'a9263745': '1.5-pruned',
-  '2c02b20a': '2.0-768-v-ema',
-};
+const modelHashesNames: Record<string, string> = Object.fromEntries(
+  Object.entries(modelHashesMap).map(([key, value]) => [value, key])
+)
 
 const MAX_STEPS = 300;
 const percentageOfMaxSteps = (val: number) => {

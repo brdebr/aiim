@@ -31,4 +31,6 @@ export const modelHashesMap = {
   'bryanwd-person': 'da781e47',
   '1.5-pruned': 'a9263745',
   '2.0-768-v-ema': '2c02b20a',
+  '2.1-768-ema-pruned': '4bdfc29c',
+  '2.1-768-nonema-pruned': 'e1542d5a',
 } as const;
