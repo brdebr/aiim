@@ -1,13 +1,14 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { JwtObject } from 'src/auth/auth.decorator';
 import { JwtPayload } from 'src/auth/auth.service';
+import { ImageSearchDto } from 'src/image-object/dto/searchDto';
 import { VoteService, VoteType } from './vote.service';
 
 @Controller('vote')
 export class VoteController {
   constructor(private readonly voteService: VoteService) {}
 
-  @Post(':imageId')
+  @Post('/image/:imageId')
   async vote(
     @JwtObject() loginInfo: JwtPayload,
     @Param('imageId') imageId: string,
@@ -29,6 +30,24 @@ export class VoteController {
       pageId,
       20,
     );
+    return votes;
+  }
+
+  @Post('search-my-votes')
+  async searchVotesByUser(
+    @JwtObject() loginInfo: JwtPayload,
+    @Body() params: ImageSearchDto,
+    @Query('type') type: VoteType,
+    @Query('page') pageId: string,
+    @Query('size') size = '20',
+  ) {
+    const votes = await this.voteService.searchVotesByUserIdIncludingImage({
+      userId: loginInfo.id,
+      voteType: type,
+      pageId,
+      size: +size,
+      params,
+    });
     return votes;
   }
 
