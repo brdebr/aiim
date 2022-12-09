@@ -110,7 +110,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ImageSearchType } from '~~/composables/useGallery';
+import { ImageSearchType } from '~~/composables/useSearchLogic';
 import { Samplers, modelHashesMap } from '~~/constants';
 
 const emit = defineEmits<{

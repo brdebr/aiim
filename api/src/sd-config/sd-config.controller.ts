@@ -1,4 +1,5 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { setSdModelDto } from './dto/sdConfigDto';
 import { SdConfigService } from './sd-config.service';
 
 @Controller('sd-config')
@@ -15,13 +16,15 @@ export class SdConfigController {
           id: container.Id,
           name: container.Image,
           imageId: container.ImageID,
-          ports: [
-            ...container.Ports.filter(
-              (port) => port.PrivatePort && port.PublicPort,
-            ).map((port) => {
-              return `${port.PublicPort}:${port.PrivatePort}`;
-            }),
-          ],
+          ports: Array.from(
+            new Set([
+              ...container.Ports.filter(
+                (port) => port.PrivatePort && port.PublicPort,
+              ).map((port) => {
+                return `${port.PublicPort}:${port.PrivatePort}`;
+              }),
+            ]),
+          ),
           status: container.State,
           statusTxt: container.Status,
         };
@@ -43,6 +46,25 @@ export class SdConfigController {
 
   @Get('engine-logs')
   async getEngineLogs() {
-    return await this.sdConfigService.getStableDiffusionLogs();
+    const result = await this.sdConfigService.getStableDiffusionLogs();
+    return result;
+  }
+
+  @Get('sd-models')
+  async getSdModels() {
+    const result = await this.sdConfigService.getModels();
+    return result;
+  }
+
+  @Post('sd-model')
+  async setSdModel(@Body() sdModel: setSdModelDto) {
+    const result = await this.sdConfigService.setModel(sdModel.modelTitle);
+    return result;
+  }
+
+  @Get('configs')
+  async getSdConfig() {
+    const result = await this.sdConfigService.getConfigs();
+    return result;
   }
 }

@@ -260,52 +260,74 @@
     >
       <div class="qw-flex qw-flex-col qw-gap-4 qw-px-3 qw-pt-5">
         <div class="qw-flex qw-w-full qw-justify-center">
-          Stable Diffusion Service [ {{ status }} ]
+          SD Service [ {{ status }} ]
         </div>
         <div v-if="runningFrom" class="qw-flex qw-w-full qw-justify-center">
           {{ runningFrom }}
         </div>
         <v-btn @click="startSd" variant="outlined" block>
-          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
-            <v-icon>
-              mdi-play
-            </v-icon>
-            <span>
-              Start - Stable Diffusion Container
-            </span>
+          <div
+            class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
+          >
+            <v-icon> mdi-play </v-icon>
+            <span> Start - SD Service </span>
           </div>
         </v-btn>
         <v-btn @click="stopSd" variant="outlined" block>
-          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
-            <v-icon>
-              mdi-stop
-            </v-icon>
-            <span>
-              Stop - Stable Diffusion Container
-            </span>
+          <div
+            class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
+          >
+            <v-icon> mdi-stop </v-icon>
+            <span> Stop - SD Service </span>
           </div>
         </v-btn>
         <v-btn @click="getSdStatus" variant="outlined" block>
-          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
-            <v-icon>
-              mdi-refresh
-            </v-icon>
-            <span>
-              Refresh status
-            </span>
+          <div
+            class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
+          >
+            <v-icon> mdi-refresh </v-icon>
+            <span> Refresh status </span>
           </div>
         </v-btn>
+        <div class="qw-flex qw-items-center qw-gap-2">
+          <v-select
+            variant="outlined"
+            :items="models"
+            item-title="model_name"
+            item-value="title"
+            label="Model"
+            density="compact"
+            hide-details
+            theme="dark"
+            transition="scroll-y-transition"
+            :menu-props="{ maxHeight: 400 }"
+            v-model="selectedModel"
+          />
+          <v-btn
+            @click="selectModel"
+            :loading="loadingModel"
+            :disabled="loadingModel"
+            variant="outlined"
+          >
+            <div
+              class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
+            >
+              <v-icon> mdi-check </v-icon>
+            </div>
+          </v-btn>
+        </div>
         <v-btn @click="getSdLogs" variant="outlined" block>
-          <div class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between">
-            <v-icon>
-              mdi-file-document-outline
-            </v-icon>
-            <span>
-              Logs - Stable Diffusion Container
-            </span>
+          <div
+            class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
+          >
+            <v-icon> mdi-file-document-outline </v-icon>
+            <span> Logs - SD Service </span>
           </div>
         </v-btn>
-        <div v-if="logs" class="text-caption qw-max-h-[450px] qw-overflow-y-scroll qw-whitespace-pre qw-font-sans">
+        <div
+          v-if="logs"
+          class="text-caption qw-max-h-[350px] qw-overflow-y-scroll qw-whitespace-pre qw-font-sans"
+        >
           {{ logs }}
         </div>
       </div>
@@ -332,10 +354,35 @@ const {
   samplers,
 } = useGenerate();
 
-const { getSdLogs, getSdStatus, startSd, stopSd, status, runningFrom, logs } = useSdConfig();
+const {
+  getSdLogs,
+  getSdStatus,
+  startSd,
+  stopSd,
+  status,
+  runningFrom,
+  logs,
+  getSdModels,
+  setSdModel,
+  models,
+  getConfigs,
+  configs,
+} = useSdConfig();
+
+const selectedModel = ref('');
+const loadingModel = ref(false);
+const selectModel = async () => {
+  loadingModel.value = true;
+  await setSdModel(selectedModel.value);
+  loadingModel.value = false;
+};
 
 onMounted(async () => {
   await getSdStatus();
+  if ( status.value !== 'Running' ) return;
+  await getConfigs();
+  selectedModel.value = configs.value['sd_model_checkpoint'];
+  models.value = await getSdModels();
 });
 
 const layoutStore = useLayoutStore();
