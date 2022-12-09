@@ -273,7 +273,7 @@
             <span> Start - SD Service </span>
           </div>
         </v-btn>
-        <v-btn @click="stopSd" variant="outlined" block>
+        <v-btn @click="stopSd" :disabled="loadingStopSd" :loading="loadingStopSd" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -281,7 +281,7 @@
             <span> Stop - SD Service </span>
           </div>
         </v-btn>
-        <v-btn @click="getSdStatus" variant="outlined" block>
+        <v-btn @click="refresh" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -289,7 +289,7 @@
             <span> Refresh status </span>
           </div>
         </v-btn>
-        <div class="qw-flex qw-items-center qw-gap-2">
+        <div v-if="status === 'Running'" class="qw-flex qw-items-center qw-gap-2">
           <v-select
             variant="outlined"
             :items="models"
@@ -356,34 +356,23 @@ const {
 
 const {
   getSdLogs,
-  getSdStatus,
   startSd,
   stopSd,
   status,
   runningFrom,
   logs,
-  getSdModels,
-  setSdModel,
   models,
-  getConfigs,
-  configs,
+  refresh,
+  selectModel,
+  selectedModel,
+  loadingModel,
+  loadingStopSd
+
 } = useSdConfig();
 
-const selectedModel = ref('');
-const loadingModel = ref(false);
-const selectModel = async () => {
-  loadingModel.value = true;
-  await setSdModel(selectedModel.value);
-  loadingModel.value = false;
-};
-
-onMounted(async () => {
-  await getSdStatus();
-  if ( status.value !== 'Running' ) return;
-  await getConfigs();
-  selectedModel.value = configs.value['sd_model_checkpoint'];
-  models.value = await getSdModels();
-});
+onMounted(() => {
+  refresh();
+})
 
 const layoutStore = useLayoutStore();
 const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);

@@ -17,6 +17,8 @@ export const useSdConfig = () => {
     const response = await $fetch<{status: string, statusTxt: string}>('/api/sd-config/engine-status', fetchOptions);
     status.value = response.status === 'running' ? 'Running' : 'Stopped';
     runningFrom.value = status.value === 'Running' ? response.statusTxt : '';
+    if (status.value !== 'Running') return;
+    await getConfigs();
   }
 
   const startSd = async () => {
@@ -26,11 +28,14 @@ export const useSdConfig = () => {
     });
   }
 
+  const loadingStopSd = ref(false);
   const stopSd = async () => {
+    loadingStopSd.value = true;
     const response = await $fetch<string>('/api/sd-config/engine-stop', {
       ...fetchOptions,
       method: 'POST',
     });
+    loadingStopSd.value = false;
   }
 
   const getSdLogs = async () => {
@@ -64,6 +69,21 @@ export const useSdConfig = () => {
     configs.value = { ...response};
   }
 
+  const selectedModel = ref('');
+  const loadingModel = ref(false);
+  const selectModel = async () => {
+    loadingModel.value = true;
+    await setSdModel(selectedModel.value);
+    loadingModel.value = false;
+  };
+
+  const refresh = async () => {
+    await getSdStatus();
+    if ( status.value !== 'Running' ) return;
+    [models.value] = await Promise.all([getSdModels(), getConfigs()]);
+    selectedModel.value = configs.value['sd_model_checkpoint'];
+  }
+
   return {
     getSdStatus,
     status,
@@ -71,11 +91,16 @@ export const useSdConfig = () => {
     logs,
     startSd,
     stopSd,
+    loadingStopSd,
     getSdLogs,
     models,
     getSdModels,
     setSdModel,
     getConfigs,
     configs,
+    refresh,
+    selectModel,
+    loadingModel,
+    selectedModel,
   }
 }
