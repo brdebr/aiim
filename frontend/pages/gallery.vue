@@ -29,6 +29,7 @@
       :width="drawerWidth"
       :temporary="rightDrawerIsTemporary"
       disable-resize-watcher
+      disable-route-watcher
     >
       <ImagesSearch
         :search-obj="searchObj"
