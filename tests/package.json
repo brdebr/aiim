@@ -1,9 +1,16 @@
 {
-  "name": "tests",
+  "name": "aiim-tests",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:debug": "playwright test --headed",
+    "test:report": "playwright test --reporter=junit,html",
+    "test:report:debug": "playwright test --reporter=junit,html --headed",
+    "test:mobile": "playwright test --device=Samsung Galaxy Note Lite 10",
+    "test:desktop": "playwright test --device=Desktop Chrome"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -1,6 +1,24 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+const SamsungNoteLite10 = {
+  name: 'Samsung Galaxy Note Lite 10',
+  use: {
+    ...devices['Pixel 5'],
+    ...{
+      "screen": {
+        "width": 412,
+        "height": 915
+      },
+      "viewport": {
+        "width": 412,
+        "height": 778
+      },
+      "deviceScaleFactor": 2.63,
+    }
+  }
+};
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -26,7 +44,7 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -45,21 +63,21 @@ const config: PlaywrightTestConfig = {
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
+      name: 'Chromium',
       use: {
         ...devices['Desktop Chrome'],
       },
     },
 
     {
-      name: 'firefox',
+      name: 'Firefox',
       use: {
         ...devices['Desktop Firefox'],
       },
     },
 
     {
-      name: 'webkit',
+      name: 'Safari',
       use: {
         ...devices['Desktop Safari'],
       },
@@ -72,12 +90,13 @@ const config: PlaywrightTestConfig = {
     //     ...devices['Pixel 5'],
     //   },
     // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: {
-    //     ...devices['iPhone 12'],
-    //   },
-    // },
+    SamsungNoteLite10,
+    {
+      name: 'Mobile Safari',
+      use: {
+        ...devices['iPhone 12'],
+      },
+    },
 
     /* Test against branded browsers. */
     // {
@@ -95,7 +114,7 @@ const config: PlaywrightTestConfig = {
   ],
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
+  outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
   // webServer: {
