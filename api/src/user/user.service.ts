@@ -20,6 +20,13 @@ export class UserService {
       where: {
         id,
       },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
     return user;
   }
@@ -33,6 +40,13 @@ export class UserService {
     const userDeleted = await this.prisma.user.delete({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     return userDeleted;
