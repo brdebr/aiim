@@ -56,4 +56,11 @@ export class AuthService {
     };
     return this.jwtService.sign(payload);
   }
+
+  decodeJwt(bearerToken: string) {
+    const decoded = this.jwtService.decode(bearerToken.replace('Bearer ', ''), {
+      json: true,
+    });
+    return decoded as Record<string, unknown>;
+  }
 }

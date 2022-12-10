@@ -40,11 +40,10 @@ export const useAuthStore = definePiniaStore('auth', () => {
     loadStorageIntoState();
   };
 
-  const fetchCurrentUser = async () => {
-    const user = await $fetch<LoginInfo>('/api/users/me', fetchOptions.value);
-    console.log('Fetched current user:', user);
-    const userWithRole = { ...user, role: 'user' };
-    return userWithRole;
+  const fetchCurrentAuth = async () => {
+    const auth = await $fetch<LoginInfo>('/api/auth/current', fetchOptions.value);
+    console.log('Fetched current auth:', auth);
+    return auth;
   };
 
   const authHeader = computed(() => ({
@@ -65,7 +64,7 @@ export const useAuthStore = definePiniaStore('auth', () => {
     loadStorageIntoState,
     // Methods
     login,
-    fetchCurrentUser,
+    fetchCurrentAuth,
     // Helpers
     fetchOptions,
     authHeader,

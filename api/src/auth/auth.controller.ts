@@ -1,6 +1,6 @@
 import { UserService } from './../user/user.service';
 import { LoginDto, SignUpDto } from './dto/authDto';
-import { AuthService } from './auth.service';
+import { AuthService, JwtPayload } from './auth.service';
 import {
   Controller,
   Post,
@@ -9,9 +9,13 @@ import {
   HttpCode,
   Headers,
   Logger,
+  Get,
 } from '@nestjs/common';
-import { Public } from './auth.decorator';
+import { JwtObject, Public } from './auth.decorator';
 import { ConfigService } from '@nestjs/config';
+import * as dayjs from 'dayjs';
+import * as relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 
 @Controller('auth')
 export class AuthController {
@@ -53,6 +57,34 @@ export class AuthController {
     return {
       token: await this.authService.generateJwt(email),
       payload: userValidate,
+    };
+  }
+
+  @Get('current')
+  async getCurrentAuth(
+    @Headers('Authorization') bearerToken: string,
+    @JwtObject() loginInfo: JwtPayload,
+  ) {
+    const jwt = this.authService.decodeJwt(bearerToken) as {
+      exp: number;
+      iat: number;
+    };
+    if (!jwt) throw new UnauthorizedException();
+    const user = await this.userService.getUserById(loginInfo.id);
+    const issuedAt = new Date(jwt.iat * 1000);
+    const expiresAt = new Date(jwt.exp * 1000);
+    const isAboutToExpire = dayjs(
+      dayjs(expiresAt).subtract(1, 'hour'),
+    ).isBefore(Date.now());
+    const expiresIn = dayjs(expiresAt).fromNow(true);
+
+    return {
+      ...user,
+      ...jwt,
+      issuedAt,
+      expiresAt,
+      expiresIn,
+      isAboutToExpire,
     };
   }
 }
