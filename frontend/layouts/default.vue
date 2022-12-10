@@ -14,7 +14,7 @@
             @click="$router.push('/')"
           >
             <img src="/logo-min.png" class="qw-h-6 qw-w-6" />
-            <span> AI Image Manager </span>
+            <span> {{ APP_DISPLAY_NAME }} </span>
           </div>
           <div id="toolbar-append"></div>
         </div>
@@ -55,6 +55,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { APP_DISPLAY_NAME } from '~~/contants';
+
 const layoutStore = useLayoutStore();
 const { bottomNavigationItems } = storeToRefs(layoutStore);
 

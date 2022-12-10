@@ -64,6 +64,9 @@
   </div>
 </template>
 <script setup lang="ts">
+useHead({
+  title: "Card Game",
+});
 const {
   firstImage: displayingImage,
   recoverLastFromBuffer,
@@ -109,10 +112,6 @@ const actionButtons = [
 ];
 
 const showingInfo = ref(false);
-
-useHead({
-  title: "Card Game",
-});
 </script>
 <style lang="scss">
 .card-game-container {

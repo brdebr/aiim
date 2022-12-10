@@ -1,4 +1,5 @@
 import vuetify from 'vite-plugin-vuetify';
+import { APP_DISPLAY_NAME } from './contants';
 
 export default defineNuxtConfig({
   imports: {
@@ -46,14 +47,14 @@ export default defineNuxtConfig({
   },
   pwa: {
     meta: {
-      name: 'AI Image Manager',
-      description: 'Application to manage images, vote on them and generate new images calling an API',
+      name: APP_DISPLAY_NAME,
+      description: 'Application to manage artificially generated images, vote on them and generate new images calling an API',
       theme_color: '#1a237e',
       lang: 'en',
     },
     manifest: {
-      name: 'AI Image Manager',
-      short_name: 'AI-IM',
+      name: APP_DISPLAY_NAME,
+      short_name: 'AAM',
       theme_color: '#1a237e',
 
     },

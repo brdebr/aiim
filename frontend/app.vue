@@ -6,13 +6,16 @@
   </v-app>
 </template>
 <script lang="ts" setup>
+import { APP_DISPLAY_NAME } from './contants';
+
+
 const authStore = useAuthStore();
 onMounted(() => {
   authStore.loadStorageIntoState();
 })
 const devTitle = import.meta.env.DEV ? 'DEV - ' : '';
 useHead({
-  titleTemplate:`${devTitle}%s - AI Image manager`,
+  titleTemplate:`${devTitle}%s - ${APP_DISPLAY_NAME}`,
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo-min.png' },
  ]

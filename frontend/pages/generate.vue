@@ -335,6 +335,9 @@
   </RightDrawerTp>
 </template>
 <script setup lang="ts">
+useHead({
+  title: 'Generate',
+});
 const {
   prompt,
   negativePrompt,
