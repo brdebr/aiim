@@ -1,5 +1,14 @@
 import { VoteService } from './../vote/vote.service';
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Res,
+  StreamableFile,
+} from '@nestjs/common';
 import { JwtObject, Public } from 'src/auth/auth.decorator';
 import { ImageObjectService } from './image-object.service';
 import { JwtPayload } from 'src/auth/auth.service';
@@ -13,12 +22,16 @@ export class ImageObjectController {
   ) {}
 
   @Public()
-  @Get('view/:id')
-  async getImage(@Param('id') id: string, @Res() response) {
+  @Get('view/:id.png')
+  async getImage(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) response,
+  ): Promise<StreamableFile> {
     const image = await this.imageService.getImage(id);
-    response.set('Content-Type', 'image/png');
-    response.set('Content-Disposition', `attachment; filename=${image.id}.png`);
-    response.send(image.imageFile);
+    response.set({
+      'Content-Type': 'image/png',
+    });
+    return new StreamableFile(image.imageFile);
   }
 
   paseSize = '10';

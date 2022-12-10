@@ -5,7 +5,7 @@
       :data-width="props.image.width"
       :data-height="props.image.height"
       :data-id="props.image.id"
-      :src="`${apiBaseURL}/api/images/view/${props.image.id}`"
+      :src="`${apiBaseURL}/api/images/view/${props.image.id}.png`"
       loading="lazy"
       :title="props.image.prompt"
       :alt="props.image.prompt"
