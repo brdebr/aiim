@@ -21,10 +21,10 @@
       </template>
       <v-toolbar-title>
         <div class="qw-flex qw-items-center qw-gap-4">
-          <v-chip label rounded="sm" color="indigo" size="small">
-            <span class="qw-text-white">
+          <v-chip label rounded="sm" color="indigo" size="x-small">
+            <span class="qw-text-white qw-flex qw-items-baseline qw-gap-[3px] !qw-text-[11px]">
               {{ imageToShow.height }} <small>px</small>
-              <span class="qw-mx-2"><small>x</small></span>
+              <span class="qw-mx-[4px] qw-text-[9px]">x</span>
               {{ imageToShow.width }} <small>px</small>
             </span>
           </v-chip>
@@ -34,33 +34,43 @@
         <div class="qw-flex qw-items-center qw-gap-2">
           <v-chip label rounded="sm" color="indigo" size="small">
             <span class="qw-text-white">
-              {{ imageToShow.model || modelHashesNames[imageToShow.modelHash] }}
+              {{ modelHashesNames[imageToShow.modelHash] }}
+            </span>
+          </v-chip>
+          <v-chip class="<md:(!qw-hidden)" label rounded="sm" color="indigo" size="small">
+            <span class="qw-text-white">
+              {{ imageToShow.sampler }}
             </span>
           </v-chip>
           <v-chip label rounded="sm" color="indigo" size="small">
             <span class="qw-text-white">
-              {{ imageToShow.sampler }}
+              {{ imageToShow.steps }} it
             </span>
           </v-chip>
           <v-progress-circular
             :size="32"
             :width="2.5"
             color="blue"
-            :model-value="percentageOfMaxSteps(imageToShow.steps)"
-            :title="`${imageToShow.steps} steps`"
+            :model-value="percentageOfMaxCfg(imageToShow.cfg)"
+            :title="`${imageToShow.cfg} CFG`"
           >
-            <span class="qw-text-xs qw-text-white">
-              {{ imageToShow.steps }}
+            <span
+              class="qw-text-white"
+              :style="getCfgTextStyle(imageToShow.cfg)"
+            >
+              {{ imageToShow.cfg }}
             </span>
           </v-progress-circular>
         </div>
       </template>
     </v-toolbar>
-    <div
-      v-if="displayingInfo"
-      class="qw-h-[calc(100%-48px)] qw-grid qw-place-items-center qw-bg-gradient-to-b qw-from-red-200 qw-to-blue-400 qw-whitespace-pre-line"
-    >
-      {{ JSON.stringify(imageToShow, null, 2) }}
+    <div v-if="displayingInfo">
+      <div>
+        {{ imageToShow.prompt }}
+      </div>
+      <div>
+        {{ imageToShow.negativePrompt }}
+      </div>
     </div>
   </ImageCard>
 </template>
@@ -75,9 +85,15 @@ const modelHashesNames: Record<string, string> = Object.fromEntries(
   Object.entries(modelHashesMap).map(([key, value]) => [value, key])
 );
 
-const MAX_STEPS = 300;
-const percentageOfMaxSteps = (val: number) => {
-  return (val / MAX_STEPS) * 100;
+const MAX_CFG = 20;
+const percentageOfMaxCfg = (val: number) => {
+  return (val / MAX_CFG) * 100;
+};
+const getCfgTextStyle = (val: number) => {
+  const cfgNumSize = `${val}`.replace(/(\.|\,)/,'').length;
+  const fontSize = cfgNumSize <= 2 ? '12px' : cfgNumSize === 3 ? '10px' : '9.5px';
+  const letterSpacing = cfgNumSize >= 3 ? '-0.5px' : undefined;
+  return { fontSize, letterSpacing };
 };
 
 const imageToShow = computed(() => {

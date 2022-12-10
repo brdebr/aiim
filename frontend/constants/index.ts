@@ -26,11 +26,11 @@ export const Samplers = [
 
 export const modelHashesMap = {
   '1.5-emaonly': '81761151',
-  '1.5-inpainting': '3e16efc8',
+  '1.5-inpaint': '3e16efc8',
   '1.4': '7460a6fa',
-  'bryanwd-person': 'da781e47',
+  'bryanwd': 'da781e47',
   '1.5-pruned': 'a9263745',
-  '2.0-768-v-ema': '2c02b20a',
-  '2.1-768-ema-pruned': '4bdfc29c',
-  '2.1-768-nonema-pruned': 'e1542d5a',
+  '2.0-ema': '2c02b20a',
+  '2.1-ema-pruned': '4bdfc29c',
+  '2.1-pruned': 'e1542d5a',
 } as const;

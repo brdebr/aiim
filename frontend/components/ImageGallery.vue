@@ -58,7 +58,7 @@ const emit = defineEmits<{
   position: relative;
   display: grid;
   grid-gap: 6px;
-  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   @media screen and (max-width: 915px) {
     // One column on mobile
     & {
