@@ -26,6 +26,8 @@ export const useSdConfig = () => {
       ...fetchOptions,
       method: 'POST',
     });
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await refresh();
   }
 
   const loadingStopSd = ref(false);
@@ -36,6 +38,8 @@ export const useSdConfig = () => {
       method: 'POST',
     });
     loadingStopSd.value = false;
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await refresh();
   }
 
   const getSdLogs = async () => {

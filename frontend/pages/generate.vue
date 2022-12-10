@@ -26,7 +26,7 @@
           </HelpLabel>
           <HelpLabel>
             <template #default>
-              Copy the current prompt to the clipboard.<br />
+              Get the image info from the clipboard and set it as the generation options.<br />
             </template>
             <template #label>
               <v-btn
@@ -34,8 +34,9 @@
                 size="x-small"
                 variant="outlined"
                 class="copy-btn text-caption"
+                @click="copyPromptFromClipboard"
               >
-                Copy to clipboard
+                Get from Clipboard
               </v-btn>
             </template>
           </HelpLabel>
@@ -110,8 +111,8 @@
             <template #default>
               The CFG (Classifier-free Guidance) is the amount of importance
               that the AI will give to the prompt.<br />
-              The higher the CFG, the more the AI will try to match the prompt.
-              But after a point it will generate glitchy images.<br />
+              A low value will allow the AI to be more creative, a high value will make the AI follow the prompt more closely.<br />
+              After a point it will generate glitchy images.<br />
               The UI constrains the value to 20 at max because of this.<br />
             </template>
             <template #label>
@@ -379,6 +380,27 @@ onMounted(() => {
 
 const layoutStore = useLayoutStore();
 const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
+
+const copyPromptFromClipboard = async () => {
+  const text = await navigator.clipboard.readText();
+  try {
+    const imageObject = JSON.parse(text);
+    console.log(imageObject);
+    prompt.value = imageObject.prompt;
+    negativePrompt.value = imageObject.negativePrompt;
+    // seed.value = imageObject.seed;
+    sampler.value = imageObject.sampler;
+    steps.value = imageObject.steps;
+    cfg.value = imageObject.cfg;
+    width.value = imageObject.width;
+    height.value = imageObject.height;
+  } catch (error) {
+    console.log('Failed to parse clipboard text as JSON');
+    console.log('Text:', text);
+    
+    console.log(error);
+  }
+};
 
 const generateDrawer = ref(false);
 const toggleGalleryDrawer = () => {
