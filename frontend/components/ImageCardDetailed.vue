@@ -35,6 +35,16 @@
                 Download
               </v-list-item-title>
             </v-list-item>
+            <v-list-item v-if="!hideSendToVClip" @click="sendImageInfoToVClip(imageToShow)">
+              <template v-slot:prepend>
+                <v-icon size="small">
+                  mdi-archive-arrow-up-outline
+                </v-icon>
+              </template>
+              <v-list-item-title class="!qw-text-sm">
+                Send image to virtual clipboard
+              </v-list-item-title>
+            </v-list-item>
             <v-list-item @click="copyImageInfoToClipboard(imageToShow)">
               <template v-slot:prepend>
                 <v-icon size="small">
@@ -42,7 +52,7 @@
                 </v-icon>
               </template>
               <v-list-item-title class="!qw-text-sm">
-                Send to clipboard
+                Copy image info
               </v-list-item-title>
             </v-list-item>
             <v-list-item disabled @click="() => 'hola'">
@@ -55,6 +65,7 @@
                 Show more info
               </v-list-item-title>
             </v-list-item>
+            <slot name="menu-item" />
           </v-list>
         </v-menu>
       </template>
@@ -128,6 +139,8 @@ import { ImageObject } from '~~/types';
 const displayingInfo = ref(false);
 const apiBaseURL = getApiBaseURL();
 
+const clipboardStore = useClipboardStore();
+
 const modelHashesNames: Record<string, string> = Object.fromEntries(
   Object.entries(modelHashesMap).map(([key, value]) => [value, key])
 );
@@ -150,6 +163,11 @@ const copyImageInfoToClipboard = (image?: ImageObject) => {
   if (!image) return;
   const imageInfo = JSON.stringify(image, null, 2);
   copy(imageInfo);
+};
+
+const sendImageInfoToVClip = (image?: ImageObject) => {
+  if (!image) return;
+  clipboardStore.addImage(image);
 };
 
 const downloadImage = (imageId?: string) => {
@@ -180,6 +198,7 @@ const imageToShow = computed(() => {
 const props = defineProps<{
   vote?: Vote;
   image?: ImageObject;
+  hideSendToVClip?: boolean;
 }>();
 </script>
 <style lang="scss">

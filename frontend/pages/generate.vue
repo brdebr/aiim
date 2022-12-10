@@ -40,6 +40,15 @@
               </v-btn>
             </template>
           </HelpLabel>
+          <v-btn
+              prepend-icon="mdi-refresh"
+              size="x-small"
+              variant="outlined"
+              class="copy-btn text-caption qw-ml-2"
+              @click="refreshGenerate"
+            >
+              Reset
+            </v-btn>
         </div>
         <div class="qw-mt-3">
           <v-textarea variant="outlined" v-model="prompt" counter rows="2" />
@@ -356,6 +365,7 @@ const {
   generateImage,
   possibleImageSideSizes,
   samplers,
+  refreshGenerate
 } = useGenerate();
 
 const {

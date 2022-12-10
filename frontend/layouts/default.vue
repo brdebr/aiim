@@ -16,6 +16,7 @@
             <img src="/logo-min.png" class="qw-h-6 qw-w-6" />
             <span> {{ APP_DISPLAY_NAME }} </span>
           </div>
+          <ImagesClipboard />
           <div id="toolbar-append"></div>
         </div>
       </v-app-bar-title>
@@ -75,6 +76,9 @@ useHead({
 <style lang="scss">
 .v-application {
   @apply qw-h-[calc(100vh-104px)] sm:qw-h-[calc(100vh-var(--v-layout-bottom))];
+  .v-toolbar-title__placeholder {
+    @apply qw-overflow-visible;
+  }
 }
 .mobile-layout {
   height: 100%;
@@ -86,6 +90,20 @@ useHead({
   &,
   .v-main > * {
     background: linear-gradient(to top, hsl(180deg 63% 25%) -15%, #000640 100%);
+  }
+}
+.image-clipboard-badge {
+  .v-badge__badge {
+    --v-badge-size: 15px;
+    width: var(--v-badge-size);
+    max-width: var(--v-badge-size);
+    min-width: var(--v-badge-size);
+    height: var(--v-badge-size);
+    max-height: var(--v-badge-size);
+    min-height: var(--v-badge-size);
+    font-size: 9px;
+    padding: 0;
+    display: grid;
   }
 }
 </style>

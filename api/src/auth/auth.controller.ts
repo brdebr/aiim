@@ -76,7 +76,9 @@ export class AuthController {
     const isAboutToExpire = dayjs(
       dayjs(expiresAt).subtract(1, 'hour'),
     ).isBefore(Date.now());
-    const expiresIn = dayjs(expiresAt).fromNow(true);
+    const expiresIn = `${dayjs(expiresAt).fromNow(true)} (${dayjs(expiresAt)
+      .diff(dayjs(), 'minute', true)
+      .toFixed(2)} minutes)`;
 
     return {
       ...user,

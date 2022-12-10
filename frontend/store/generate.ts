@@ -1,0 +1,78 @@
+import { Samplers } from '~~/constants';
+import { ImageObject } from '~~/types';
+import { useClipboardStore } from './imageClipboard';
+
+export const DEFAULT_PROMPT = 'a fluffy cat sitting on top of a table';
+export const DEFAULT_NEGATIVE_PROMPT =
+  'poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish';
+
+export const DEFAULT_SAMPLER = 'Euler a';
+export const DEFAULT_STEPS = 28;
+export const DEFAULT_CFG = 9;
+export const DEFAULT_WIDTH = 768;
+export const DEFAULT_HEIGHT = 768;
+
+export const useGenerateStore = definePiniaStore('generate', () => {
+
+  const clipboardStore = useClipboardStore();
+  const { clipboard } = storeToRefs(clipboardStore);
+
+  const prompt = ref(DEFAULT_PROMPT);
+  const negativePrompt = ref(DEFAULT_NEGATIVE_PROMPT);
+
+  const seed = ref<string | null>(null);
+
+  const sampler = ref<typeof Samplers[number]>(DEFAULT_SAMPLER);
+  const steps = ref(DEFAULT_STEPS);
+  const cfg = ref(DEFAULT_CFG);
+  const width = ref(DEFAULT_WIDTH);
+  const height = ref(DEFAULT_HEIGHT);
+
+  const imagesInQueue = ref(0);
+  const progress = ref(0);
+  const eta = ref(0);
+  const previewImage = ref<string>('');
+
+  const generatedImages = ref<ImageObject[]>([]);
+
+  const resetGenerateState = () => {
+    prompt.value = DEFAULT_PROMPT;
+    negativePrompt.value = DEFAULT_NEGATIVE_PROMPT;
+    seed.value = null;
+    sampler.value = DEFAULT_SAMPLER;
+    steps.value = DEFAULT_STEPS;
+    cfg.value = DEFAULT_CFG;
+    width.value = DEFAULT_WIDTH;
+    height.value = DEFAULT_HEIGHT;
+  };
+
+  const copyFromClipboard = (image: ImageObject) => {
+    prompt.value = image.prompt;
+    negativePrompt.value = image.negativePrompt;
+    seed.value = image.seed;
+    sampler.value = image.sampler;
+    steps.value = image.steps;
+    cfg.value = image.cfg;
+    width.value = image.width;
+    height.value = image.height;
+  };
+
+
+  return {
+    prompt,
+    negativePrompt,
+    seed,
+    sampler,
+    steps,
+    cfg,
+    width,
+    height,
+    imagesInQueue,
+    progress,
+    eta,
+    previewImage,
+    generatedImages,
+    copyFromClipboard,
+    resetGenerateState,
+  };
+});

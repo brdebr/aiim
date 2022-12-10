@@ -1,3 +1,5 @@
+import { Samplers } from "~~/constants";
+
 export type ImageObject = {
   id: string;
   // Prompt
@@ -6,7 +8,7 @@ export type ImageObject = {
   // Configs
   seed: string;
   steps: number;
-  sampler: string;
+  sampler: typeof Samplers[number];
   cfg: number;
   width: number;
   height: number;
