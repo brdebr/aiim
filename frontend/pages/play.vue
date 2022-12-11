@@ -118,11 +118,16 @@ const showingInfo = ref(false);
   @apply qw-absolute;
   @apply qw-pt-2 qw-pb-[52px];
   @apply qw-w-full qw-h-[calc(100%-var(--v-layout-bottom))];
-  .image-card,
-  .io-view,
-  .io-view > img {
-    @apply qw-w-full qw-h-full;
+  .image-card {
+    @apply qw-w-full qw-h-full qw-place-items-center qw-grid qw-grid-cols-1 qw-grid-rows-1 qw-px-2;
+    .io-view {
+      @apply qw-w-full qw-h-full qw-flex;
+    }
   }
+  // .io-view,
+  // .io-view > img {
+  //   @apply qw-w-full qw-h-full;
+  // }
   .card-game-buttons {
     @apply qw-absolute qw-bottom-[var(--v-layout-bottom)];
     @apply qw-pb-5 qw-pt-8 qw-px-3;
@@ -143,7 +148,7 @@ const showingInfo = ref(false);
     @apply qw-text-sm;
   }
   .card-game-info-btn {
-    @apply qw-absolute qw-top-4 qw-right-0 qw-px-3;
+    @apply qw-absolute qw-top-4 qw-right-0 qw-px-3 qw-z-10;
   }
 }
 </style>

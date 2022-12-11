@@ -30,12 +30,12 @@ export const useCardGame = async () => {
     currentCards.value = currentCards.value.concat(newCards);
   };
 
-  const { data: initialImages } = await useAsyncData<ImageObject[]>(
-    'initial-card-game-fetch',
-    fetchCardsPage
-  );
+  // const { data: initialImages } = await useAsyncData<ImageObject[]>(
+  //   'initial-card-game-fetch',
+  //   fetchCardsPage
+  // );
 
-  const currentCards = ref(initialImages.value || []);
+  const currentCards = ref<ImageObject[]>([]);
   watch(
     currentCards,
     (newVal) => {
