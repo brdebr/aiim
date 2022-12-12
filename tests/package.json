@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test",
-    "test:debug": "playwright test --headed",
-    "test:report": "playwright test --reporter=junit,html",
-    "test:report:debug": "playwright test --reporter=junit,html --headed",
-    "test:mobile": "playwright test --device=Samsung Galaxy Note Lite 10",
-    "test:desktop": "playwright test --device=Desktop Chrome"
+    "test": "playwright test page",
+    "auth": "npm run test:auth",
+    "report": "playwright show-report",
+    "test:report": "playwright test page && npm run report",
+    "test:auth": "playwright test auth --project=\"Google Chrome\"",
+    "test:update": "playwright test page --update-snapshots",
+    "test:debug": "playwright test page --headed",
+    "test:mobile": "playwright test page --project=\"Samsung Galaxy Note Lite 10\"",
+    "test:desktop": "playwright test page --project=\"Google Chrome\""
   },
   "keywords": [],
   "author": "",
