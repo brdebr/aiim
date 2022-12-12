@@ -14,8 +14,8 @@ export const DEFAULT_HEIGHT = 768;
 
 export const useGenerateStore = definePiniaStore('generate', () => {
 
-  const clipboardStore = useClipboardStore();
-  const { clipboard } = storeToRefs(clipboardStore);
+  // const clipboardStore = useClipboardStore();
+  // const { clipboard } = storeToRefs(clipboardStore);
 
   const prompt = ref(DEFAULT_PROMPT);
   const negativePrompt = ref(DEFAULT_NEGATIVE_PROMPT);
@@ -49,7 +49,7 @@ export const useGenerateStore = definePiniaStore('generate', () => {
   const copyFromClipboard = (image: ImageObject) => {
     prompt.value = image.prompt;
     negativePrompt.value = image.negativePrompt;
-    seed.value = image.seed;
+    // seed.value = image.seed;
     sampler.value = image.sampler;
     steps.value = image.steps;
     cfg.value = image.cfg;
