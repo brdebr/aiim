@@ -1,12 +1,12 @@
-# AI Image Manager
+# Artificial Art Manager
 
 A web application built using Vue 3, Nuxt 3, and Vuetify 3 for the frontend.
 
-And NestJs, PrismaDB, MongoDB, and Redis for the backend.
+And for the backend NestJs, PrismaDB, MongoDB, and Redis.
 
-The purpose of this application is to help users generate images in a queue manner, view and filter the generated images, and later categorize them with a tinder-like UI.
+The purpose of this application is to help users generate images pushing request to a queue, view and filter the generated images, and later categorize them with a tinder-like UI.
 
-The images are generated using the Stable Diffusion model through the AUTOMATIC1111 webui using the handy `--api`.
+The images are generated using the Stable Diffusion model through the [AUTOMATIC1111 webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) using the handy `--api` argument.
 
 ## Features
 
