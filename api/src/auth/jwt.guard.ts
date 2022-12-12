@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, Provider } from '@nestjs/common';
 import { APP_GUARD, Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -20,7 +20,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 }
 
-export const GlobalJwtGuardProvider = {
+export const GlobalJwtGuardProvider: Provider = {
   provide: APP_GUARD,
   useClass: JwtAuthGuard,
 };
