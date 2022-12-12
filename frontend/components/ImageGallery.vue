@@ -1,5 +1,5 @@
 <template>
-  <div class="image-gallery" v-if="galleryObjects.length">
+  <div class="image-gallery" :class="{'one-column': props.oneCol}" v-if="galleryObjects.length">
     <slot name="prepend" />
     <div
       v-for="vote in galleryObjects"
@@ -47,6 +47,7 @@ useIntersectionObserver(
 const props = defineProps<{
   images?: ImageObject[];
   votes?: Vote[];
+  oneCol?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -59,6 +60,10 @@ const emit = defineEmits<{
   display: grid;
   grid-gap: 6px;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  &.one-column {
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+  }
   @media screen and (max-width: 915px) {
     // One column on mobile
     & {

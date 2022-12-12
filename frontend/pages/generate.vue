@@ -226,7 +226,7 @@
           <v-img :src="previewImage" :width="width" :height="height" rounded />
         </div>
         <div class="qw-flex qw-flex-col qw-gap-3">
-          <ImageGallery :images="generatedImages" />
+          <ImageGallery :images="generatedImages" one-col />
         </div>
       </div>
     </v-card>
