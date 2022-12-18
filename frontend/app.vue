@@ -7,12 +7,6 @@
 </template>
 <script lang="ts" setup>
 import { APP_DISPLAY_NAME } from './contants';
-
-
-const authStore = useAuthStore();
-onMounted(() => {
-  authStore.loadStorageIntoState();
-})
 const devTitle = import.meta.env.DEV ? 'DEV - ' : '';
 useHead({
   titleTemplate:`${devTitle}%s - ${APP_DISPLAY_NAME}`,

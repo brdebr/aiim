@@ -1,6 +1,7 @@
 export const useLogin = async () => {
   const router = useRouter();
   const authStore = useAuthStore();
+  const socket = useSocketStore();
 
   const loginEmail = ref('');
   const loginPassword = ref('');
@@ -11,7 +12,8 @@ export const useLogin = async () => {
     loading.value = true;
     try {
       await authStore.login(loginEmail.value, loginPassword.value);
-      router.push('/play');
+      socket.initWsConnection();
+      router.push('/generate');
     } catch (error) {
       console.log('Error logging in:', error);
     } finally {

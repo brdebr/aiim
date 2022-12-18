@@ -1,32 +1,18 @@
 import { LOCAL_STORAGE_PREFIX as PREFIX } from '~~/constants';
-import { LoginInfo } from '~~/types';
+import { CurrentLoginInfo, LoginInfo } from '~~/types';
 import { getApiBaseURL } from '~~/utils/general';
+import { skipHydrate } from 'pinia';
 
 export type LoginResponse = {
   token: string;
-  payload: LoginInfo;
+  info: LoginInfo;
 };
 
 export const useAuthStore = definePiniaStore('auth', () => {
   const apiBaseURL = getApiBaseURL();
 
-  // Auth state
-  const userId = ref('');
-  const loginInfo = ref<LoginInfo | null>(null);
-  const token = ref('');
-
-  // Local storage state
-  const storedUserId = useLocalStorage(`${PREFIX}user-id`, '');
-  const storedLoginInfo = useLocalStorage<string>(`${PREFIX}login-info`, '');
-  const storedToken = useLocalStorage(`${PREFIX}api-token`, '');
-
-  const loadStorageIntoState = () => {
-    if (storedUserId.value) userId.value = storedUserId.value;
-    if (storedLoginInfo.value)
-      loginInfo.value = JSON.parse(storedLoginInfo.value || '{}') as LoginInfo;
-    if (storedToken.value) token.value = storedToken.value;
-  };
-  const tokenOrStored = computed(() => token.value || storedToken.value);
+  const storedLoginInfo = useLocalStorage<Partial<CurrentLoginInfo>>(`${PREFIX}login-data`, {});
+  const storedToken = useLocalStorage<string>(`${PREFIX}token`, '');
 
   const login = async (email: string, password: string) => {
     const loginResponse = await $fetch<LoginResponse>('/api/auth/login', {
@@ -35,19 +21,21 @@ export const useAuthStore = definePiniaStore('auth', () => {
       ...fetchOptions.value,
     });
     storedToken.value = loginResponse.token;
-    storedLoginInfo.value = JSON.stringify(loginResponse.payload);
-    storedUserId.value = loginResponse.payload.id;
-    loadStorageIntoState();
+    storedLoginInfo.value = loginResponse.info;
+  };
+
+  const cleanAuth = () => {
+    storedToken.value = '';
+    storedLoginInfo.value = {};
   };
 
   const fetchCurrentAuth = async () => {
-    const auth = await $fetch<LoginInfo>('/api/auth/current', fetchOptions.value);
-    console.log('Fetched current auth:', auth);
-    return auth;
+    const auth = await $fetch<CurrentLoginInfo>('/api/auth/current', fetchOptions.value);
+    storedLoginInfo.value = auth;
   };
 
   const authHeader = computed(() => ({
-    Authorization: `Bearer ${tokenOrStored.value}`,
+    Authorization: `Bearer ${storedToken.value}`,
   }));
 
   const fetchOptions = computed(() => ({
@@ -55,18 +43,24 @@ export const useAuthStore = definePiniaStore('auth', () => {
     headers: authHeader.value,
   }));
 
+  const minutesToExpire = () => {
+    const nowDate = new Date().getTime();
+    const expDate = new Date(storedLoginInfo.value.exp || 0).getTime();
+
+    return (Math.round((expDate - nowDate) / 1000)) / 60;
+  };
+
   return {
     // Auth state
-    userId,
-    loginInfo,
-    token,
-    // Local storage state
-    loadStorageIntoState,
+    token: skipHydrate(storedToken),
+    loginInfo: skipHydrate(storedLoginInfo),
     // Methods
     login,
+    cleanAuth,
     fetchCurrentAuth,
     // Helpers
     fetchOptions,
     authHeader,
+    minutesToExpire,
   };
 });

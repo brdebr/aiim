@@ -4,7 +4,7 @@
       <div class="qw-px-3 qw-py-3">
         <h1>Profile</h1>
         <v-divider class="qw-my-3" />
-        <div v-if="loginInfo">
+        <div v-if="loginInfo.id">
           <v-row>
             <v-col> ID: </v-col>
             <v-col>

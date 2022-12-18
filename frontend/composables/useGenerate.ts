@@ -44,22 +44,6 @@ export const useGenerate = () => {
   const eta = ref(0);
   const previewImage = ref<string>('');
 
-  useUserQueueSocket({
-    imageFinishedCallback(generationEvent) {
-      console.log('Generated Image id: ', generationEvent.image.id);
-      generatedImages.value.unshift(generationEvent.image);
-      imagesInQueue.value = generationEvent.queuePosition || 0;
-      resetProgressState();
-    },
-    progressCallback(progressEvent) {
-      progress.value = progressEvent.progress * 100;
-      eta.value = progressEvent.eta_relative;
-      previewImage.value = progressEvent.current_image
-        ? `data:image/png;base64,${progressEvent.current_image}`
-        : '';
-    },
-  });
-
   const resetProgressState = () => {
     progress.value = 0;
     eta.value = 0;

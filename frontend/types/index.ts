@@ -34,3 +34,14 @@ export type LoginInfo = {
   name?: string;
   role: string;
 };
+
+export type CurrentLoginInfo = LoginInfo & {
+  createdAt: string;
+  updatedAt: string;
+  iat: number;
+  exp: number;
+  issuedAt: string;
+  expiresAt: string;
+  expiresIn: string;
+  isAboutToExpire: boolean;
+}

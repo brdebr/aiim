@@ -23,36 +23,40 @@
     </v-app-bar>
     <!-- MAIN -->
     <v-main>
-      <slot />
+      <ClientOnly>
+        <slot />
+      </ClientOnly>
     </v-main>
     <!-- RIGHT DRAWER -->
     <div id="right-drawer"></div>
-    <!-- BOTTOM NAV -->
-    <v-bottom-navigation
-      v-if="userId"
-      class="bottom-bar"
-      mode="shift"
-      :elevation="0"
-      density="comfortable"
-      border="t-md b-md s-lg e-lg"
-      bg-color="indigo-darken-4"
-      grow
-      hide-on-scroll
-    >
-      <v-btn
-        v-for="item in bottomNavigationItems"
-        :to="item.route"
-        :key="item.route"
-        :value="item.route"
+    <ClientOnly>
+      <v-bottom-navigation
+        v-if="loginInfo.id"
+        class="bottom-bar"
+        mode="shift"
+        :elevation="0"
+        density="comfortable"
+        border="t-md b-md s-lg e-lg"
+        bg-color="indigo-darken-4"
+        grow
+        hide-on-scroll
       >
-        <v-icon>
-          {{ item.icon }}
-        </v-icon>
-        <span class="!qw-text-[10px]">
-          {{ item.label }}
-        </span>
-      </v-btn>
-    </v-bottom-navigation>
+        <v-btn
+          v-for="item in bottomNavigationItems"
+          :to="item.route"
+          :key="item.route"
+          :value="item.route"
+        >
+          <v-icon>
+            {{ item.icon }}
+          </v-icon>
+          <span class="!qw-text-[10px]">
+            {{ item.label }}
+          </span>
+        </v-btn>
+      </v-bottom-navigation>
+    </ClientOnly>
+    <!-- BOTTOM NAV -->
   </div>
 </template>
 <script setup lang="ts">
@@ -62,7 +66,7 @@ const layoutStore = useLayoutStore();
 const { bottomNavigationItems } = storeToRefs(layoutStore);
 
 const authStore = useAuthStore();
-const { userId } = storeToRefs(authStore);
+const { loginInfo } = storeToRefs(authStore);
 
 useHead({
   meta: [
