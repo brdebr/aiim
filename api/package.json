@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "rm -rf dist/ && PORT=3006 nest start --watch",
+    "dev": "npm run start:dev",
     "start:debug": "nest start --debug --watch",
     "start:prod": "npm run db:push && node dist/src/main",
     "prod": "npm run build && npm run start:prod",

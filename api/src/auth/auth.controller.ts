@@ -13,9 +13,6 @@ import {
 } from '@nestjs/common';
 import { JwtObject, Public } from './auth.decorator';
 import { ConfigService } from '@nestjs/config';
-import * as dayjs from 'dayjs';
-import * as relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
 
 @Controller('auth')
 export class AuthController {
@@ -54,39 +51,16 @@ export class AuthController {
     if (!userValidate) {
       throw new UnauthorizedException();
     }
+    const token = await this.authService.generateJwt(email);
+    const info = await this.authService.buildCurrentLoginInfo(token);
     return {
-      token: await this.authService.generateJwt(email),
-      payload: userValidate,
+      token,
+      info,
     };
   }
 
   @Get('current')
-  async getCurrentAuth(
-    @Headers('Authorization') bearerToken: string,
-    @JwtObject() loginInfo: JwtPayload,
-  ) {
-    const jwt = this.authService.decodeJwt(bearerToken) as {
-      exp: number;
-      iat: number;
-    };
-    if (!jwt) throw new UnauthorizedException();
-    const user = await this.userService.getUserById(loginInfo.id);
-    const issuedAt = new Date(jwt.iat * 1000);
-    const expiresAt = new Date(jwt.exp * 1000);
-    const isAboutToExpire = dayjs(
-      dayjs(expiresAt).subtract(1, 'hour'),
-    ).isBefore(Date.now());
-    const expiresIn = `${dayjs(expiresAt).fromNow(true)} (${dayjs(expiresAt)
-      .diff(dayjs(), 'minute', true)
-      .toFixed(2)} minutes)`;
-
-    return {
-      ...user,
-      ...jwt,
-      issuedAt,
-      expiresAt,
-      expiresIn,
-      isAboutToExpire,
-    };
+  async getCurrentAuth(@Headers('Authorization') bearerToken: string) {
+    return this.authService.buildCurrentLoginInfo(bearerToken);
   }
 }

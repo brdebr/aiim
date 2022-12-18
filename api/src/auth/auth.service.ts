@@ -1,6 +1,15 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+
+import * as dayjs from 'dayjs';
+import * as relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 
 export type JwtPayload = {
   id: string;
@@ -62,5 +71,32 @@ export class AuthService {
       json: true,
     });
     return decoded as Record<string, unknown>;
+  }
+
+  async buildCurrentLoginInfo(bearerToken: string) {
+    const jwt = this.decodeJwt(bearerToken) as JwtPayload & {
+      exp: number;
+      iat: number;
+    };
+    if (!jwt) throw new UnauthorizedException();
+    const user = await this.userService.getUserById(jwt.id);
+    const issuedAt = new Date(jwt.iat * 1000);
+    const expiresAt = new Date(jwt.exp * 1000);
+    const isAboutToExpire = dayjs(
+      dayjs(expiresAt).subtract(1, 'hour'),
+    ).isBefore(Date.now());
+    const expiresIn = `${dayjs(expiresAt).fromNow(true)} (${dayjs(expiresAt)
+      .diff(dayjs(), 'minute', true)
+      .toFixed(2)} minutes)`;
+    return {
+      ...user,
+      ...jwt,
+      iat: jwt.iat * 1000,
+      exp: jwt.exp * 1000,
+      issuedAt,
+      expiresAt,
+      expiresIn,
+      isAboutToExpire,
+    };
   }
 }

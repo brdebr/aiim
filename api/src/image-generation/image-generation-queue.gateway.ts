@@ -114,8 +114,9 @@ export class ImageGenerationGateway
 
   @OnEvent('image-progress')
   async sendImageProgress(payload: ImageGenerationProgressEvent) {
-    this.server
-      .to(`user_${payload.user}`)
-      .emit('image_on_progress', payload.response);
+    this.server.to(`user_${payload.user}`).emit('image_on_progress', {
+      queuePosition: (await this.generationQueue.getJobCounts()).waiting,
+      progress: payload.response,
+    });
   }
 }
