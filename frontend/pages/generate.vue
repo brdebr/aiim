@@ -8,7 +8,7 @@
       color="indigo-darken-4"
       :elevation="0"
       border="md"
-      class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px]"
+      class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px] qw-mb-28"
       theme="dark"
     >
       <div class="qw-px-5 qw-py-4">
@@ -218,9 +218,10 @@
           />
         </div>
         <div v-if="imagesInQueue">
-          Next image in [ {{ eta.toFixed(2) || '0' }}s ]. Images in your queue [
-          {{ imagesInQueue }} ] - Generated images: [
-          {{ generatedImages.length }} ]
+          <div>
+            Generated images: [
+            {{ generatedImages.length }} ]
+          </div>
         </div>
         <div v-if="previewImage">
           <v-img :src="previewImage" :width="width" :height="height" rounded />
@@ -233,19 +234,6 @@
   </v-container>
   <ToolbarAppend>
     <div class="qw-flex qw-gap-3 qw-items-center">
-      <div v-if="imagesInQueue" class="qw-flex qw-items-center qw-gap-2">
-        <span class="qw-text-xs qw-text-white">
-          {{ eta.toFixed(2) || '0' }}s
-        </span>
-        <v-progress-circular
-          :size="32"
-          :width="4"
-          color="amber"
-          v-if="progress"
-          :model-value="progress"
-        >
-        </v-progress-circular>
-      </div>
       <div>
         <v-btn
           variant="outlined"
@@ -359,13 +347,12 @@ const {
   height,
   imagesInQueue,
   progress,
-  eta,
   previewImage,
   generatedImages,
   generateImage,
   possibleImageSideSizes,
   samplers,
-  refreshGenerate
+  refreshGenerate,
 } = useGenerate();
 
 const {

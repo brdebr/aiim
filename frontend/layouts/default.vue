@@ -11,12 +11,29 @@
         <div class="qw-mx-2 qw-flex qw-items-center qw-gap-4">
           <div
             class="qw-flex qw-gap-3 qw-items-center qw-select-none qw-mr-auto qw-flex-grow"
-            @click="$router.push('/')"
           >
             <img src="/logo-min.png" class="qw-h-6 qw-w-6" />
             <span> {{ APP_DISPLAY_NAME }} </span>
           </div>
+          <!-- Toolbar Status -->
+          <div v-if="imagesInQueue" class="qw-flex qw-items-center qw-gap-2">
+            <span class="qw-text-xs qw-text-white">
+              {{ eta.toFixed(2) || '0' }}s
+            </span>
+            <v-progress-circular
+              :size="30"
+              :width="2"
+              color="amber"
+              v-if="progress"
+              :model-value="progress"
+            >
+              <span class="qw-text-xs qw-text-amber-200">
+                {{ imagesInQueue }}
+              </span>
+            </v-progress-circular>
+          </div>
           <ImagesClipboard />
+          <!-- Toolbar Append -->
           <div id="toolbar-append"></div>
         </div>
       </v-app-bar-title>
@@ -67,6 +84,9 @@ const { bottomNavigationItems } = storeToRefs(layoutStore);
 
 const authStore = useAuthStore();
 const { loginInfo } = storeToRefs(authStore);
+
+const socketStore = useSocketStore();
+const { imagesInQueue, eta, progress } = storeToRefs(socketStore);
 
 useHead({
   meta: [

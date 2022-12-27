@@ -36,19 +36,10 @@ export const useGenerate = () => {
     cfg,
     width,
     height,
-    generatedImages,
    } = storeToRefs(generateStore);
 
-  const imagesInQueue = ref(0);
-  const progress = ref(0);
-  const eta = ref(0);
-  const previewImage = ref<string>('');
-
-  const resetProgressState = () => {
-    progress.value = 0;
-    eta.value = 0;
-    previewImage.value = '';
-  };
+  const socketStore = useSocketStore();
+  const { eta, imagesInQueue, progress, previewImage, generatedImages } = storeToRefs(socketStore);
 
   const generateImage = async () => {
     try {
@@ -89,10 +80,10 @@ export const useGenerate = () => {
     progress,
     eta,
     previewImage,
-    generatedImages,
     generateImage,
     possibleImageSideSizes: POSSIBLE_IMAGE_SIZES,
     samplers: Samplers,
     refreshGenerate: generateStore.resetGenerateState,
+    generatedImages,
   };
 };

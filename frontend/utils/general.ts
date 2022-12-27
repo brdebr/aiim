@@ -1,6 +1,10 @@
 import { ImageObject } from '~~/types';
 import { apiBaseUrlDev } from '~~/constants';
 
+type SoundsPaths = 'notification-pretty-good.mp3';
+
+const baseSoundsPath = '/sound';
+
 export const scrollToTop = () => {
   window.scrollTo(0, 0);
 };
@@ -22,6 +26,11 @@ export const getRouteQry = (prop: string) => {
   return computed<string>(() => {
     return [route.query[prop]].flat().join('');
   });
+};
+
+export const playSound = async (soundUrl: SoundsPaths) => {
+  const audio = new Audio(`${baseSoundsPath}/${soundUrl}`);
+  await audio.play();
 };
 
 export const getImageDimensions = (image: ImageObject) => {

@@ -1,6 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { ImageGenerationEvent } from "~~/composables/useGenerate";
 import { apiWsBaseUrlDev } from "~~/constants";
+import { ImageObject } from "~~/types";
+import { playSound } from "~~/utils/general";
 
 export type ProgressResponse = {
   progress: {
@@ -32,6 +34,26 @@ export const useSocketStore = definePiniaStore('wsocket', () => {
   const imageFinishedHook = createEventHook<ImageGenerationEvent>();
   const progressHook = createEventHook<ProgressResponse>();
 
+  const imagesInQueue = ref(0);
+  const progress = ref(0);
+  const eta = ref(0);
+  const previewImage = ref<string>('');
+
+  const generatedImages = ref<ImageObject[]>([]);
+
+  const { show } = useWebNotification({
+    title: 'Finished generating images!',
+    dir: 'auto',
+    lang: 'en',
+    tag: 'txt2img',
+    renotify: true,
+  });
+
+  const notify = () => {
+    show();
+    playSound('notification-pretty-good.mp3');
+  };
+
   const initWsConnection = () => {
     if (socket) return;
     socket = io(apiWsBaseUrlDev, {
@@ -58,6 +80,12 @@ export const useSocketStore = definePiniaStore('wsocket', () => {
     socket.on('image_finished', (generationEvent: ImageGenerationEvent) => {
       console.log('Generated Image id: ', generationEvent.image.id);
       imageFinishedHook.trigger(generationEvent);
+      imagesInQueue.value--;
+      if (imagesInQueue.value === 0) {
+        resetProgressState();
+        notify();
+      }
+      generatedImages.value.unshift(generationEvent.image);
     });
 
     socket.on('image_on_progress', (progressEvent: ProgressResponse) => {
@@ -76,15 +104,11 @@ export const useSocketStore = definePiniaStore('wsocket', () => {
     socket = undefined;
   };
 
-  const imagesInQueue = ref(0);
-  const progress = ref(0);
-  const eta = ref(0);
-  const previewImage = ref<string>('');
-
   const resetProgressState = () => {
     progress.value = 0;
     eta.value = 0;
     previewImage.value = '';
+    imagesInQueue.value = 0;
   };
 
   return {
@@ -100,5 +124,6 @@ export const useSocketStore = definePiniaStore('wsocket', () => {
     eta,
     previewImage,
     resetProgressState,
+    generatedImages,
   };
 });

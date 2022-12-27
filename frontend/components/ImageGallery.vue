@@ -54,7 +54,7 @@ const emit = defineEmits<{
   (event: 'more'): void;
 }>();
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .image-gallery {
   position: relative;
   display: grid;
@@ -63,6 +63,9 @@ const emit = defineEmits<{
   &.one-column {
     grid-template-columns: 1fr;
     grid-gap: 8px;
+    .v-img {
+      max-height: 350px !important;
+    }
   }
   @media screen and (max-width: 915px) {
     // One column on mobile

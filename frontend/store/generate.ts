@@ -1,6 +1,5 @@
 import { Samplers } from '~~/constants';
 import { ImageObject } from '~~/types';
-import { useClipboardStore } from './imageClipboard';
 
 export const DEFAULT_PROMPT = 'a fluffy cat sitting on top of a table';
 export const DEFAULT_NEGATIVE_PROMPT =
@@ -14,9 +13,6 @@ export const DEFAULT_HEIGHT = 768;
 
 export const useGenerateStore = definePiniaStore('generate', () => {
 
-  // const clipboardStore = useClipboardStore();
-  // const { clipboard } = storeToRefs(clipboardStore);
-
   const prompt = ref(DEFAULT_PROMPT);
   const negativePrompt = ref(DEFAULT_NEGATIVE_PROMPT);
 
@@ -27,13 +23,6 @@ export const useGenerateStore = definePiniaStore('generate', () => {
   const cfg = ref(DEFAULT_CFG);
   const width = ref(DEFAULT_WIDTH);
   const height = ref(DEFAULT_HEIGHT);
-
-  const imagesInQueue = ref(0);
-  const progress = ref(0);
-  const eta = ref(0);
-  const previewImage = ref<string>('');
-
-  const generatedImages = ref<ImageObject[]>([]);
 
   const resetGenerateState = () => {
     prompt.value = DEFAULT_PROMPT;
@@ -67,11 +56,6 @@ export const useGenerateStore = definePiniaStore('generate', () => {
     cfg,
     width,
     height,
-    imagesInQueue,
-    progress,
-    eta,
-    previewImage,
-    generatedImages,
     copyFromClipboard,
     resetGenerateState,
   };

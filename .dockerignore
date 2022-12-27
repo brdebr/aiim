@@ -3,6 +3,7 @@ dist
 node_modules
 
 /frontend/dist
+/frontend/.nuxt
 /frontend/node_modules
 
 /api/dist
