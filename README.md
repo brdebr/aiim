@@ -33,9 +33,20 @@ You can start the services by running `docker-compose up` in the root directory.
 The UI will be available at `http://localhost:3000`, and the backend API will be available at `http://localhost:3005`.
 
 - In the `/generate/` page you can send image generation requests to the queue and manage the Stable Diffusion docker service. After the queue is empty the application will send a notification.
+
+<img src="/tests/e2e/screenshots/generate/generate-page-Google-Chrome.png" alt="Generate page screenshot" width="830" />
+
 - In the `/gallery/` page you can view and filter the generated images.
+
+<img src="/tests/e2e/screenshots/gallery/gallery-page-Google-Chrome.png" alt="Gallery page screenshot" width="830" />
+
 - In the `/play/` page you can categorize the images with a tinder-like UI.
+
+<img src="/tests/e2e/screenshots/play/play-page-Google-Chrome.png" alt="Play page screenshot" width="830" />
+
 - In the `/votes/` page you can see the images that have been categorized, filtered by vote type (like, dislike, favorite, etc) and with the possibility to add more filters.
+
+<img src="/tests/e2e/screenshots/votes/votes-page-Google-Chrome.png" alt="Votes page screenshot" width="830" />
 
 ## Development
 
