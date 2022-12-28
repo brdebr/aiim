@@ -19,10 +19,10 @@ test.describe('Auth', () => {
     await page.click('button[type="submit"]');
 
     await Promise.all([
-      page.waitForURL('**\/play'),
+      page.waitForURL('**\/generate'),
       waitForResponseAndLog('**/api/auth/login', page, info),
     ]);
-    await expect(page.url(), 'Navigated to Play page').toBe(`${basePage}/play`);
+    await expect(page.url(), 'Navigated to Generate page').toBe(`${basePage}/generate`);
 
     // Save browser state to use later
     await page.context().storageState({ path: `./e2e/loggedState.json`});

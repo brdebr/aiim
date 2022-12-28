@@ -27,17 +27,17 @@ test.describe('Login', () => {
 
     await Promise.all([
       page.click('button[type="submit"]'),
-      page.waitForURL('**\/play'),
+      page.waitForURL('**\/generate'),
       waitForResponseAndLog('**/api/auth/login', page, info),
     ]);
-    await expect(page, 'Navigated to Play page').toHaveURL(`${basePage}/play`);
-    
+
     // Wait for play page to load.
     await Promise.all([
-      waitForResponseAndLog('**/api/images/card-game', page, info),
-      waitForResponseAndLog('**/api/images/view/*', page, info),
-      page.waitForSelector('[data-image-id][data-image-loaded]')
+      waitForResponseAndLog('**/api/sd-config/engine-status', page, info),
+      page.waitForSelector('text=Do it')
     ]);
+
+    await expect(page, 'Navigated to Generate page').toHaveURL(`${basePage}/generate`);
   });
 
   test('should not login with invalid credentials', async ({ page }, info) => {
