@@ -1,11 +1,22 @@
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
+import {
+  catchError,
+  firstValueFrom,
+  forkJoin,
+  interval,
+  lastValueFrom,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { PortainerContainer, SdModel, SdConfig } from './types';
+import { AxiosError } from 'axios';
 
-const SD_INIT_MESSAGE = 'Running on local URL:';
-const SD_MODEL_CHANGED_MESSAGE = 'Model loaded.';
+export const MODELS_CHECK_INTERVAL_MS = 2000;
 
 @Injectable()
 export class SdConfigService {
@@ -15,6 +26,8 @@ export class SdConfigService {
   ) {}
 
   private readonly logger = new Logger(SdConfigService.name);
+
+  embeddings: string[] = [];
 
   async getPortainerToken() {
     const baseUrl = this.configService.get('PORTAINER_URL');
@@ -66,20 +79,58 @@ export class SdConfigService {
     );
     this.logger.log('Starting Stable Diffusion container...');
 
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/start`,
-        {},
-        {
-          baseURL: this.configService.get('PORTAINER_URL'),
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
+    const startSdEngineRequest = this.httpService.post(
+      `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/start`,
+      {},
+      {
+        baseURL: this.configService.get('PORTAINER_URL'),
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
         },
-      ),
+      },
     );
+
+    const startContainerRequestEnded = new Subject();
+
+    await lastValueFrom(
+      forkJoin([
+        startSdEngineRequest.pipe(
+          catchError((error: AxiosError) => {
+            this.logger.error(error.response.data);
+            throw 'Ohh nooo, an error happened starting the SD container! :(';
+          }),
+        ),
+        interval(MODELS_CHECK_INTERVAL_MS).pipe(
+          takeUntil(startContainerRequestEnded),
+          switchMap(() => this.getModels()),
+          tap((models) => {
+            if (!models.length) {
+              this.logger.log('Loading models...');
+              return;
+            }
+            this.logger.log('Models loaded!');
+            startContainerRequestEnded.next(true);
+            startContainerRequestEnded.complete();
+          }),
+        ),
+      ]),
+    );
+
     this.logger.log('Started Stable Diffusion container! 🚀');
-    return data;
+
+    this.logger.log('Getting embeddings...');
+    const logs = await this.getStableDiffusionLogs(jwtToken);
+    const embeddingsStr =
+      /Embeddings: (?<content>.*)/gm.exec(logs)?.groups?.content || '';
+    const embeddings = embeddingsStr
+      .split(',')
+      .map((embedding) => embedding.trim());
+    embeddings.sort((a, b) => a.localeCompare(b));
+
+    this.embeddings = embeddings;
+    this.logger.log(`Found [ ${embeddings.length} ] embeddings!`);
+
+    return embeddings;
   }
 
   async stopStableDiffusionContainer(token?: string) {
@@ -125,14 +176,22 @@ export class SdConfigService {
       ),
     );
     this.logger.log('Got Stable Diffusion logs');
-    return data.toString();
+    const logs = data.toString();
+
+    return logs;
   }
 
   async getModels() {
     const { data } = await firstValueFrom(
-      this.httpService.get<SdModel[]>('/sd-models', {
-        baseURL: this.configService.get('GENERATION_API_URL'),
-      }),
+      this.httpService
+        .get<SdModel[]>('/sd-models', {
+          baseURL: this.configService.get('GENERATION_API_URL'),
+        })
+        .pipe(
+          catchError(() => {
+            return of({ data: [] as SdModel[] });
+          }),
+        ),
     );
     return data;
   }
@@ -157,5 +216,9 @@ export class SdConfigService {
       }),
     );
     return data;
+  }
+
+  getEmbeddings() {
+    return this.embeddings;
   }
 }

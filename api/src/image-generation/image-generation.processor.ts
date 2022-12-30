@@ -244,6 +244,7 @@ export class ImageGenerationProcessor {
           }),
           tap(() => {
             fetchRequestEnded.next(true);
+            fetchRequestEnded.complete();
           }),
         ),
         interval(PROGRESS_INTERVAL).pipe(

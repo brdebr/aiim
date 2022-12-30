@@ -22,18 +22,19 @@ export const useSdConfig = () => {
   }
 
   const startSd = async () => {
-    const response = await $fetch<string>('/api/sd-config/engine-start', {
+    await $fetch<string>('/api/sd-config/engine-start', {
       ...fetchOptions,
       method: 'POST',
     });
     await new Promise(resolve => setTimeout(resolve, 200));
     await refresh();
+    await getEmbeddings();
   }
 
   const loadingStopSd = ref(false);
   const stopSd = async () => {
     loadingStopSd.value = true;
-    const response = await $fetch<string>('/api/sd-config/engine-stop', {
+    await $fetch<string>('/api/sd-config/engine-stop', {
       ...fetchOptions,
       method: 'POST',
     });
@@ -53,6 +54,8 @@ export const useSdConfig = () => {
 
   const models = ref<SdModel[]>([]);
 
+  const embeddings = ref<string[]>([]);
+
   const configs = ref<Record<string, string>>({});
 
   const getSdModels = async () => {
@@ -71,6 +74,11 @@ export const useSdConfig = () => {
   const getConfigs = async () => {
     const response = await $fetch<Record<string, string>>('/api/sd-config/configs', fetchOptions);
     configs.value = { ...response};
+  }
+
+  const getEmbeddings = async () => {
+    const response = await $fetch<string[]>('/api/sd-config/embeddings', fetchOptions);
+    embeddings.value = response;
   }
 
   const selectedModel = ref('');
@@ -106,5 +114,7 @@ export const useSdConfig = () => {
     selectModel,
     loadingModel,
     selectedModel,
+    embeddings,
+    getEmbeddings,
   }
 }

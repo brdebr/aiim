@@ -62,6 +62,12 @@ export class SdConfigController {
     return result;
   }
 
+  @Get('embeddings')
+  getEmbeddings() {
+    const result = this.sdConfigService.getEmbeddings();
+    return result;
+  }
+
   @Get('configs')
   async getSdConfig() {
     const result = await this.sdConfigService.getConfigs();
