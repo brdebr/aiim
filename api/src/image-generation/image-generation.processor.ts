@@ -138,6 +138,7 @@ export class ImageGenerationProcessor {
     | 'updatedAt'
     | 'generatedAt'
     | 'timeToGenerate'
+    | 'tags'
   > {
     const { images, parameters, info } = response;
     const {
@@ -265,6 +266,7 @@ export class ImageGenerationProcessor {
 
       imageObject.timeToGenerate = timeToGenerate;
       imageObject.generatedAt = new Date();
+      imageObject.tags = params?.tags || [];
 
       this.logger.log(`Saving to database...`);
       const generatedImageObject = await this.prisma.imageObject.create({

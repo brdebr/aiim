@@ -9,5 +9,6 @@ node_modules
 /api/dist
 /api/node_modules
 aiim-db_data_volume.tar
+aiim-db_data_volume_001.tar
 
 /tests

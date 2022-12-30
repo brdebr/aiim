@@ -38,10 +38,12 @@ export const defaultsWithFile: Prisma.ImageObjectSelect = {
 
 type ImageObjectFilter = {
   [key in keyof ImageObject]?: ImageObject[key] extends string
-    ? Prisma.StringFilter
+    ? Prisma.StringFilter // if string, use string filter
     : ImageObject[key] extends number
-    ? Prisma.IntFilter | number
-    : ImageObject[key];
+    ? Prisma.IntFilter | number // if number, use int filter
+    : ImageObject[key] extends Array<string>
+    ? Prisma.StringNullableListFilter // if array of strings, use string list filter
+    : ImageObject[key]; // otherwise, use the type as is
 };
 
 type ImageObjectKeyArray = (keyof ImageObject)[];
@@ -170,7 +172,9 @@ export class ImageObjectService {
 
   async getAllIdsFiltered(filters: ImageObjectFilter) {
     const queryResponse = await this.prisma.imageObject.findMany({
-      where: filters,
+      where: {
+        ...filters,
+      },
       select: {
         id: true,
       },

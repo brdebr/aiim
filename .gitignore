@@ -42,6 +42,7 @@ docker-data
 !.vscode/launch.json
 !.vscode/extensions.json
 aiim-db_data_volume.tar
+aiim-db_data_volume_001.tar
 
 tests/e2e/login.spec.ts-snapshots/
 

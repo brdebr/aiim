@@ -30,6 +30,7 @@ model ImageObject {
   imageFile        Bytes?
   imageSize        Int?
   rawParameters    String?
+  tags             String[]
 
   // Time metadata
   createdAt        DateTime @default(now())

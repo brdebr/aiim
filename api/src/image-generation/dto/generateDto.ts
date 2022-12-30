@@ -8,6 +8,7 @@ import {
   IsDivisibleBy,
   IsOptional,
   IsBooleanString,
+  IsArray,
 } from 'class-validator';
 
 export const Samplers = [
@@ -88,4 +89,9 @@ export class Text2ImageDto {
   @IsBooleanString()
   @IsOptional()
   public faceRestoration?: boolean;
+
+  // Tags
+  @IsOptional()
+  @IsArray()
+  public tags?: string[];
 }
