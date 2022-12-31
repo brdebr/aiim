@@ -3,15 +3,19 @@
     v-if="imageToShow"
     :image="imageToShow"
     :vote-type="props.vote?.vote"
+    :show-title="!displayingInfo"
+    ref="imageCard"
   >
     <v-toolbar
       color="rgba(0, 0, 0, 0)"
       theme="dark"
       class="voted-img-toolbar"
+      :class="{
+        'voted-img-toolbar--detailed': displayingInfo,
+      }"
       density="compact"
-      @click.stop="false"
     >
-      <template v-slot:prepend>
+      <template #prepend>
         <v-menu
           transition="scroll-y-transition"
           :menu-props="{ maxHeight: 400 }"
@@ -24,19 +28,29 @@
               icon="mdi-dots-vertical"
             />
           </template>
-          <v-list density="compact" class="image-menu-list bg-indigo-darken-4">
-            <v-list-item @click="downloadImage(imageToShow?.id)">
-              <template v-slot:prepend>
+          <v-list density="compact" class="image-menu-list bg-indigo-darken-4 qw-mt-1">
+            <v-list-item @click="displayingInfo = !displayingInfo">
+              <template #prepend>
                 <v-icon size="small">
-                  mdi-download
+                  mdi-information
                 </v-icon>
               </template>
               <v-list-item-title class="!qw-text-sm">
-                Download
+                Show more info
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="showInFullscreen">
+              <template #prepend>
+                <v-icon size="small">
+                  mdi-fullscreen
+                </v-icon>
+              </template>
+              <v-list-item-title class="!qw-text-sm">
+                Fullscreen
               </v-list-item-title>
             </v-list-item>
             <v-list-item v-if="!hideSendToVClip" @click="sendImageInfoToVClip(imageToShow)">
-              <template v-slot:prepend>
+              <template #prepend>
                 <v-icon size="small">
                   mdi-archive-arrow-up-outline
                 </v-icon>
@@ -46,7 +60,7 @@
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="copyImageInfoToClipboard(imageToShow)">
-              <template v-slot:prepend>
+              <template #prepend>
                 <v-icon size="small">
                   mdi-content-copy
                 </v-icon>
@@ -55,14 +69,14 @@
                 Copy image info
               </v-list-item-title>
             </v-list-item>
-            <v-list-item disabled @click="() => 'hola'">
-              <template v-slot:prepend>
+            <v-list-item @click="downloadImage(imageToShow?.id)">
+              <template #prepend>
                 <v-icon size="small">
-                  mdi-information
+                  mdi-download
                 </v-icon>
               </template>
               <v-list-item-title class="!qw-text-sm">
-                Show more info
+                Download
               </v-list-item-title>
             </v-list-item>
             <slot name="menu-item" />
@@ -82,7 +96,7 @@
           </v-chip>
         </div>
       </v-toolbar-title>
-      <template v-slot:append>
+      <template #append>
         <div class="qw-flex qw-items-center qw-gap-2">
           <v-chip label rounded="sm" color="indigo" size="small" :title="`Model used hash: ${imageToShow.modelHash}`">
             <span class="qw-text-white">
@@ -120,18 +134,67 @@
           </v-progress-circular>
         </div>
       </template>
+      <template #extension v-if="displayingInfo">
+        <div class="qw-px-3 qw-pt-3 qw-flex qw-flex-col qw-gap-3 qw-text-sm qw-w-full qw-h-full">
+          <div class="qw-grid qw-gap-3 qw-grid-cols-2 <<md:qw-grid-cols-1">
+            <v-sheet rounded class="image-field-container image-field-container--small">
+              <span class="image-field-container__label">
+                Id:
+              </span>
+              <span class="qw-tracking-wide qw-text-xs">
+                {{ imageToShow.id }}
+              </span>
+            </v-sheet>
+            <v-sheet rounded class="image-field-container image-field-container--small">
+              <span class="image-field-container__label">
+                Date:
+              </span>
+              <span class="qw-tracking-wide qw-text-xs">
+                {{ imageToShow.generatedAt }}
+              </span>
+            </v-sheet>
+          </div>
+          <div class="qw-grid qw-gap-3 qw-grid-cols-2 <<md:qw-grid-cols-1">
+            <v-sheet rounded class="image-field-container image-field-container--small">
+              <span class="image-field-container__label">
+                Seed:
+              </span>
+              <span class="qw-tracking-wide qw-text-xs">
+                {{ imageToShow.seed }}
+              </span>
+            </v-sheet>
+            <v-sheet rounded class="image-field-container image-field-container--small">
+              <span class="image-field-container__label">
+                Time to generate:
+              </span>
+              <span class="qw-tracking-wide qw-text-xs">
+                {{ formatTimeToGenerate(imageToShow.timeToGenerate) }}
+              </span>
+            </v-sheet>
+          </div>
+          <v-sheet rounded class="image-field-container">
+            <span class="image-field-container__label">
+              Prompt:
+            </span>
+            <span class="qw-tracking-wide qw-text-xs">
+              {{ imageToShow.prompt }}
+            </span>
+          </v-sheet>
+          <v-sheet rounded class="image-field-container">
+            <span class="image-field-container__label">
+              Negative Prompt:
+            </span>
+            <span class="qw-tracking-wide qw-text-xs">
+              {{ imageToShow.negativePrompt }}
+            </span>
+          </v-sheet>
+        </div>
+      </template>
     </v-toolbar>
-    <div v-if="displayingInfo">
-      <div>
-        {{ imageToShow.prompt }}
-      </div>
-      <div>
-        {{ imageToShow.negativePrompt }}
-      </div>
-    </div>
   </ImageCard>
 </template>
 <script setup lang="ts">
+import ImageCard from './ImageCard.vue';
 import { Vote } from '~~/composables/useVotesGallery';
 import { modelHashesMap } from '~~/constants';
 import { ImageObject } from '~~/types';
@@ -195,6 +258,22 @@ const imageToShow = computed(() => {
   if (props.image) return props.image;
 });
 
+const imageCard = ref<InstanceType<typeof ImageCard>>();
+
+const showInFullscreen = () => {
+  imageCard.value?.goFullscreen();
+}
+
+const formatTimeToGenerate = (timeToGenerate: number) => {
+  const timeInSeconds = (timeToGenerate / 1000);
+  if (timeInSeconds > 60) {
+    const timeInMinutes = Math.floor(timeInSeconds / 60);
+    const timeInSecondsLeft = (timeInSeconds % 60).toFixed(0);
+    return `${timeInMinutes} mins ${timeInSecondsLeft} secs`;
+  }
+  return `${(timeInSeconds).toFixed(2)} secs`;
+}
+
 const props = defineProps<{
   vote?: Vote;
   image?: ImageObject;
@@ -203,14 +282,38 @@ const props = defineProps<{
 </script>
 <style lang="scss">
 .voted-img-toolbar {
-  background: linear-gradient(
-    0deg,
-    rgba(9, 9, 119, 0) 0%,
-    rgba(0, 0, 0, 1) 95%
-  ) !important;
+  background: linear-gradient(0deg,
+      rgba(9, 9, 119, 0) 0%,
+      rgba(0, 0, 0, 1) 95%) !important;
+
+  &--detailed {
+    @apply qw-h-full;
+
+    .v-toolbar__extension {
+      @apply !qw-h-[calc(100%-48px)];
+      @apply qw-items-start;
+    }
+  }
+}
+.image-field-container {
+  @apply qw-w-full;
+  @apply qw-px-3 qw-pb-3 qw-pt-6;
+  @apply qw-relative;
+  @apply !qw-border-[2px] !qw-border-blue-900 !qw-bg-gray-700/35;
+  @apply qw-backdrop-filter qw-backdrop-blur-2xl;
+  &.image-field-container--small {
+    @apply qw-pb-2 qw-pt-5;
+  }
+  &__label {
+    @apply qw-absolute;
+    @apply qw-top-[6px] qw-left-2;
+    @apply qw-tracking-wider qw-select-none;
+    @apply qw-text-[11px];
+    @apply qw-text-blue-200;
+  }
 }
 .image-menu-list {
-  .v-list-item__prepend > .v-icon {
+  .v-list-item__prepend>.v-icon {
     margin-inline-end: 20px !important;
   }
 }

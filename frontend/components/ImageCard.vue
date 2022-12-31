@@ -1,12 +1,12 @@
 <template>
-  <v-card rounded="lg">
+  <v-card rounded="lg" :ripple="false">
     <v-img
       ref="imageEl"
       :alt="props.image.prompt"
-      :title="props.image.prompt"
+      :title="props.showTitle && !isFullscreen ? props.image.prompt : null"
       :src="`${apiBaseURL}/api/images/view/${props.image.id}.png`"
       :aspect-ratio="props.image.width / props.image.height"
-      @click="toggleFullscreen"
+      @click="exitFullscreen"
     >
       <slot />
     </v-img>
@@ -16,6 +16,11 @@
 import { VImg } from 'vuetify/components';
 import { ImageObject } from '~~/types';
 
+type ImageCardProps = {
+  image: ImageObject;
+  showTitle?: boolean;
+};
+
 const apiBaseURL = getApiBaseURL();
 
 const isFullscreen = ref(false);
@@ -23,9 +28,13 @@ const goFullscreen = () => {
   imageEl.value?.image?.requestFullscreen();
   isFullscreen.value = true;
 };
-const exitFullscreen = () => {
-  document.exitFullscreen();
-  isFullscreen.value = false;
+const exitFullscreen = async () => {
+  try {
+    await document?.exitFullscreen();
+    isFullscreen.value = false;
+  } catch (e) {
+    console.log(e);
+  }
 };
 const toggleFullscreen = () => {
   if (isFullscreen.value) {
@@ -37,7 +46,13 @@ const toggleFullscreen = () => {
 
 const imageEl = ref<VImg>();
 
-const props = defineProps<{
-  image: ImageObject;
-}>();
+const props = withDefaults(defineProps<ImageCardProps>(), {
+  showTitle: true,
+});
+
+defineExpose({
+  goFullscreen,
+  exitFullscreen,
+  toggleFullscreen,
+});
 </script>
