@@ -126,30 +126,16 @@
             </template>
             <template #label>
               <ClientOnly>
-                <v-slider
+                <v-text-field
                   v-model.number="cfg"
-                  class="align-center qw-w-full qw-min-w-60 lg:qw-min-w-[255px] 2xl:qw-min-w-[350px] !qw-mx-0"
-                  :step="0.1"
-                  :max="20"
-                  :min="1"
-                  color="teal-darken-3"
-                  track-color="teal-darken-2"
-                  thumb-color="indigo"
                   hide-details
-                >
-                  <template #prepend>
-                    <v-text-field
-                      v-model.number="cfg"
-                      hide-details
-                      label="CFG"
-                      variant="outlined"
-                      density="comfortable"
-                      type="number"
-                      step="0.1"
-                      style="width: 90px"
-                    />
-                  </template>
-                </v-slider>
+                  label="CFG"
+                  variant="outlined"
+                  density="comfortable"
+                  type="number"
+                  step="0.1"
+                  style="width: 90px"
+                />
               </ClientOnly>
             </template>
           </HelpLabel>
