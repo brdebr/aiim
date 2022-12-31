@@ -164,9 +164,17 @@ export class SdConfigService {
     );
     this.logger.log('Getting Stable Diffusion logs...');
 
+    const params = new URLSearchParams({
+      stderr: '1',
+      stdout: '1',
+      tail: '50',
+    });
+
     const { data } = await firstValueFrom(
       this.httpService.get<string>(
-        `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/logs?stderr=1&stdout=1&tail=50`,
+        `/endpoints/2/docker/containers/${
+          stableDiffusionContainer.Id
+        }/logs?${params.toString()}`,
         {
           baseURL: this.configService.get('PORTAINER_URL'),
           headers: {

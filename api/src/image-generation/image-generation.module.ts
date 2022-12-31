@@ -7,6 +7,7 @@ import { BullModule } from '@nestjs/bull';
 import { ImageGenerationProcessor } from './image-generation.processor';
 import { ImageGenerationGateway } from './image-generation-queue.gateway';
 import { JwtNestModule } from 'src/auth/jwt.module';
+import { SdConfigModule } from 'src/sd-config/sd-config.module';
 
 const GenerationHttpModule = HttpModule.registerAsync({
   imports: [ConfigModule],
@@ -23,7 +24,12 @@ const GenerationQueue = BullModule.registerQueue({
 });
 
 @Module({
-  imports: [GenerationHttpModule, GenerationQueue, JwtNestModule],
+  imports: [
+    GenerationHttpModule,
+    GenerationQueue,
+    JwtNestModule,
+    SdConfigModule,
+  ],
   providers: [
     ImageGenerationService,
     ImageGenerationProcessor,

@@ -18,6 +18,8 @@ import {
 } from 'rxjs';
 import { defaultImageFieldsSelect } from 'src/image-object/image-object.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SdConfigService } from 'src/sd-config/sd-config.service';
+import { bytesToHuman } from 'src/utils';
 import { Text2ImageDto } from './dto/generateDto';
 
 export type ProgressResponse = {
@@ -120,6 +122,7 @@ export class ImageGenerationProcessor {
   constructor(
     private readonly httpService: HttpService,
     private readonly prisma: PrismaService,
+    private readonly sdConfigService: SdConfigService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -139,6 +142,7 @@ export class ImageGenerationProcessor {
     | 'generatedAt'
     | 'timeToGenerate'
     | 'tags'
+    | 'embeddings'
   > {
     const { images, parameters, info } = response;
     const {
@@ -268,6 +272,11 @@ export class ImageGenerationProcessor {
       imageObject.timeToGenerate = timeToGenerate;
       imageObject.generatedAt = new Date();
       imageObject.tags = params?.tags || [];
+      imageObject.embeddings = [
+        ...(await this.getEmbeddingsUsedInPrompt(params.prompt)),
+        ...(await this.getEmbeddingsUsedInPrompt(params.negativePrompt)),
+      ];
+      imageObject.imageSize = imageObject.imageFile.byteLength;
 
       this.logger.log(`Saving to database...`);
       const generatedImageObject = await this.prisma.imageObject.create({
@@ -314,5 +323,13 @@ export class ImageGenerationProcessor {
       response: data,
       user: userId,
     });
+  }
+
+  async getEmbeddingsUsedInPrompt(prompt: string): Promise<string[]> {
+    const embeddings = this.sdConfigService.getEmbeddings();
+    const embeddingsUsed = embeddings.filter((embedding) =>
+      prompt.includes(embedding),
+    );
+    return embeddingsUsed;
   }
 }

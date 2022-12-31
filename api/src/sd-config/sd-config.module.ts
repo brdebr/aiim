@@ -16,5 +16,6 @@ const SdConfigHttpModule = HttpModule.register({
   imports: [SdConfigHttpModule],
   providers: [SdConfigService],
   controllers: [SdConfigController],
+  exports: [SdConfigService],
 })
 export class SdConfigModule {}

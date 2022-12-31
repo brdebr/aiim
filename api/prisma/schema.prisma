@@ -42,6 +42,8 @@ model ImageObject {
   prompt           String
   negativePrompt   String?
 
+  embeddings       String[]
+
   // Configs
   steps            Int
   sampler          String
