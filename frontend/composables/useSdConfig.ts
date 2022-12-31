@@ -19,25 +19,36 @@ export const useSdConfig = () => {
     runningFrom.value = status.value === 'Running' ? response.statusTxt : '';
     if (status.value !== 'Running') return;
     await getConfigs();
+    await getEmbeddings();
   }
 
+  const loadingStartSd = ref(false);
   const startSd = async () => {
-    await $fetch<string>('/api/sd-config/engine-start', {
-      ...fetchOptions,
-      method: 'POST',
-    });
+    loadingStartSd.value = true;
+    try {
+      await $fetch<string>('/api/sd-config/engine-start', {
+        ...fetchOptions,
+        method: 'POST',
+      });
+    } catch (e) {
+      console.log(`Error starting SD: ${e}`);
+    }
+    loadingStartSd.value = false;
     await new Promise(resolve => setTimeout(resolve, 200));
-    await refresh();
-    await getEmbeddings();
+    await Promise.all([refresh(), getEmbeddings()]);
   }
 
   const loadingStopSd = ref(false);
   const stopSd = async () => {
     loadingStopSd.value = true;
-    await $fetch<string>('/api/sd-config/engine-stop', {
-      ...fetchOptions,
-      method: 'POST',
-    });
+    try {
+      await $fetch<string>('/api/sd-config/engine-stop', {
+        ...fetchOptions,
+        method: 'POST',
+      });
+    } catch (e) {
+      console.log(`Error stopping SD: ${e}`);
+    }
     loadingStopSd.value = false;
     await new Promise(resolve => setTimeout(resolve, 200));
     await refresh();
@@ -104,6 +115,7 @@ export const useSdConfig = () => {
     startSd,
     stopSd,
     loadingStopSd,
+    loadingStartSd,
     getSdLogs,
     models,
     getSdModels,

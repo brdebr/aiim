@@ -189,6 +189,8 @@
             variant="flat"
             border
             block
+            class="generate-btn"
+            :disabled="!isSdRunning"
             color="blue-darken-4"
             @click="generateImage"
           >
@@ -244,12 +246,12 @@
     >
       <div class="qw-flex qw-flex-col qw-gap-4 qw-px-3 qw-pt-5">
         <div class="qw-flex qw-w-full qw-justify-center">
-          SD Service [ {{ status }} ]
+          SD Service [ {{ isSdLoading ? '...' : status }} ]
         </div>
         <div v-if="runningFrom" class="qw-flex qw-w-full qw-justify-center">
           {{ runningFrom }}
         </div>
-        <v-btn @click="startSd" variant="outlined" block>
+        <v-btn @click="startSd" :disabled="isSdLoading" :loading="isSdLoading" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -257,7 +259,7 @@
             <span> Start - SD Service </span>
           </div>
         </v-btn>
-        <v-btn @click="stopSd" :disabled="loadingStopSd" :loading="loadingStopSd" variant="outlined" block>
+        <v-btn @click="stopSd" :disabled="isSdLoading" :loading="isSdLoading" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -265,7 +267,7 @@
             <span> Stop - SD Service </span>
           </div>
         </v-btn>
-        <v-btn @click="refresh" variant="outlined" block>
+        <v-btn @click="refresh" :disabled="isSdLoading" :loading="isSdLoading" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -273,7 +275,7 @@
             <span> Refresh status </span>
           </div>
         </v-btn>
-        <div v-if="status === 'Running'" class="qw-flex qw-items-center qw-gap-2">
+        <div v-if="!isSdLoading && isSdRunning" class="qw-flex qw-items-center qw-gap-2">
           <v-select
             variant="outlined"
             :items="models"
@@ -283,14 +285,15 @@
             density="compact"
             hide-details
             theme="dark"
+            :disabled="isSdLoading"
             transition="scroll-y-transition"
             :menu-props="{ maxHeight: 400 }"
             v-model="selectedModel"
           />
           <v-btn
             @click="selectModel"
-            :loading="loadingModel"
-            :disabled="loadingModel"
+            :loading="loadingModel || isSdLoading"
+            :disabled="loadingModel || isSdLoading"
             variant="outlined"
           >
             <div
@@ -300,7 +303,7 @@
             </div>
           </v-btn>
         </div>
-        <v-btn @click="getSdLogs" variant="outlined" block>
+        <v-btn @click="getSdLogs" :disabled="isSdLoading" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -353,8 +356,9 @@ const {
   selectModel,
   selectedModel,
   loadingModel,
-  loadingStopSd
-
+  loadingStopSd,
+  loadingStartSd,
+  embeddings
 } = useSdConfig();
 
 onMounted(() => {
@@ -363,6 +367,9 @@ onMounted(() => {
 
 const layoutStore = useLayoutStore();
 const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
+
+const isSdLoading = computed(() => loadingStartSd.value || loadingStopSd.value);
+const isSdRunning = computed(() => status.value === 'Running');
 
 const copyPromptFromClipboard = async () => {
   const text = await navigator.clipboard.readText();
@@ -395,6 +402,11 @@ const toggleGalleryDrawer = () => {
   .mdi.v-icon {
     font-size: 11px;
     transform: rotateY(180deg);
+  }
+}
+.generate-btn {
+  .v-btn__overlay {
+    background-color: rgba(0, 0, 0);
   }
 }
 </style>
