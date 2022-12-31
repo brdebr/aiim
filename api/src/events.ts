@@ -1,3 +1,3 @@
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
-export const EventEmmiter = EventEmitterModule.forRoot();
+export const EventEmitter = EventEmitterModule.forRoot();

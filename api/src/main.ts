@@ -14,7 +14,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3005;
 
   await app.listen(port);
-  // Get primsa service
+
   const prismaService = app.get(PrismaService);
 
   const imagesCount = await prismaService.imageObject.count();

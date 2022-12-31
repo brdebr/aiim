@@ -8,7 +8,7 @@ import { GlobalJwtGuardProvider } from './auth/jwt.guard';
 import { ConfigurationModule } from './config';
 import { ImageGenerationModule } from './image-generation/image-generation.module';
 import { BullQueuesModule } from './queues';
-import { EventEmmiter } from './events';
+import { EventEmitter } from './events';
 import { SdConfigModule } from './sd-config/sd-config.module';
 
 @Module({
@@ -21,7 +21,7 @@ import { SdConfigModule } from './sd-config/sd-config.module';
     VoteModule,
     ImageGenerationModule,
     BullQueuesModule,
-    EventEmmiter,
+    EventEmitter,
     SdConfigModule,
   ],
   controllers: [],
