@@ -30,7 +30,7 @@
         <div class="qw-flex qw-flex-col qw-gap-3 qw-px-3">
           <ImageCardDetailed v-for="image in clipboard" :key="image.id" :image="image" hide-send-to-v-clip>
             <template #menu-item>
-              <v-list-item @click="generateStore.copyFromClipboard(image)">
+              <v-list-item @click="generateStore.sendToGenerate(image)">
                 <template v-slot:prepend>
                   <v-icon size="small">
                     mdi-upload

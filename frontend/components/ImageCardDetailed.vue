@@ -59,6 +59,16 @@
                 Send image to virtual clipboard
               </v-list-item-title>
             </v-list-item>
+            <v-list-item @click="sendToGenerate(imageToShow)">
+              <template v-slot:prepend>
+                <v-icon size="small">
+                  mdi-upload
+                </v-icon>
+              </template>
+              <v-list-item-title class="!qw-text-sm">
+                Send to generate
+              </v-list-item-title>
+            </v-list-item>
             <v-list-item @click="copyImageInfoToClipboard(imageToShow)">
               <template #prepend>
                 <v-icon size="small">
@@ -203,6 +213,7 @@ const displayingInfo = ref(false);
 const apiBaseURL = getApiBaseURL();
 
 const clipboardStore = useClipboardStore();
+const generateStore = useGenerateStore();
 
 const modelHashesNames: Record<string, string> = Object.fromEntries(
   Object.entries(modelHashesMap).map(([key, value]) => [value, key])
@@ -231,6 +242,10 @@ const copyImageInfoToClipboard = (image?: ImageObject) => {
 const sendImageInfoToVClip = (image?: ImageObject) => {
   if (!image) return;
   clipboardStore.addImage(image);
+};
+const sendToGenerate = (image?: ImageObject) => {
+  if (!image) return;
+  generateStore.sendToGenerate(image);
 };
 
 const downloadImage = (imageId?: string) => {

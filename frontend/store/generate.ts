@@ -35,7 +35,7 @@ export const useGenerateStore = definePiniaStore('generate', () => {
     height.value = DEFAULT_HEIGHT;
   };
 
-  const copyFromClipboard = (image: ImageObject) => {
+  const sendToGenerate = (image: ImageObject) => {
     prompt.value = image.prompt;
     negativePrompt.value = image.negativePrompt;
     // seed.value = image.seed;
@@ -56,7 +56,7 @@ export const useGenerateStore = definePiniaStore('generate', () => {
     cfg,
     width,
     height,
-    copyFromClipboard,
+    sendToGenerate,
     resetGenerateState,
   };
 });
