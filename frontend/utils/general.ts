@@ -33,14 +33,16 @@ export const playSound = async (soundUrl: SoundsPaths) => {
   await audio.play();
 };
 
-export const getImageDimensions = (image: ImageObject) => {
+export const getImageDimensions = (image?: ImageObject) => {
+  if (!image) return {};
   const { width, height } = image;
-  const ratio = width / height;
-  const isLandscape = ratio > 1.05;
-  const isPortrait = ratio < 0.95;
+  const aspectRatio = width / height;
+  const isLandscape = aspectRatio > 1.05;
+  const isPortrait = aspectRatio < 0.95;
   return {
     width,
     height,
+    aspectRatio,
     isTall: isPortrait,
     isWide: isLandscape,
   };

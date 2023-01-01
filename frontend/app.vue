@@ -1,5 +1,5 @@
 <template>
-  <v-app full-height>
+  <v-app class="aiim-v-app">
     <NuxtLayout>
       <NuxtPage/>
     </NuxtLayout>
@@ -15,3 +15,9 @@ useHead({
  ]
 })
 </script>
+<style lang="scss">
+.aiim-v-app {
+  min-height: 100vh !important;
+  height: auto !important;
+}
+</style>

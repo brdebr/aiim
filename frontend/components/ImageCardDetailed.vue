@@ -13,6 +13,7 @@
       :class="{
         'voted-img-toolbar--detailed': displayingInfo,
       }"
+      :style="styleAspectRatio"
       density="compact"
     >
       <template #prepend>
@@ -145,8 +146,8 @@
         </div>
       </template>
       <template #extension v-if="displayingInfo">
-        <div class="qw-px-3 qw-pt-3 qw-flex qw-flex-col qw-gap-3 qw-text-sm qw-w-full qw-h-full">
-          <div class="qw-grid qw-gap-3 qw-grid-cols-2 <<md:qw-grid-cols-1">
+        <div class="qw-px-3 qw-pt-3 qw-pb-4 qw-flex qw-flex-col qw-gap-3 qw-text-sm qw-w-full qw-h-full qw-overflow-y-auto">
+          <div class="qw-grid qw-gap-3 qw-grid-cols-2 <md:qw-grid-cols-1">
             <v-sheet rounded class="image-field-container image-field-container--small">
               <span class="image-field-container__label">
                 Id:
@@ -164,7 +165,7 @@
               </span>
             </v-sheet>
           </div>
-          <div class="qw-grid qw-gap-3 qw-grid-cols-2 <<md:qw-grid-cols-1">
+          <div class="qw-grid qw-gap-3 qw-grid-cols-2 <md:qw-grid-cols-1">
             <v-sheet rounded class="image-field-container image-field-container--small">
               <span class="image-field-container__label">
                 Seed:
@@ -271,6 +272,13 @@ const downloadImage = (imageId?: string) => {
 const imageToShow = computed(() => {
   if (props.vote) return props.vote.image;
   if (props.image) return props.image;
+});
+const styleAspectRatio = computed(() => {
+  if (!imageToShow.value || !displayingInfo.value) return {};
+  const { width, height } = getImageDimensions(imageToShow.value);
+  return {
+    aspectRatio: `${width} / ${height}`,
+  };
 });
 
 const imageCard = ref<InstanceType<typeof ImageCard>>();

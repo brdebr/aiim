@@ -1,11 +1,12 @@
 <template>
   <v-card rounded="lg" :ripple="false">
     <v-img
+      class="image-card__image"
       ref="imageEl"
       :alt="props.image.prompt"
       :title="props.showTitle && !isFullscreen ? props.image.prompt : null"
       :src="`${apiBaseURL}/api/images/view/${props.image.id}.png`"
-      :aspect-ratio="props.image.width / props.image.height"
+      :aspect-ratio="aspectRatio"
       @click="exitFullscreen"
     >
       <slot />
@@ -50,9 +51,18 @@ const props = withDefaults(defineProps<ImageCardProps>(), {
   showTitle: true,
 });
 
+const { aspectRatio } = getImageDimensions(props.image);
+
 defineExpose({
   goFullscreen,
   exitFullscreen,
   toggleFullscreen,
 });
 </script>
+<style lang="scss">
+.image-card__image {
+  img {
+    background-color: #212121;
+  }
+}
+</style>

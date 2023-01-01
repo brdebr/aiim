@@ -378,7 +378,6 @@ const copyPromptFromClipboard = async () => {
     console.log(imageObject);
     prompt.value = imageObject.prompt;
     negativePrompt.value = imageObject.negativePrompt;
-    // seed.value = imageObject.seed;
     sampler.value = imageObject.sampler;
     steps.value = imageObject.steps;
     cfg.value = imageObject.cfg;
