@@ -8,11 +8,11 @@
       color="indigo-darken-4"
       :elevation="0"
       border="md"
-      class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px] qw-mb-28"
+      class="qw-mx-auto <sm:qw-max-w-[100%] md:qw-max-w-[1080px] 2xl:qw-max-w-[1440px] qw-mb-2"
       theme="dark"
     >
       <div class="qw-px-5 qw-py-4">
-        <div class="qw-mb-2 qw-flex qw-items-center">
+        <div class="qw-mb-2 qw-flex qw-gap-3 qw-items-center">
           <HelpLabel class="qw-mr-auto">
             <template #default>
               The prompt is the text that the AI will use to generate the
@@ -22,6 +22,42 @@
             </template>
             <template #label>
               <span class="text-body-2"> Prompt </span>
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
+              Embeddings are a way to saving a detailed description into compressed bytes that the AI can understand.<br />
+              These embeddings are created by training the AI on a dataset of images to learn the intrinsic properties of the images.<br />
+              You can combine multiple embeddings in the prompt or negative prompt.<br />
+            </template>
+            <template #label>
+              <v-menu
+                transition="scroll-y-transition"
+                :max-height="400"
+                location="bottom end"
+              >
+                <template #activator="{ props }">
+                  <v-btn
+                    size="x-small"
+                    variant="outlined"
+                    class="copy-btn text-caption"
+                    v-bind="props"
+                  >
+                    [ {{ embeddings.length }} ] Embeddings
+                  </v-btn>
+                </template>
+                <v-list v-if="embeddings.length" class="qw-mt-1" density="compact">
+                  <v-list-item
+                    v-for="embedding in embeddings"
+                    :key="embedding"
+                    :value="embedding"
+                  >
+                    <v-list-item-title @click="appendEmbedding(embedding)">
+                      {{ embedding }}
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </template>
           </HelpLabel>
           <HelpLabel>
@@ -36,40 +72,49 @@
                 class="copy-btn text-caption"
                 @click="copyPromptFromClipboard"
               >
-                Get from Clipboard
+                From clipboard
               </v-btn>
             </template>
           </HelpLabel>
-          <v-btn
-              prepend-icon="mdi-refresh"
-              size="x-small"
-              variant="outlined"
-              class="copy-btn text-caption qw-ml-2"
-              @click="refreshGenerate"
-            >
-              Reset
-            </v-btn>
         </div>
         <div class="qw-mt-3">
-          <v-textarea variant="outlined" v-model="prompt" counter rows="2" />
+          <v-textarea variant="outlined" v-model="prompt" rows="2" />
         </div>
-        <HelpLabel>
-          <template #default>
-            The negative prompt is the text that the AI will try to avoid when
-            generating the image.<br />
-            For example, if you want to generate an image of a forest and use
-            "green" as negative prompt, the AI probably will try to generate a
-            forest in autumn.<br />
-          </template>
-          <template #label>
-            <span class="text-body-2"> Negative prompt </span>
-          </template>
-        </HelpLabel>
+        <div class="qw-mb-2 qw-flex qw-items-center">
+          <HelpLabel class="qw-mr-auto">
+            <template #default>
+              The negative prompt is the text that the AI will try to avoid when
+              generating the image.<br />
+              For example, if you want to generate an image of a forest and use
+              "green" as negative prompt, the AI probably will try to generate a
+              forest in autumn.<br />
+            </template>
+            <template #label>
+              <span class="text-body-2"> Negative prompt </span>
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
+              This will reset the prompt configuration to the default values.<br />
+            </template>
+            <template #label>
+              <v-btn
+                prepend-icon="mdi-refresh"
+                size="x-small"
+                variant="outlined"
+                class="copy-btn text-caption"
+                @click="refreshGenerate"
+              >
+                Reset configs
+              </v-btn>
+            </template>
+          </HelpLabel>
+        </div>
         <div class="qw-mt-3">
           <v-textarea variant="outlined" v-model="negativePrompt" rows="2" />
         </div>
         <div class="qw-mt-3 md:qw-mb-6 qw-flex <lg:qw-flex-col qw-gap-3">
-          <HelpLabel class="qw-mr-1">
+          <HelpLabel class="lg:qw-mr-1">
             <template #default>
               The sampler is the algorithm that the AI will use to generate the
               image.<br />
@@ -93,7 +138,7 @@
               </ClientOnly>
             </template>
           </HelpLabel>
-          <HelpLabel class="qw-mr-9">
+          <HelpLabel class="lg:qw-mr-9">
             <template #default>
               The number of steps is the number of iterations that the AI will
               use to generate the image.<br />
@@ -211,7 +256,7 @@
               </ClientOnly>
             </template>
           </HelpLabel>
-          <HelpLabel class="mr-5">
+          <HelpLabel class="lg:qw-mr-5 qw-h-12">
             <template #default>
               This option will improve the quality of the faces in the image using the CodeFormer model.<br />
               But it will take longer to generate the image because it needs to
@@ -228,7 +273,7 @@
               </ClientOnly>
             </template>
           </HelpLabel>
-          <HelpLabel>
+          <HelpLabel class="qw-h-12">
             <template #default>
               This option will generate images that are repeatable in a grid.<br />
               This is useful for creating textures or patterns.<br />
@@ -245,7 +290,7 @@
             </template>
           </HelpLabel>
           <v-spacer class="qw-hidden lg:qw-block" />
-          <div class="qw-flex-grow qw-grid lg:qw-grid-cols-2 qw-gap-3 lg:qw-max-w-[331px]">
+          <div class="qw-flex-grow qw-grid lg:qw-grid-cols-2 qw-gap-3 <lg:qw-mt-1 lg:qw-max-w-[331px]">
             <HelpLabel>
               <template #default>
                 The number of images that will be generated at the same time.<br />
@@ -276,7 +321,7 @@
                   density="comfortable"
                   type="number"
                   step="1"
-                  max="4"
+                  max="100"
                   min="1"
                   hide-details
                 />
@@ -294,7 +339,7 @@
             color="blue-darken-4"
             @click="generateImage"
           >
-            DO IT
+            Generate [ {{ imagesPerBatch * batchesToGenerate }} ] images
           </v-btn>
         </div>
         <div class="qw-my-3" v-if="imagesInQueue">
@@ -495,6 +540,10 @@ const copyPromptFromClipboard = async () => {
   }
 };
 
+const appendEmbedding = (embedding: string) => {
+  prompt.value += ` ${embedding}`;
+}
+
 const generateDrawer = ref(false);
 const toggleGalleryDrawer = () => {
   generateDrawer.value = !generateDrawer.value;
@@ -518,8 +567,12 @@ const toggleGalleryDrawer = () => {
 }
 .help-label-component {
   .v-checkbox {
-    .v-label {
-      margin-left: 6px;
+    .v-selection-control {
+      width: 100%;
+      .v-label {
+        margin-left: 6px;
+        flex-grow: 1;
+      }
     }
   }
 }

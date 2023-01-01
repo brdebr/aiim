@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsBooleanString,
   IsArray,
+  IsBoolean,
 } from 'class-validator';
 
 export const Samplers = [
@@ -86,7 +87,7 @@ export class Text2ImageDto {
   public firstPassHr?: number;
 
   // Face restoration
-  @IsBooleanString()
+  @IsBoolean()
   @IsOptional()
   public faceRestoration?: boolean;
 
@@ -96,7 +97,7 @@ export class Text2ImageDto {
   public tags?: string[];
 
   // Tiling
-  @IsBooleanString()
+  @IsBoolean()
   @IsOptional()
   public tiling?: boolean;
 

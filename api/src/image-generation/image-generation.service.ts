@@ -27,7 +27,7 @@ export class ImageGenerationService {
 
   async generateImage(params: Text2ImageDto, userId: string) {
     for (const i of Array(params.batchesToGenerate).keys()) {
-      this.logger.log(`Adding job ${i + 1} of ${params.batchesToGenerate + 1}`);
+      this.logger.log(`Adding job ${i + 1}/${params.batchesToGenerate}`);
       await this.generationQueue.add(
         'txt2img',
         { params, user: userId },

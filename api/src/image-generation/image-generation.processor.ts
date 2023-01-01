@@ -130,19 +130,21 @@ export class ImageGenerationProcessor {
 
   parseResponseIntoImageObject(
     response: ImageGenerationResponse,
-  ): Omit<
-    ImageObject,
-    | 'id'
-    | 'number'
-    | 'fileName'
-    | 'imageSize'
-    | 'rawParameters'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'generatedAt'
-    | 'timeToGenerate'
-    | 'tags'
-    | 'embeddings'
+  ): Array<
+    Omit<
+      ImageObject,
+      | 'id'
+      | 'number'
+      | 'fileName'
+      | 'imageSize'
+      | 'rawParameters'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'generatedAt'
+      | 'timeToGenerate'
+      | 'tags'
+      | 'embeddings'
+    >
   > {
     const { images, parameters, info } = response;
     const {
@@ -158,27 +160,34 @@ export class ImageGenerationProcessor {
       firstphase_width,
       firstphase_height,
     } = parameters;
-
     const infoObject: Record<string, string> = JSON.parse(info);
 
-    const imageBuffer = Buffer.from(images[0], 'base64');
+    const result = [];
+    let i = 0;
 
-    return {
-      prompt,
-      negativePrompt: negative_prompt,
-      steps,
-      seed: infoObject?.['seed'].toString() || undefined,
-      sampler: sampler_name,
-      cfg: cfg_scale,
-      width,
-      height,
-      faceRestoration: restore_faces ? 'Codeformer' : undefined,
-      denoisingHr: denoising_strength,
-      imageFile: imageBuffer,
-      modelHash: infoObject['sd_model_hash'],
-      model: modelHashesNames[infoObject['sd_model_hash']],
-      firstPassHr: null,
-    };
+    for (const imageData of images) {
+      const imageBuffer = Buffer.from(imageData, 'base64');
+      const imageObjectData = {
+        prompt,
+        negativePrompt: negative_prompt,
+        steps,
+        seed: infoObject?.['all_seeds']?.[i].toString() || undefined,
+        sampler: sampler_name,
+        cfg: cfg_scale,
+        width,
+        height,
+        faceRestoration: restore_faces ? 'Codeformer' : undefined,
+        denoisingHr: denoising_strength,
+        imageFile: imageBuffer,
+        modelHash: infoObject['sd_model_hash'],
+        model: modelHashesNames[infoObject['sd_model_hash']],
+        firstPassHr: null,
+      };
+      i++;
+      result.push(imageObjectData);
+    }
+
+    return result;
   }
 
   parseParams(params: Text2ImageDto): ImageGenerationRequest {
@@ -268,31 +277,34 @@ export class ImageGenerationProcessor {
     this.logger.log(`Image generated in ${timeInSeconds}s`);
 
     try {
-      const imageObject = this.parseResponseIntoImageObject(
+      const imageObjects = this.parseResponseIntoImageObject(
         data,
-      ) as ImageObject;
+      ) as Array<ImageObject>;
 
-      imageObject.timeToGenerate = timeToGenerate;
-      imageObject.generatedAt = new Date();
-      imageObject.tags = params?.tags || [];
-      imageObject.embeddings = [
-        ...(await this.getEmbeddingsUsedInPrompt(params.prompt)),
-        ...(await this.getEmbeddingsUsedInPrompt(params.negativePrompt)),
-      ];
-      imageObject.imageSize = imageObject.imageFile.byteLength;
+      for (const imageObject of imageObjects) {
+        imageObject.timeToGenerate = timeToGenerate;
+        imageObject.generatedAt = new Date();
+        imageObject.tags = params?.tags || [];
+        imageObject.embeddings = [
+          ...(await this.getEmbeddingsUsedInPrompt(params.prompt)),
+          ...(await this.getEmbeddingsUsedInPrompt(params.negativePrompt)),
+        ];
+        imageObject.imageSize = imageObject.imageFile.byteLength;
 
-      this.logger.log(`Saving to database...`);
-      const generatedImageObject = await this.prisma.imageObject.create({
-        data: imageObject,
-        select: defaultImageFieldsSelect as {
-          [P in keyof ImageObject]: boolean;
-        },
-      });
-      this.logger.log(`Generated image with ID: ${generatedImageObject.id}`);
-      this.eventEmitter.emit('image-generated', {
-        image: generatedImageObject,
-        user,
-      });
+        this.logger.log(`Saving to database...`);
+        const generatedImageObject = await this.prisma.imageObject.create({
+          data: imageObject,
+          select: defaultImageFieldsSelect as {
+            [P in keyof ImageObject]: boolean;
+          },
+        });
+        this.logger.log(`Generated image with ID: ${generatedImageObject.id}`);
+        this.eventEmitter.emit('image-generated', {
+          image: generatedImageObject,
+          user,
+        });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
       const finalTime = Date.now();
       const finalTimeInSeconds = (finalTime - startTime) / 1000;
       this.logger.log(
