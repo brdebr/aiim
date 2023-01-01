@@ -8,18 +8,14 @@ export type SdModel = {
 };
 
 export const useSdConfig = () => {
-  const status = ref<'Running' | 'Stopped' | ''>('');
-  const runningFrom = ref('');
-  const logs = ref('');
   const fetchOptions = getFetchOptions();
 
-  const getSdStatus = async () => {
+  const status = ref<'Running' | 'Stopped' | ''>('');
+  const runningFrom = ref('');
+  const fetchSdStatus = async () => {
     const response = await $fetch<{status: string, statusTxt: string}>('/api/sd-config/engine-status', fetchOptions);
     status.value = response.status === 'running' ? 'Running' : 'Stopped';
     runningFrom.value = status.value === 'Running' ? response.statusTxt : '';
-    if (status.value !== 'Running') return;
-    await getConfigs();
-    await getEmbeddings();
   }
 
   const loadingStartSd = ref(false);
@@ -29,13 +25,25 @@ export const useSdConfig = () => {
       await $fetch<string>('/api/sd-config/engine-start', {
         ...fetchOptions,
         method: 'POST',
+        headers: {
+          'Cache-Control': 'no-cache',
+          ...fetchOptions.headers
+        },
       });
+      await new Promise(resolve => setTimeout(resolve, 200));
+      await refresh();
     } catch (e) {
       console.log(`Error starting SD: ${e}`);
+    } finally {
+      loadingStartSd.value = false;
     }
-    loadingStartSd.value = false;
-    await new Promise(resolve => setTimeout(resolve, 200));
-    await Promise.all([refresh(), getEmbeddings()]);
+  }
+
+  const refresh = async () => {
+    await fetchSdStatus();
+    if ( status.value !== 'Running' ) return;
+    await Promise.all([fetchSdModels(), fetchEmbeddings(), fetchConfigs()]);
+    selectedModel.value = configs.value['sd_model_checkpoint'];
   }
 
   const loadingStopSd = ref(false);
@@ -51,9 +59,10 @@ export const useSdConfig = () => {
     }
     loadingStopSd.value = false;
     await new Promise(resolve => setTimeout(resolve, 200));
-    await refresh();
+    await fetchSdStatus();
   }
 
+  const logs = ref('');
   const getSdLogs = async () => {
     const response = await $fetch<string>('/api/sd-config/engine-logs', fetchOptions);
     // replacing everything that is not a letter, number, space, or punctuation with empty
@@ -64,15 +73,23 @@ export const useSdConfig = () => {
   // Models
 
   const models = ref<SdModel[]>([]);
+  const fetchSdModels = async () => {
+    const response = await $fetch<SdModel[]>('/api/sd-config/sd-models', fetchOptions);
+    models.value = response;
+  }
 
   const embeddings = ref<string[]>([]);
+  const fetchEmbeddings = async () => {
+    const response = await $fetch<string[]>('/api/sd-config/embeddings', fetchOptions);
+    embeddings.value = response;
+  }
 
   const configs = ref<Record<string, string>>({});
-
-  const getSdModels = async () => {
-    const response = await $fetch<SdModel[]>('/api/sd-config/sd-models', fetchOptions);
-    return response;
+  const fetchConfigs = async () => {
+    const response = await $fetch<Record<string, string>>('/api/sd-config/configs', fetchOptions);
+    configs.value = { ...response};
   }
+
 
   const setSdModel = async (modelTitle: string) => {
     const response = await $fetch<string>('/api/sd-config/sd-model', {
@@ -80,16 +97,6 @@ export const useSdConfig = () => {
       method: 'POST',
       body: JSON.stringify({ modelTitle }),
     });
-  }
-
-  const getConfigs = async () => {
-    const response = await $fetch<Record<string, string>>('/api/sd-config/configs', fetchOptions);
-    configs.value = { ...response};
-  }
-
-  const getEmbeddings = async () => {
-    const response = await $fetch<string[]>('/api/sd-config/embeddings', fetchOptions);
-    embeddings.value = response;
   }
 
   const selectedModel = ref('');
@@ -100,15 +107,7 @@ export const useSdConfig = () => {
     loadingModel.value = false;
   };
 
-  const refresh = async () => {
-    await getSdStatus();
-    if ( status.value !== 'Running' ) return;
-    [models.value] = await Promise.all([getSdModels(), getConfigs()]);
-    selectedModel.value = configs.value['sd_model_checkpoint'];
-  }
-
   return {
-    getSdStatus,
     status,
     runningFrom,
     logs,
@@ -118,15 +117,15 @@ export const useSdConfig = () => {
     loadingStartSd,
     getSdLogs,
     models,
-    getSdModels,
+    fetchSdModels,
     setSdModel,
-    getConfigs,
+    fetchConfigs,
     configs,
     refresh,
     selectModel,
     loadingModel,
     selectedModel,
     embeddings,
-    getEmbeddings,
+    fetchEmbeddings,
   }
 }

@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
 import { setSdModelDto } from './dto/sdConfigDto';
 import { SdConfigService } from './sd-config.service';
 
 @Controller('sd-config')
 export class SdConfigController {
   constructor(private readonly sdConfigService: SdConfigService) {}
+
+  private readonly logger = new Logger(SdConfigController.name);
 
   @Get('engine-status')
   async getEngineStatus() {
@@ -35,12 +37,14 @@ export class SdConfigController {
   @Post('engine-start')
   async startSdEngine() {
     await this.sdConfigService.startStableDiffusionContainer();
+    this.logger.log('Started SD Engine petition');
     return 'Started';
   }
 
   @Post('engine-stop')
   async stopSdEngine() {
     await this.sdConfigService.stopStableDiffusionContainer();
+    this.logger.log('Stopped SD Engine petition');
     return 'Stopped';
   }
 

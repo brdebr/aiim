@@ -38,16 +38,23 @@ export class SdConfigService {
     const password = this.configService.get('PORTAINER_PASS');
 
     const { data } = await firstValueFrom(
-      this.httpService.post<{ jwt: string }>(
-        '/auth',
-        {
-          username,
-          password,
-        },
-        {
-          baseURL: this.configService.get('PORTAINER_URL'),
-        },
-      ),
+      this.httpService
+        .post<{ jwt: string }>(
+          '/auth',
+          {
+            username,
+            password,
+          },
+          {
+            baseURL: this.configService.get('PORTAINER_URL'),
+          },
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            this.logger.error(error);
+            throw 'Ohh nooo, an error happened getting the Portainer token! :(';
+          }),
+        ),
     );
     this.logger.log('Got Portainer token');
     return data;
@@ -57,15 +64,22 @@ export class SdConfigService {
     const jwtToken = token || (await this.getPortainerToken()).jwt;
     this.logger.log('Getting Portainer status...');
     const { data } = await firstValueFrom(
-      this.httpService.get<PortainerContainer[]>(
-        '/endpoints/2/docker/containers/json?all=true',
-        {
-          baseURL: this.configService.get('PORTAINER_URL'),
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
+      this.httpService
+        .get<PortainerContainer[]>(
+          '/endpoints/2/docker/containers/json?all=true',
+          {
+            baseURL: this.configService.get('PORTAINER_URL'),
+            headers: {
+              Authorization: `Bearer ${jwtToken}`,
+            },
           },
-        },
-      ),
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            this.logger.error(error);
+            throw 'Ohh nooo, an error happened getting the Portainer status! :(';
+          }),
+        ),
     );
     this.logger.log('Got Portainer status');
     return data;
@@ -96,7 +110,7 @@ export class SdConfigService {
       forkJoin([
         startSdEngineRequest.pipe(
           catchError((error: AxiosError) => {
-            this.logger.error(error.response.data);
+            this.logger.error(error);
             throw 'Ohh nooo, an error happened starting the SD container! :(';
           }),
         ),
@@ -128,7 +142,8 @@ export class SdConfigService {
     embeddings.sort((a, b) => a.localeCompare(b));
 
     this.embeddings = embeddings;
-    this.logger.log(`Found [ ${embeddings.length} ] embeddings!`);
+    this.logger.log(`Found [ ${embeddings.length} ] embeddings:`);
+    this.logger.log(embeddings.join(', '));
 
     return embeddings;
   }
@@ -140,20 +155,32 @@ export class SdConfigService {
       container.Image.includes('sd-auto'),
     );
     this.logger.log('Stopping Stable Diffusion container...');
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/stop`,
-        {},
-        {
-          baseURL: this.configService.get('PORTAINER_URL'),
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        },
-      ),
-    );
-    this.logger.log('Stopped Stable Diffusion container!');
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .post(
+            `/endpoints/2/docker/containers/${stableDiffusionContainer.Id}/stop`,
+            {},
+            {
+              baseURL: this.configService.get('PORTAINER_URL'),
+              headers: {
+                Authorization: `Bearer ${jwtToken}`,
+              },
+            },
+          )
+          .pipe(
+            catchError((error: AxiosError) => {
+              this.logger.error(error);
+              throw 'Ohh nooo, an error happened stopping the SD container! :(';
+            }),
+          ),
+      );
+      this.logger.log('Stopped Stable Diffusion container!');
+      return data;
+    } catch (error) {
+      this.logger.error(error);
+      return 'Error stopping the SD container';
+    }
   }
 
   async getStableDiffusionLogs(token?: string) {
@@ -170,60 +197,102 @@ export class SdConfigService {
       tail: '50',
     });
 
-    const { data } = await firstValueFrom(
-      this.httpService.get<string>(
-        `/endpoints/2/docker/containers/${
-          stableDiffusionContainer.Id
-        }/logs?${params.toString()}`,
-        {
-          baseURL: this.configService.get('PORTAINER_URL'),
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        },
-      ),
-    );
-    this.logger.log('Got Stable Diffusion logs');
-    const logs = data.toString();
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .get<string>(
+            `/endpoints/2/docker/containers/${
+              stableDiffusionContainer.Id
+            }/logs?${params.toString()}`,
+            {
+              baseURL: this.configService.get('PORTAINER_URL'),
+              headers: {
+                Authorization: `Bearer ${jwtToken}`,
+              },
+            },
+          )
+          .pipe(
+            catchError((error: AxiosError) => {
+              this.logger.error(error);
+              throw 'Ohh nooo, an error happened getting the SD logs! :(';
+            }),
+          ),
+      );
+      this.logger.log('Got Stable Diffusion logs');
+      const logs = data.toString();
 
-    return logs;
+      return logs;
+    } catch (error) {
+      this.logger.error(error);
+      return 'Error getting the SD logs';
+    }
   }
 
   async getModels() {
-    const { data } = await firstValueFrom(
-      this.httpService
-        .get<SdModel[]>('/sd-models', {
-          baseURL: this.configService.get('GENERATION_API_URL'),
-        })
-        .pipe(
-          catchError(() => {
-            return of({ data: [] as SdModel[] });
-          }),
-        ),
-    );
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .get<SdModel[]>('/sd-models', {
+            baseURL: this.configService.get('GENERATION_API_URL'),
+          })
+          .pipe(
+            catchError(() => {
+              return of({ data: [] as SdModel[] });
+            }),
+          ),
+      );
+      return data;
+    } catch (error) {
+      this.logger.error('Error getting the models');
+      this.logger.error(error);
+      return [];
+    }
   }
 
   async setModel(modelTitle: string) {
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        '/options',
-        { sd_model_checkpoint: modelTitle },
-        {
-          baseURL: this.configService.get('GENERATION_API_URL'),
-        },
-      ),
-    );
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .post(
+            '/options',
+            { sd_model_checkpoint: modelTitle },
+            {
+              baseURL: this.configService.get('GENERATION_API_URL'),
+            },
+          )
+          .pipe(
+            catchError((error: AxiosError) => {
+              this.logger.error(error);
+              throw 'Ohh nooo, an error happened setting the model! :(';
+            }),
+          ),
+      );
+      return data;
+    } catch (error) {
+      this.logger.error(error);
+      return 'Error setting the model';
+    }
   }
 
   async getConfigs() {
-    const { data } = await firstValueFrom(
-      this.httpService.get<SdConfig>('/options', {
-        baseURL: this.configService.get('GENERATION_API_URL'),
-      }),
-    );
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .get<SdConfig>('/options', {
+            baseURL: this.configService.get('GENERATION_API_URL'),
+          })
+          .pipe(
+            catchError((error: AxiosError) => {
+              this.logger.error(error);
+              throw 'Ohh nooo, an error happened getting the configs! :(';
+            }),
+          ),
+      );
+      return data;
+    } catch (error) {
+      this.logger.error(error);
+      return {};
+    }
   }
 
   getEmbeddings() {
