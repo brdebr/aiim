@@ -36,6 +36,10 @@ export const useGenerate = () => {
     cfg,
     width,
     height,
+    restoreFaces,
+    tiling,
+    batchesToGenerate,
+    imagesPerBatch,
    } = storeToRefs(generateStore);
 
   const socketStore = useSocketStore();
@@ -52,6 +56,10 @@ export const useGenerate = () => {
         width: width.value,
         height: height.value,
         seed: seed.value || undefined,
+        faceRestoration: restoreFaces.value,
+        tiling: tiling.value,
+        batchesToGenerate: batchesToGenerate.value,
+        imagesPerBatch: imagesPerBatch.value,
       };
       const response = await $fetch<{ queuePosition: number }>(
         '/api/generate/txt2img',
@@ -85,5 +93,9 @@ export const useGenerate = () => {
     samplers: Samplers,
     refreshGenerate: generateStore.resetGenerateState,
     generatedImages,
+    restoreFaces,
+    tiling,
+    batchesToGenerate,
+    imagesPerBatch,
   };
 };

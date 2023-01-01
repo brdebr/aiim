@@ -68,8 +68,8 @@
         <div class="qw-mt-3">
           <v-textarea variant="outlined" v-model="negativePrompt" rows="2" />
         </div>
-        <div class="qw-mt-3 qw-flex <lg:qw-flex-col qw-gap-3">
-          <HelpLabel>
+        <div class="qw-mt-3 md:qw-mb-6 qw-flex <lg:qw-flex-col qw-gap-3">
+          <HelpLabel class="qw-mr-1">
             <template #default>
               The sampler is the algorithm that the AI will use to generate the
               image.<br />
@@ -93,7 +93,7 @@
               </ClientOnly>
             </template>
           </HelpLabel>
-          <HelpLabel>
+          <HelpLabel class="qw-mr-9">
             <template #default>
               The number of steps is the number of iterations that the AI will
               use to generate the image.<br />
@@ -183,6 +183,106 @@
               </ClientOnly>
             </template>
           </HelpLabel>
+        </div>
+        <div class="qw-mt-3 qw-flex <lg:qw-flex-col qw-gap-3">
+          <HelpLabel>
+            <template #default>
+              The seed is the random number that the AI will use to start generating the image.<br />
+              If you want to generate the same image again, you can use the same seed.<br />
+              But will only generate the exact same image if you use the same configurations.<br />
+              When you find a good image, you can use that seed and play with the steps to generate a more refined image.<br />
+              Or do small changes to the prompt or configuration and see how the image changes.<br />
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-text-field
+                  v-model="seed"
+                  hide-details
+                  persistent-placeholder
+                  placeholder="Random seed"
+                  label="Seed"
+                  class="seed-input"
+                  variant="outlined"
+                  density="comfortable"
+                  type="text"
+                  :title="seed"
+                  style="width: 120px"
+                />
+              </ClientOnly>
+            </template>
+          </HelpLabel>
+          <HelpLabel class="mr-5">
+            <template #default>
+              This option will improve the quality of the faces in the image using the CodeFormer model.<br />
+              But it will take longer to generate the image because it needs to
+              load and run the restoration model for each image.
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-checkbox
+                  label="Fix faces"
+                  variant="outlined"
+                  v-model="restoreFaces"
+                  hide-details
+                />
+              </ClientOnly>
+            </template>
+          </HelpLabel>
+          <HelpLabel>
+            <template #default>
+              This option will generate images that are repeatable in a grid.<br />
+              This is useful for creating textures or patterns.<br />
+            </template>
+            <template #label>
+              <ClientOnly>
+                <v-checkbox
+                  label="Tiling"
+                  variant="outlined"
+                  v-model="tiling"
+                  hide-details
+                />
+              </ClientOnly>
+            </template>
+          </HelpLabel>
+          <v-spacer class="qw-hidden lg:qw-block" />
+          <div class="qw-flex-grow qw-grid lg:qw-grid-cols-2 qw-gap-3 lg:qw-max-w-[331px]">
+            <HelpLabel>
+              <template #default>
+                The number of images that will be generated at the same time.<br />
+              </template>
+              <template #label>
+                <v-text-field
+                  v-model.number="imagesPerBatch"
+                  label="Images per batch"
+                  variant="outlined"
+                  density="comfortable"
+                  type="number"
+                  step="1"
+                  max="16"
+                  min="1"
+                  hide-details
+                />
+              </template>
+            </HelpLabel>
+            <HelpLabel class="qw-inline-block">
+              <template #default>
+                The number of batches of images that will be generated.<br />
+              </template>
+              <template #label>
+                <v-text-field
+                  v-model.number="batchesToGenerate"
+                  label="Num of batches"
+                  variant="outlined"
+                  density="comfortable"
+                  type="number"
+                  step="1"
+                  max="4"
+                  min="1"
+                  hide-details
+                />
+              </template>
+            </HelpLabel>
+          </div>
         </div>
         <div class="qw-mt-8 qw-mb-3">
           <v-btn
@@ -342,6 +442,10 @@ const {
   possibleImageSideSizes,
   samplers,
   refreshGenerate,
+  restoreFaces,
+  tiling,
+  batchesToGenerate,
+  imagesPerBatch,
 } = useGenerate();
 
 const {
@@ -406,6 +510,17 @@ const toggleGalleryDrawer = () => {
 .generate-btn {
   .v-btn__overlay {
     background-color: rgba(0, 0, 0);
+  }
+}
+.seed-input input {
+  font-size: 13px;
+  padding-right: 10px;
+}
+.help-label-component {
+  .v-checkbox {
+    .v-label {
+      margin-left: 6px;
+    }
   }
 }
 </style>

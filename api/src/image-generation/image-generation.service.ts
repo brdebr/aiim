@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bull';
 import { Text2ImageDto } from './dto/generateDto';
 import {
@@ -16,37 +16,7 @@ export class ImageGenerationService {
     private generationQueue: Queue<TextToImageGenerationJobType>,
   ) {}
 
-  parseParams(params: Text2ImageDto): ImageGenerationRequest {
-    const {
-      prompt,
-      negativePrompt,
-      steps,
-      sampler,
-      cfg,
-      seed,
-      width,
-      height,
-      faceRestoration,
-      denoisingHr,
-      firstPassHr,
-    } = params;
-
-    return {
-      prompt,
-      negative_prompt: negativePrompt,
-      sampler_name: sampler,
-      cfg_scale: cfg,
-      seed: parseInt(`${seed}`),
-      width,
-      height,
-      restore_faces: faceRestoration,
-      denoising_strength: denoisingHr,
-      firstphase_width: firstPassHr,
-      steps,
-      batch_size: 1,
-      n_iter: 1,
-    };
-  }
+  private readonly logger = new Logger(ImageGenerationService.name);
 
   async getUserQueue(userId: string) {
     const jobs = await this.generationQueue.getJobs(['waiting', 'active']);
@@ -56,11 +26,14 @@ export class ImageGenerationService {
   }
 
   async generateImage(params: Text2ImageDto, userId: string) {
-    this.generationQueue.add(
-      'txt2img',
-      { params, user: userId },
-      { timeout: 0 },
-    );
+    for (const i of Array(params.batchesToGenerate).keys()) {
+      this.logger.log(`Adding job ${i + 1} of ${params.batchesToGenerate + 1}`);
+      await this.generationQueue.add(
+        'txt2img',
+        { params, user: userId },
+        { timeout: 0 },
+      );
+    }
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 

@@ -194,6 +194,8 @@ export class ImageGenerationProcessor {
       faceRestoration,
       denoisingHr,
       firstPassHr,
+      imagesPerBatch,
+      tiling,
     } = params;
 
     return {
@@ -205,10 +207,11 @@ export class ImageGenerationProcessor {
       width,
       height,
       restore_faces: faceRestoration,
+      tiling,
       denoising_strength: denoisingHr,
       firstphase_width: firstPassHr,
       steps,
-      batch_size: 1,
+      batch_size: imagesPerBatch,
       n_iter: 1,
     };
   }

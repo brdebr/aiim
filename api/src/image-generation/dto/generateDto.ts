@@ -94,4 +94,19 @@ export class Text2ImageDto {
   @IsOptional()
   @IsArray()
   public tags?: string[];
+
+  // Tiling
+  @IsBooleanString()
+  @IsOptional()
+  public tiling?: boolean;
+
+  // Images per batch
+  @IsNumber()
+  @IsOptional()
+  public imagesPerBatch?: number;
+
+  // Batches
+  @IsNumber()
+  @IsOptional()
+  public batchesToGenerate?: number;
 }

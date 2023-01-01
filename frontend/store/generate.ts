@@ -23,6 +23,11 @@ export const useGenerateStore = definePiniaStore('generate', () => {
   const cfg = ref(DEFAULT_CFG);
   const width = ref(DEFAULT_WIDTH);
   const height = ref(DEFAULT_HEIGHT);
+  const restoreFaces = ref(false);
+  const tiling = ref(false);
+
+  const batchesToGenerate = ref(1);
+  const imagesPerBatch = ref(1);
 
   const resetGenerateState = () => {
     prompt.value = DEFAULT_PROMPT;
@@ -38,7 +43,6 @@ export const useGenerateStore = definePiniaStore('generate', () => {
   const sendToGenerate = (image: ImageObject) => {
     prompt.value = image.prompt;
     negativePrompt.value = image.negativePrompt;
-    // seed.value = image.seed;
     sampler.value = image.sampler;
     steps.value = image.steps;
     cfg.value = image.cfg;
@@ -56,6 +60,10 @@ export const useGenerateStore = definePiniaStore('generate', () => {
     cfg,
     width,
     height,
+    restoreFaces,
+    tiling,
+    batchesToGenerate,
+    imagesPerBatch,
     sendToGenerate,
     resetGenerateState,
   };
