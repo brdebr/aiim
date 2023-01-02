@@ -34,9 +34,13 @@ test.describe('Login', () => {
     // Wait for play page to load.
     await Promise.all([
       waitForResponseAndLog('**/api/sd-config/engine-status', page, info),
-      page.waitForSelector('text=Do it')
     ]);
 
+    await expect(page.locator('button', {
+      hasText: /Generate (.*) images/,
+    }), 'Found generate button').toBeVisible();
+
+    // Expect the page URL to match the expected URL.
     await expect(page, 'Navigated to Generate page').toHaveURL(`${basePage}/generate`);
   });
 
