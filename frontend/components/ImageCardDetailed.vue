@@ -202,6 +202,18 @@
         </div>
       </template>
     </v-toolbar>
+    <div v-if="!displayingInfo" class="qw-relative qw-h-[calc(100%-48px)]">
+      <div class="qw-absolute qw-bottom-3 qw-right-3">
+        <v-btn
+          @click="showInFullscreen"
+          class="fullscreen-btn"
+          color="white"
+          size="x-small"
+          variant="outlined"
+          icon="mdi-eye"
+        />
+      </div>
+    </div>
   </ImageCard>
 </template>
 <script setup lang="ts">
@@ -338,6 +350,14 @@ const props = defineProps<{
 .image-menu-list {
   .v-list-item__prepend>.v-icon {
     margin-inline-end: 20px !important;
+  }
+}
+.fullscreen-btn {
+  @apply qw-bg-sky-500/15;
+  @apply qw-backdrop-filter qw-backdrop-blur;
+  @apply qw-border-[#2196f3];
+  i {
+    @apply qw-text-white;
   }
 }
 </style>
