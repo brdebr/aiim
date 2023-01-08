@@ -19,8 +19,10 @@
     >
       <template #prepend>
         <v-menu
+          v-model="detailsMenuIsOpen"
           transition="scroll-y-transition"
           :menu-props="{ maxHeight: 400 }"
+          :close-on-content-click="false"
         >
           <template #activator="{ props }">
             <v-btn
@@ -31,7 +33,7 @@
             />
           </template>
           <v-list density="compact" class="image-menu-list bg-indigo-darken-4 qw-mt-1">
-            <v-list-item @click="displayingInfo = !displayingInfo">
+            <v-list-item @click="toggleInfo">
               <template #prepend>
                 <v-icon size="small">
                   mdi-information
@@ -52,35 +54,52 @@
               </v-list-item-title>
             </v-list-item>
             <v-list-item v-if="!hideSendToVClip" @click="sendImageInfoToVClip(imageToShow)">
-              <template #prepend>
-                <v-icon size="small">
-                  mdi-archive-arrow-up-outline
-                </v-icon>
+            <v-list-group class="qw-bg-black/20">
+              <template #activator="{ props }">
+                <v-list-item class="bg-indigo-darken-4" v-bind="props">
+                  <template v-slot:prepend>
+                    <v-icon size="small">
+                      mdi-upload-multiple
+                    </v-icon>
+                  </template>
+                  <v-list-item-title class="!qw-text-sm">
+                    Send to...
+                  </v-list-item-title>
+                </v-list-item>
               </template>
-              <v-list-item-title class="!qw-text-sm">
-                Send image to virtual clipboard
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="sendToGenerate(imageToShow)">
-              <template v-slot:prepend>
-                <v-icon size="small">
-                  mdi-upload
-                </v-icon>
+              <template #default>
+                <v-list-item @click="sendToGenerate(imageToShow)" style="padding-inline-start: 16px !important;">
+                  <template v-slot:prepend>
+                    <v-icon size="small">
+                      mdi-form-textbox
+                    </v-icon>
+                  </template>
+                  <v-list-item-title class="!qw-text-sm">
+                    To generate
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="copyImageInfoToClipboard(imageToShow)" style="padding-inline-start: 16px !important;">
+                  <template #prepend>
+                    <v-icon size="small">
+                      mdi-content-copy
+                    </v-icon>
+                  </template>
+                  <v-list-item-title class="!qw-text-sm">
+                    To clipboard
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="!hideSendToVClip" @click="sendImageInfoToVClip(imageToShow)" style="padding-inline-start: 16px !important;">
+                  <template #prepend>
+                    <v-icon size="small">
+                      mdi-archive-arrow-up-outline
+                    </v-icon>
+                  </template>
+                  <v-list-item-title class="!qw-text-sm">
+                    To holder
+                  </v-list-item-title>
+                </v-list-item>
               </template>
-              <v-list-item-title class="!qw-text-sm">
-                Send to generate
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="copyImageInfoToClipboard(imageToShow)">
-              <template #prepend>
-                <v-icon size="small">
-                  mdi-content-copy
-                </v-icon>
-              </template>
-              <v-list-item-title class="!qw-text-sm">
-                Copy image info
-              </v-list-item-title>
-            </v-list-item>
+            </v-list-group>
             <v-list-item @click="downloadImage(imageToShow?.id)">
               <template #prepend>
                 <v-icon size="small">
@@ -192,7 +211,7 @@
               {{ imageToShow.prompt }}
             </span>
           </v-sheet>
-          <v-sheet rounded class="image-field-container">
+          <v-sheet v-if="imageToShow.negativePrompt" rounded class="image-field-container">
             <span class="image-field-container__label">
               Negative Prompt:
             </span>
@@ -219,12 +238,15 @@
 </template>
 <script setup lang="ts">
 import ImageCard from './ImageCard.vue';
-import { Vote } from '~~/composables/useVotesGallery';
+
 import { modelHashesMap } from '~~/constants';
 import { ImageObject } from '~~/types';
+import { Vote } from '~~/composables/pages/useVotesGallery';
 
 const displayingInfo = ref(false);
 const apiBaseURL = getApiBaseURL();
+
+const detailsMenuIsOpen = ref(false);
 
 const clipboardStore = useClipboardStore();
 const generateStore = useGenerateStore();
@@ -251,15 +273,18 @@ const copyImageInfoToClipboard = (image?: ImageObject) => {
   if (!image) return;
   const imageInfo = JSON.stringify(image, null, 2);
   copy(imageInfo);
+  detailsMenuIsOpen.value = false;
 };
 
 const sendImageInfoToVClip = (image?: ImageObject) => {
   if (!image) return;
   clipboardStore.addImage(image);
+  detailsMenuIsOpen.value = false;
 };
 const sendToGenerate = (image?: ImageObject) => {
   if (!image) return;
   generateStore.sendToGenerate(image);
+  detailsMenuIsOpen.value = false;
 };
 
 const downloadImage = (imageId?: string) => {
@@ -280,6 +305,7 @@ const downloadImage = (imageId?: string) => {
       link.click();
       link.remove();
     });
+  detailsMenuIsOpen.value = false;
 }
 
 const imageToShow = computed(() => {
@@ -298,7 +324,13 @@ const imageCard = ref<InstanceType<typeof ImageCard>>();
 
 const showInFullscreen = () => {
   imageCard.value?.goFullscreen();
+  detailsMenuIsOpen.value = false;
 }
+
+const toggleInfo = () => {
+  displayingInfo.value = !displayingInfo.value;
+  detailsMenuIsOpen.value = false;
+};
 
 const formatTimeToGenerate = (timeToGenerate: number) => {
   const timeInSeconds = (timeToGenerate / 1000);
