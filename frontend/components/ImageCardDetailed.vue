@@ -53,7 +53,7 @@
                 Fullscreen
               </v-list-item-title>
             </v-list-item>
-            <v-list-item v-if="!hideSendToVClip" @click="sendImageInfoToVClip(imageToShow)">
+            <DeleteModal :image="imageToShow" />
             <v-list-group class="qw-bg-black/20">
               <template #activator="{ props }">
                 <v-list-item class="bg-indigo-darken-4" v-bind="props">
@@ -363,6 +363,9 @@ const props = defineProps<{
       @apply qw-items-start;
     }
   }
+}
+.expand-transition-leave-active {
+  @apply !qw-transition-none;
 }
 .image-field-container {
   @apply qw-w-full;
