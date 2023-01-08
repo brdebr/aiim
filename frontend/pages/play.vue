@@ -136,7 +136,7 @@ const showingInfo = ref(false);
     );
   }
   .card-game-info {
-    @apply qw-absolute qw-top-3 qw-px-3;
+    @apply qw-absolute qw-z-10 qw-top-3 qw-px-3;
     @apply qw-w-full qw-flex qw-flex-col qw-gap-4;
     > div {
       @apply qw-bg-white/45 qw-p-2 qw-rounded qw-backdrop-filter qw-backdrop-blur-md;

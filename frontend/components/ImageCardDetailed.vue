@@ -363,9 +363,9 @@ const props = defineProps<{
       @apply qw-items-start;
     }
   }
-}
-.expand-transition-leave-active {
-  @apply !qw-transition-none;
+  .expand-transition-leave-active {
+    @apply !qw-transition-none;
+  }
 }
 .image-field-container {
   @apply qw-w-full;
