@@ -341,10 +341,10 @@ export class ImageGenerationProcessor {
   }
 
   async getEmbeddingsUsedInPrompt(prompt: string): Promise<string[]> {
-    const embeddings = this.sdConfigService.getEmbeddings();
-    const embeddingsUsed = embeddings.filter((embedding) =>
-      prompt.includes(embedding),
-    );
+    const embeddings = await this.sdConfigService.getEmbeddings();
+    const embeddingsUsed = embeddings
+      .filter((embedding) => prompt.includes(embedding.name))
+      .map((embedding) => embedding.name);
     return embeddingsUsed;
   }
 }

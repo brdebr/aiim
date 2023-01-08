@@ -13,7 +13,13 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { PortainerContainer, SdModel, SdConfig } from './types';
+import {
+  PortainerContainer,
+  SdModel,
+  SdConfig,
+  GetEmbeddingsResponse,
+  SdEmbeddingNamed,
+} from './types';
 import { AxiosError } from 'axios';
 
 export const MODELS_CHECK_INTERVAL_MS = 2000;
@@ -26,8 +32,6 @@ export class SdConfigService {
   ) {}
 
   private readonly logger = new Logger(SdConfigService.name);
-
-  embeddings: string[] = [];
 
   async getPortainerToken() {
     const baseUrl = this.configService.get('PORTAINER_URL');
@@ -132,20 +136,8 @@ export class SdConfigService {
 
     this.logger.log('Started Stable Diffusion container! 🚀');
 
-    this.logger.log('Getting embeddings...');
     const logs = await this.getStableDiffusionLogs(jwtToken);
-    const embeddingsStr =
-      /Embeddings: (?<content>.*)/gm.exec(logs)?.groups?.content || '';
-    const embeddings = embeddingsStr
-      .split(',')
-      .map((embedding) => embedding.trim());
-    embeddings.sort((a, b) => a.localeCompare(b));
-
-    this.embeddings = embeddings;
-    this.logger.log(`Found [ ${embeddings.length} ] embeddings:`);
-    this.logger.log(embeddings.join(', '));
-
-    return embeddings;
+    return logs;
   }
 
   async stopStableDiffusionContainer(token?: string) {
@@ -295,7 +287,31 @@ export class SdConfigService {
     }
   }
 
-  getEmbeddings() {
-    return this.embeddings;
+  async getEmbeddings(): Promise<SdEmbeddingNamed[]> {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .get<GetEmbeddingsResponse>('/embeddings', {
+            baseURL: this.configService.get('GENERATION_API_URL'),
+          })
+          .pipe(
+            catchError(() => {
+              return of({
+                data: { loaded: {}, skipped: {} } as GetEmbeddingsResponse,
+              });
+            }),
+          ),
+      );
+      const loadedEmbeddings = Object.keys(data.loaded).map((key) => ({
+        ...data.loaded[key],
+        name: key,
+      }));
+      loadedEmbeddings.sort((a, b) => a.name.localeCompare(b.name));
+      return loadedEmbeddings;
+    } catch (error) {
+      this.logger.error('Error getting the models');
+      this.logger.error(error);
+      return [];
+    }
   }
 }

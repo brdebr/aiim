@@ -25,6 +25,27 @@ export type SdModel = {
   config: string;
 };
 
+export type SdEmbedding = {
+  step: number | null;
+  sd_checkpoint: string | null;
+  sd_checkpoint_name: string | null;
+  shape: number;
+  vectors: number;
+};
+
+export type SdEmbeddingNamed = SdEmbedding & {
+  name: string;
+};
+
+export type GetEmbeddingsResponse = {
+  loaded: {
+    [key: string]: SdEmbedding;
+  };
+  skipped: {
+    [key: string]: SdEmbedding;
+  };
+};
+
 export type SdConfig = {
   samples_save: boolean;
   samples_format: string;
