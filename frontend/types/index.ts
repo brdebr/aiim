@@ -20,6 +20,8 @@ export type ImageObject = {
   firstPassHr: string;
   // Face restoration
   faceRestoration: string;
+  // Tiling
+  tiling: boolean;
   // Metadata
   generatedAt: string;
   imageSize: string;

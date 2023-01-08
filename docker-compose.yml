@@ -3,6 +3,7 @@ version: '3.1'
 services:
   aiim-frontend:
     container_name: aiim-frontend_container
+    restart: unless-stopped
     build: ./frontend
     ports:
       - 3000:3000
@@ -12,6 +13,7 @@ services:
       NUXT_PUBLIC_API_BASE_URL: ${NUXT_PUBLIC_API_BASE_URL}
   aiim-api:
     container_name: aiim-api_container
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./api/Dockerfile
@@ -26,6 +28,7 @@ services:
       SIGN_PASS: ${SIGN_PASS}
   aiim-db:
     image: 'bitnami/mongodb:4.4.3'
+    restart: unless-stopped
     environment:
       - MONGODB_REPLICA_SET_MODE=primary
       - MONGODB_PRIMARY_HOST=localhost
@@ -41,6 +44,7 @@ services:
       - 27017:27017
   aiim-redis:
     image: redis:7.0.5
+    restart: unless-stopped
     ports:
       - 6379:6379
 

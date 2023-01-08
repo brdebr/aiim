@@ -38,6 +38,10 @@ export const useGenerateStore = definePiniaStore('generate', () => {
     cfg.value = DEFAULT_CFG;
     width.value = DEFAULT_WIDTH;
     height.value = DEFAULT_HEIGHT;
+    restoreFaces.value = false;
+    tiling.value = false;
+    batchesToGenerate.value = 1;
+    imagesPerBatch.value = 1;
   };
 
   const sendToGenerate = (image: ImageObject) => {
@@ -48,6 +52,8 @@ export const useGenerateStore = definePiniaStore('generate', () => {
     cfg.value = image.cfg;
     width.value = image.width;
     height.value = image.height;
+    restoreFaces.value = !!image.faceRestoration;
+    tiling.value = image.tiling;
   };
 
 

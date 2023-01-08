@@ -353,9 +353,9 @@ const props = defineProps<{
   }
 }
 .fullscreen-btn {
-  @apply qw-bg-sky-500/15;
+  @apply !qw-bg-sky-500/15;
   @apply qw-backdrop-filter qw-backdrop-blur;
-  @apply qw-border-[#2196f3];
+  @apply !qw-border-[#2196f3];
   i {
     @apply qw-text-white;
   }
