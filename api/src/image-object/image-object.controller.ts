@@ -2,6 +2,7 @@ import { VoteService } from './../vote/vote.service';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -32,6 +33,11 @@ export class ImageObjectController {
       'Content-Type': 'image/png',
     });
     return new StreamableFile(image.imageFile);
+  }
+
+  @Delete(':id')
+  async deleteImage(@Param('id') id: string) {
+    return this.imageService.deleteImage(id);
   }
 
   paseSize = '10';

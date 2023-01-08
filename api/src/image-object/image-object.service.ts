@@ -263,4 +263,11 @@ export class ImageObjectService {
     const randomIdsArray = await this.getAmountOfRandomItems(filteredIds, size);
     return this.getImagesByIds(randomIdsArray);
   }
+
+  async deleteImage(id: string) {
+    const queryResponse = await this.prisma.imageObject.delete({
+      where: { id },
+    });
+    return queryResponse;
+  }
 }

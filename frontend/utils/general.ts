@@ -47,3 +47,13 @@ export const getImageDimensions = (image?: ImageObject) => {
     isWide: isLandscape,
   };
 };
+
+export const deleteImage = async (image: ImageObject) => {
+  const { id } = image;
+  const fetchOptions = getFetchOptions();
+  const deleteUrl = `/api/images/${id}`;
+  await fetch(deleteUrl, {
+    ...fetchOptions,
+    method: 'DELETE',
+  });
+}
