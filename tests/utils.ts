@@ -6,6 +6,10 @@ export const getProjectNameForFile = (info: TestInfo) => {
   return parsedProjectName;
 };
 
+export const capitalize = (s: string) => {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 export const goWait = async (page: Page, url: string) => {
   await Promise.all([
     page.goto(url, {
@@ -50,6 +54,8 @@ export const expectCleanConsole = (consoleMessages: ConsoleMessage[], info: Test
 export const savePageScreenshot = async (page: Page, pageName: string, info: TestInfo) => {
   await page.waitForTimeout(1000);
   await page.screenshot({ path: `./e2e/screenshots/${pageName}/${pageName}-page-${getProjectNameForFile(info)}.png` });
+  const screenshot = await page.screenshot();
+  await info.attach(`${capitalize(pageName)} - page`, { body: screenshot, contentType: 'image/png' });
 }
 
 export const logApiRequest = (request: Request, info: TestInfo) => {
