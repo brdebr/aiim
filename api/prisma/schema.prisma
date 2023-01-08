@@ -84,3 +84,48 @@ model Vote {
 
   @@unique([userId, imageId])
 }
+
+model ImageObjectDeleted {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+
+  deletedAt        DateTime @default(now())
+
+  // Metadata
+  number           String?
+  fileName         String?
+  imageFile        Bytes?
+  imageSize        Int?
+  rawParameters    String?
+  tags             String[]
+
+  // Time metadata
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  generatedAt      DateTime
+  timeToGenerate   Int      @default(0)
+
+  // Prompt
+  prompt           String
+  negativePrompt   String?
+
+  embeddings       String[]
+
+  // Configs
+  steps            Int
+  sampler          String
+  cfg              Float
+  seed             String
+
+  width            Int
+  height           Int
+
+  model            String?
+  modelHash        String
+
+  // High res
+  denoisingHr      Float?
+  firstPassHr      String?
+
+  // Face restoration
+  faceRestoration  String?
+}

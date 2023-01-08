@@ -14,8 +14,9 @@ export const useGalleryStore = definePiniaStore('gallery', () => {
     galleryImages.value = [image, ...galleryImages.value];
   }
 
-  const removeImage = async (image: ImageObject) => {
+  const removeImage = async (image: ImageObject, callback?: () => Promise<void>) => {
     await sendDeleteImage(image);
+    await callback?.();
     galleryImages.value = galleryImages.value.filter((img) => img.id !== image.id);
   }
 

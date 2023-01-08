@@ -13,7 +13,7 @@
       </v-list-item>
     </template>
     <template #default>
-      <v-card border="md" class="delete-modal-card">
+      <v-card :persistent="loading" border="md" class="delete-modal-card">
         <v-card-title class="!qw-py-3">
           Delete image ?
         </v-card-title>
@@ -28,10 +28,10 @@
         </v-card-text>
         <v-divider />
         <v-card-actions class="qw-justify-end qw-gap-2 !qw-py-[10px] !qw-px-3">
-          <v-btn class="!qw-px-3" variant="tonal" @click="dialogIsOpen = false">
+          <v-btn :disabled="loading" :loading="loading" class="!qw-px-3" variant="tonal" @click="dialogIsOpen = false">
             Close Dialog
           </v-btn>
-          <v-btn class="!qw-px-3" color="error" variant="tonal" @click="galleryStore.removeImage(props.image)">
+          <v-btn :disabled="loading" :loading="loading" class="!qw-px-3" color="error" variant="tonal" @click="confirmDelete">
             Delete
           </v-btn>
         </v-card-actions>
@@ -45,6 +45,16 @@ import { ImageObject } from '~~/types';
 
 const dialogIsOpen = ref(false);
 const galleryStore = useGalleryStore();
+const loading = ref(false);
+
+const confirmDelete = async () => {
+  loading.value = true;
+  await galleryStore.removeImage(props.image, async () => {
+    loading.value = false;
+    dialogIsOpen.value = false;
+    await nextTick();
+  });
+};
 
 const props = defineProps<{
   image: ImageObject;
