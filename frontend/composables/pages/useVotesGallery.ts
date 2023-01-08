@@ -1,7 +1,7 @@
 import { ImageObject } from '~~/types';
 import { getFetchOptions, scrollToTop } from '~~/utils/general';
 import { VoteType } from './useCardGame';
-import { ImageSearchResultType, ImageSearchType, useSearchLogic } from './useSearchLogic';
+import { ImageSearchResultType, ImageSearchType, useSearchLogic } from '~~/composables/useSearchLogic';
 
 export type Vote = {
   id: string;
@@ -34,7 +34,6 @@ export type VoteTab = {
 };
 
 export const useVotesGallery = () => {
-  const router = useRouter();
   const fetchOptions = getFetchOptions();
   const votedImages = ref<Vote[]>([]);
 

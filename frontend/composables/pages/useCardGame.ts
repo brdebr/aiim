@@ -1,6 +1,6 @@
 import { ImageObject } from '~~/types';
 import { getFetchOptions } from '~~/utils/general';
-import { useVoteImage } from './useVoteImage';
+import { useVoteImage } from '~~/composables/useVoteImage';
 
 export enum VoteType {
   UPVOTE = 'UPVOTE',

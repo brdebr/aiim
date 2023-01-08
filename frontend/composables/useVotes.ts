@@ -1,6 +1,6 @@
 import { ImageObject } from '~~/types';
 import { getFetchOptions } from '~~/utils/general';
-import { VoteType } from './useCardGame';
+import { VoteType } from '~~/composables/pages/useCardGame';
 import { useVoteImage } from './useVoteImage';
 
 export const useVotes = async () => {

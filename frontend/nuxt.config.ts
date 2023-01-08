@@ -3,7 +3,10 @@ import { APP_DISPLAY_NAME } from './contants';
 
 export default defineNuxtConfig({
   imports: {
-    dirs: ['store'],
+    dirs: [
+      'store',
+      'composables/**',
+    ],
   },
   css: ['vuetify/styles', '@/assets/global-styles.scss'],
   vite: {

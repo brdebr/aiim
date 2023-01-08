@@ -1,6 +1,6 @@
 import { ImageObject } from '~~/types';
 import { getFetchOptions, getRouteQry, scrollToTop } from '~~/utils/general';
-import { ImageSearchResultType, ImageSearchType, useSearchLogic } from './useSearchLogic';
+import { ImageSearchResultType, ImageSearchType, useSearchLogic } from '~~/composables/useSearchLogic';
 
 export type ImageObjectsPageResponse = ImageObject[];
 
