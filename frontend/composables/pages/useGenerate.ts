@@ -1,7 +1,6 @@
 import { Samplers } from '~~/constants';
 import { useGenerateStore } from '~~/store/generate';
 import { ImageObject } from '~~/types';
-import { getFetchOptions } from '~~/utils/general';
 
 export type ImageGenerationEvent = {
   image: ImageObject;
@@ -24,7 +23,7 @@ export const POSSIBLE_IMAGE_SIZES = Array.from(Array(32).keys())
   });
 
 export const useGenerate = () => {
-  const fetchOptions = getFetchOptions();
+  const { sendTxt2ImageGenerate } = useApi();
 
   const generateStore = useGenerateStore();
   const {
@@ -61,14 +60,7 @@ export const useGenerate = () => {
         batchesToGenerate: batchesToGenerate.value,
         imagesPerBatch: imagesPerBatch.value,
       };
-      const response = await $fetch<{ queuePosition: number }>(
-        '/api/generate/txt2img',
-        {
-          ...fetchOptions,
-          method: 'POST',
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await sendTxt2ImageGenerate(body);
       imagesInQueue.value = response.queuePosition;
     } catch (error) {
       console.log(error);

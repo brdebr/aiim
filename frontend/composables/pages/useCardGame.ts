@@ -12,18 +12,13 @@ export enum VoteType {
 }
 
 export const useCardGame = async () => {
+  const { fetchCardsPage } = useApi();
+
   onMounted(async () => {
     currentCards.value = await fetchCardsPage();
   });
 
-  const fetchOptions = getFetchOptions();
   const { voteImage, voteLoading } = useVoteImage();
-
-  const fetchCardsPage = async () => {
-    const endpoint = `/api/images/card-game`;
-    const response = await $fetch<ImageObject[]>(endpoint, fetchOptions);
-    return response;
-  };
 
   const rerollCards = async () => {
     const newCards = await fetchCardsPage();

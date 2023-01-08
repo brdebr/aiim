@@ -413,7 +413,7 @@
             <span> Stop - SD Service </span>
           </div>
         </v-btn>
-        <v-btn @click="refresh" :disabled="isSdLoading" :loading="isSdLoading" variant="outlined" block>
+        <v-btn @click="refreshSdStatus" :disabled="isSdLoading" :loading="isSdLoading" variant="outlined" block>
           <div
             class="qw-w-full qw-flex qw-items-center qw-gap-4 qw-justify-between"
           >
@@ -502,7 +502,7 @@ const {
   runningFrom,
   logs,
   models,
-  refresh,
+  refreshSdStatus,
   selectModel,
   selectedModel,
   loadingModel,
@@ -512,7 +512,7 @@ const {
 } = useSdConfig();
 
 onMounted(() => {
-  refresh();
+  refreshSdStatus();
 })
 
 const layoutStore = useLayoutStore();

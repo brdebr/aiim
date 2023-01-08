@@ -124,10 +124,6 @@ const showingInfo = ref(false);
       @apply qw-w-full qw-h-full qw-flex;
     }
   }
-  // .io-view,
-  // .io-view > img {
-  //   @apply qw-w-full qw-h-full;
-  // }
   .card-game-buttons {
     @apply qw-absolute qw-bottom-[var(--v-layout-bottom)];
     @apply qw-pb-5 qw-pt-8 qw-px-3;

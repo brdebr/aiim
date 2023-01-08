@@ -1,10 +1,8 @@
 import { ImageObject } from '~~/types';
-import { getApiBaseURL, getFetchOptions } from '~~/utils/general';
-import { VoteType } from './useCardGame';
+import { VoteType } from '~~/composables/pages/useCardGame';
 
 export const useVoteImage = () => {
-  const apiBaseURL = getApiBaseURL();
-  const fetchOptions = getFetchOptions();
+  const { sendVoteImage } = useApi();
 
   const voteLoading = ref(false);
 
@@ -13,13 +11,7 @@ export const useVoteImage = () => {
     type: VoteType = VoteType.UPVOTE
   ) => {
     voteLoading.value = true;
-    const query = new URLSearchParams({
-      type,
-    });
-    await $fetch(`${apiBaseURL}/api/vote/image/${image.id}?${query}`, {
-      ...fetchOptions,
-      method: 'POST',
-    });
+    sendVoteImage(image, type)
     voteLoading.value = false;
   };
 

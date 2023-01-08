@@ -8,18 +8,30 @@ export type LoginResponse = {
   info: LoginInfo;
 };
 
-export const useAuthStore = definePiniaStore('auth', () => {
-  const apiBaseURL = getApiBaseURL();
+export type FetchOptionsType = {
+  baseURL: string;
+  headers: {
+    Authorization: string;
+  };
+};
 
+export const useAuthStore = definePiniaStore('auth', () => {
   const storedLoginInfo = useLocalStorage<Partial<CurrentLoginInfo>>(`${PREFIX}login-data`, {});
   const storedToken = useLocalStorage<string>(`${PREFIX}token`, '');
 
+  const fetchOptions = computed<FetchOptionsType>(() => ({
+    baseURL: apiBaseURL,
+    headers: authHeader.value,
+  }));
+  const apiBaseURL = getApiBaseURL();
+  const authHeader = computed(() => ({
+    Authorization: `Bearer ${storedToken.value}`,
+  }));
+
+  const { sendLogin, fetchCurrentAuth } = useApi(fetchOptions.value);
+
   const login = async (email: string, password: string) => {
-    const loginResponse = await $fetch<LoginResponse>('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      ...fetchOptions.value,
-    });
+    const loginResponse = await sendLogin(email, password)
     storedToken.value = loginResponse.token;
     storedLoginInfo.value = loginResponse.info;
   };
@@ -29,19 +41,10 @@ export const useAuthStore = definePiniaStore('auth', () => {
     storedLoginInfo.value = {};
   };
 
-  const fetchCurrentAuth = async () => {
-    const auth = await $fetch<CurrentLoginInfo>('/api/auth/current', fetchOptions.value);
+  const refreshCurrentAuth = async () => {
+    const auth = await fetchCurrentAuth();
     storedLoginInfo.value = auth;
   };
-
-  const authHeader = computed(() => ({
-    Authorization: `Bearer ${storedToken.value}`,
-  }));
-
-  const fetchOptions = computed(() => ({
-    baseURL: apiBaseURL,
-    headers: authHeader.value,
-  }));
 
   const minutesToExpire = () => {
     const nowDate = new Date().getTime();
@@ -57,7 +60,7 @@ export const useAuthStore = definePiniaStore('auth', () => {
     // Methods
     login,
     cleanAuth,
-    fetchCurrentAuth,
+    refreshCurrentAuth,
     // Helpers
     fetchOptions,
     authHeader,

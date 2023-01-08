@@ -1,4 +1,4 @@
-import { getFetchOptions } from '~~/utils/general';
+import { useApi } from './useApi';
 
 export type GenerationJob = {
   id: string;
@@ -34,18 +34,13 @@ export type GenerationJobData = {
 };
 
 export const useQueue = () => {
-  const fetchOptions = getFetchOptions();
+  const { fetchQueue } = useApi();
 
   onMounted(async () => {
     await fetchAndSetQueue();
   });
 
   const queue = ref<GenerationJob[]>([]);
-
-  const fetchQueue = async () => {
-    const endpoint = `/api/generate/queue`;
-    return await $fetch<GenerationJob[]>(endpoint, fetchOptions);
-  };
 
   const fetchAndSetQueue = async () => {
     queue.value = await fetchQueue();

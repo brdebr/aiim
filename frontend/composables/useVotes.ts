@@ -1,11 +1,10 @@
 import { ImageObject } from '~~/types';
-import { getFetchOptions } from '~~/utils/general';
 import { VoteType } from '~~/composables/pages/useCardGame';
 import { useVoteImage } from './useVoteImage';
 
 export const useVotes = async () => {
   const { voteImage: voteImageFetch } = useVoteImage();
-  const fetchOptions = getFetchOptions();
+  const { fetchVotedImageIds } = useApi();
 
   onMounted(async () => {
     if (votedImageIds.value.length) {
@@ -15,11 +14,7 @@ export const useVotes = async () => {
     votedImageIds.value = votedImageIdsResponse.value || [];
   });
 
-  const fetchVotedImageIds = async () => {
-    const endpoint = `/api/vote/voted-image-ids`;
-    const response = await $fetch<string[]>(endpoint, fetchOptions);
-    return response;
-  };
+
   const { data: votedImageIdsResponse, refresh } = await useAsyncData<string[]>(
     'initial-voted-ids-fetch',
     fetchVotedImageIds

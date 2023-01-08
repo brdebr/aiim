@@ -1,7 +1,7 @@
 import { ImageObject } from '~~/types';
-import { getFetchOptions, scrollToTop } from '~~/utils/general';
+import { scrollToTop } from '~~/utils/general';
 import { VoteType } from './useCardGame';
-import { ImageSearchResultType, ImageSearchType, useSearchLogic } from '~~/composables/useSearchLogic';
+import { ImageSearchType, useSearchLogic } from '~~/composables/useSearchLogic';
 
 export type Vote = {
   id: string;
@@ -34,37 +34,25 @@ export type VoteTab = {
 };
 
 export const useVotesGallery = () => {
-  const fetchOptions = getFetchOptions();
+  const {
+    fetchVotedImages,
+    fetchVotedImagesSearch,
+    fetchVoteCounts,
+    fetchTotalImages
+  } = useApi();
+
   const votedImages = ref<Vote[]>([]);
+  const totalImages = ref<number>(0);
 
   const lastVoteImage = computed(() => {
     return votedImages.value[votedImages.value.length - 1];
   });
 
-  const fetchTotalImages = async () => {
-    const endpoint = `/api/images/total`;
-    const response = await $fetch<number>(endpoint, fetchOptions);
-    return response;
-  };
-  const totalImages = ref<number>(0);
-
-  const fetchVotedImages = async (filterType?: VoteType, page?: string) => {
-    const queryObj: Record<string, string> = {};
-    if (filterType) {
-      queryObj['type'] = filterType;
-    }
-    if (page) {
-      queryObj['page'] = page;
-    }
-
-    const query = new URLSearchParams(queryObj);
-    const endpoint = `/api/vote/my-votes?${query.toString()}`;
-    const response = await $fetch<VotedImageObjectsPageResponse>(
-      endpoint,
-      fetchOptions
-    );
-    return response.results;
-  };
+  const currentVoteTypeFilter = ref<VoteType>(VoteType.FAVORITE);
+  watch(currentVoteTypeFilter, async (newFilter) => {
+    const results = await fetchVotedImages(newFilter);
+    votedImages.value = results;
+  });
 
   const fetchInitialVotes = async () => {
     const results = await fetchVotedImages(currentVoteTypeFilter.value);
@@ -80,30 +68,20 @@ export const useVotesGallery = () => {
     votedImages.value = votedImages.value.concat(response);
   };
 
-  const currentVoteTypeFilter = ref<VoteType>(VoteType.FAVORITE);
-  watch(currentVoteTypeFilter, async (newFilter) => {
-    const results = await fetchVotedImages(newFilter);
-    votedImages.value = results;
-  });
-
-  const searchFn = async (params: ImageSearchType, query?: URLSearchParams) => {
-    const endpoint = `/api/vote/search-my-votes${query ? `?${query.toString()}` : ''}`;
-
-    const searchImagesResult = await $fetch<ImageSearchResultType<Vote>>(
-      endpoint,
-      {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify(params),
-      }
-    );
-    console.log('searchImagesResult', searchImagesResult);
-    return searchImagesResult;
-  }
-
-  const { foundImages, searchObj, clearSearchObj, searchFirstPage, searchNextPage, totalSearchResults, clearSearchResult } = useSearchLogic<Vote>({
+  const {
+    foundImages,
+    searchObj,
+    clearSearchObj,
+    searchFirstPage,
+    searchNextPage,
+    totalSearchResults,
+    clearSearchResult
+  } = useSearchLogic<Vote>({
     pageSize: DEFAULT_GALLERY_PAGE_SIZE,
-    searchFn,
+    searchFn: async (params: ImageSearchType, query?: URLSearchParams) => {
+      const searchImagesResult = await fetchVotedImagesSearch(params, query);
+      return searchImagesResult;
+    }
   })
 
   const performSearch = async () => {
@@ -135,14 +113,6 @@ export const useVotesGallery = () => {
 
 
   // Vote counts
-  const fetchVoteCounts = async () => {
-    const endpoint = `/api/vote/my-vote-counts`;
-    const response = await $fetch<VoteCountsByUserResponse>(
-      endpoint,
-      fetchOptions
-    );
-    return response;
-  };
   const voteCounts = ref<VoteCountsByUserResponseResults>();
   const totalVotes = ref(0);
   const voteCountsMap = computed(() => {
@@ -218,10 +188,8 @@ export const useVotesGallery = () => {
     currentVoteTypeFilter,
     voteCounts,
     totalVotes,
-    fetchVoteCounts,
     voteCountsMap,
     totalImages,
-    fetchTotalImages,
     fetchNextPage,
     percentagesMap,
     tabs,

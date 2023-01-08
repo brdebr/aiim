@@ -1,6 +1,6 @@
 import { ImageObject } from '~~/types';
-import { getFetchOptions, getRouteQry, scrollToTop } from '~~/utils/general';
-import { ImageSearchResultType, ImageSearchType, useSearchLogic } from '~~/composables/useSearchLogic';
+import { getRouteQry, scrollToTop } from '~~/utils/general';
+import { ImageSearchType, useSearchLogic } from '~~/composables/useSearchLogic';
 
 export type ImageObjectsPageResponse = ImageObject[];
 
@@ -18,10 +18,13 @@ export const useGallery = async (
   firstPageSize = DEFAULT_GALLERY_FIRST_PAGE_SIZE
 ) => {
   const router = useRouter();
-  const fetchOptions = getFetchOptions();
+  const { fetchImagesPage, fetchImagesSearchPage, fetchTotalImages } = useApi();
 
   onMounted(async () => {
-    Promise.all([fetchInitialImages()]);
+    [ totalImages.value ] = await Promise.all([
+      fetchTotalImages(),
+      fetchInitialImages(),
+    ]);
   });
 
   const pageIdFromQuery = getRouteQry('page');
@@ -33,24 +36,8 @@ export const useGallery = async (
   });
 
   const allImages = ref<ImageObject[]>([]);
-
+  const totalImages = ref(0);
   const loadingInitialImages = ref(false);
-
-  const fetchImagesPage = async (
-    pageId: string,
-    pageSize: number = DEFAULT_GALLERY_PAGE_SIZE
-  ) => {
-    const query = new URLSearchParams({
-      page: pageId,
-      size: pageSize.toString(),
-    });
-    const endpoint = `/api/images?${query.toString()}`;
-    const response = await $fetch<ImageObjectsPageResponse>(
-      endpoint,
-      fetchOptions
-    );
-    return response;
-  };
 
   const fetchInitialImages = async (forceInitial?: boolean) => {
     loadingInitialImages.value = true;
@@ -73,23 +60,20 @@ export const useGallery = async (
   };
 
   // Search
-  const searchFn = async (params: ImageSearchType, query?: URLSearchParams) => {
-    const endpoint = `/api/images/search${query ? `?${query.toString()}` : ''}`;
-
-    const searchImagesResult = await $fetch<ImageSearchResultType<ImageObject>>(
-      endpoint,
-      {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify(params),
-      }
-    );
-    return searchImagesResult;
-  }
-
-  const { foundImages, searchFirstPage, searchNextPage, searchObj, totalSearchResults, clearSearchObj, clearSearchResult } = useSearchLogic<ImageObject>({
+  const {
+    foundImages,
+    searchFirstPage,
+    searchNextPage,
+    searchObj,
+    totalSearchResults,
+    clearSearchObj,
+    clearSearchResult
+  } = useSearchLogic<ImageObject>({
     pageSize: DEFAULT_GALLERY_PAGE_SIZE,
-    searchFn,
+    searchFn: async (params: ImageSearchType, query?: URLSearchParams) => {
+      const searchImagesResult = await fetchImagesSearchPage(params, query);
+      return searchImagesResult;
+    }
   })
 
   const performSearch = async () => {
@@ -114,21 +98,11 @@ export const useGallery = async (
     router.push('/gallery');
   };
 
-  // Total Images
-  const fetchTotalImages = async () => {
-    const endpoint = `/api/images/total`;
-    const response = await $fetch<number>(endpoint, fetchOptions);
-    return response;
-  };
-  const { data: imagesCount } = await useAsyncData<number>(
-    'initial-gallery-image-count-fetch',
-    fetchTotalImages
-  );
 
   return {
     allImages,
     fetchNextImages,
-    imagesCount,
+    totalImages,
     pageIdFromQuery,
     loadingInitialImages,
     fetchInitialImages,
