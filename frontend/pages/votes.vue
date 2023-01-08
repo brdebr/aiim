@@ -52,7 +52,7 @@
       location="right"
       color="indigo-darken-4"
       :width="drawerWidth"
-      :temporary="rightDrawerIsTemporary"
+      temporary
       disable-resize-watcher
       disable-route-watcher
     >
@@ -91,7 +91,7 @@ const percentage = computed(() =>
 );
 
 const layoutStore = useLayoutStore();
-const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
+const { drawerWidth } = storeToRefs(layoutStore);
 
 const votesDrawer = ref(false);
 const toggleVotesDrawer = () => {

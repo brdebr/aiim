@@ -73,7 +73,9 @@
                 class="copy-btn text-caption"
                 @click="copyPromptFromClipboard"
               >
-                From clipboard
+                <span class="<md:qw-hidden">
+                  From clipboard
+                </span>
               </v-btn>
             </template>
           </HelpLabel>
@@ -384,7 +386,7 @@
       location="right"
       color="indigo-darken-4"
       :width="drawerWidth"
-      :temporary="rightDrawerIsTemporary"
+      temporary
       disable-resize-watcher
       disable-route-watcher
     >
@@ -514,7 +516,7 @@ onMounted(() => {
 })
 
 const layoutStore = useLayoutStore();
-const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
+const { drawerWidth } = storeToRefs(layoutStore);
 
 const isSdLoading = computed(() => loadingStartSd.value || loadingStopSd.value);
 const isSdRunning = computed(() => status.value === 'Running');
@@ -551,6 +553,7 @@ const toggleGalleryDrawer = () => {
 <style lang="scss">
 .copy-btn {
   .mdi.v-icon {
+    @apply <md:-mr-[5px];
     font-size: 11px;
     transform: rotateY(180deg);
   }

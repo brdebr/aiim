@@ -27,7 +27,7 @@
       location="right"
       color="indigo-darken-4"
       :width="drawerWidth"
-      :temporary="rightDrawerIsTemporary"
+      temporary
       disable-resize-watcher
       disable-route-watcher
     >
@@ -46,7 +46,7 @@ useHead({
 });
 
 const layoutStore = useLayoutStore();
-const { drawerWidth, rightDrawerIsTemporary } = storeToRefs(layoutStore);
+const { drawerWidth } = storeToRefs(layoutStore);
 
 const galleryDrawer = ref(false);
 const toggleGalleryDrawer = () => {

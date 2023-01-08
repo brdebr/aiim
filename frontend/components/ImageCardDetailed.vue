@@ -247,6 +247,7 @@ const displayingInfo = ref(false);
 const apiBaseURL = getApiBaseURL();
 
 const detailsMenuIsOpen = ref(false);
+const router = useRouter();
 
 const clipboardStore = useClipboardStore();
 const generateStore = useGenerateStore();
@@ -285,6 +286,7 @@ const sendToGenerate = (image?: ImageObject) => {
   if (!image) return;
   generateStore.sendToGenerate(image);
   detailsMenuIsOpen.value = false;
+  router.push('/generate');
 };
 
 const downloadImage = (imageId?: string) => {

@@ -130,4 +130,9 @@ useHead({
     display: grid;
   }
 }
+.v-navigation-drawer__scrim {
+  @apply qw-opacity-100;
+  @apply qw-backdrop-filter qw-backdrop-blur-md;
+  background: hsla(231, 100%, 50%, 0.15);
+}
 </style>
