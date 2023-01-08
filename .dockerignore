@@ -1,14 +1,16 @@
 
 dist
 node_modules
+.git
 
-/frontend/dist
-/frontend/.nuxt
-/frontend/node_modules
+frontend
+frontend/dist
+frontend/.nuxt
+frontend/node_modules
 
-/api/dist
-/api/node_modules
+api/dist
+api/node_modules
 aiim-db_data_volume.tar
 aiim-db_data_volume_001.tar
 
-/tests
+tests
