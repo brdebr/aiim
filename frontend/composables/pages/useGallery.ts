@@ -19,10 +19,12 @@ export const useGallery = async (
 ) => {
   const router = useRouter();
   const { fetchImagesPage, fetchImagesSearchPage, fetchTotalImages } = useApi();
+  const galleryStore = useGalleryStore();
+  const { galleryImages } = storeToRefs(galleryStore);
 
-  onMounted(async () => {
-    [ totalImages.value ] = await Promise.all([
-      fetchTotalImages(),
+  onMounted(() => {
+    Promise.all([
+      fetchInitialTotalImages(),
       fetchInitialImages(),
     ]);
   });
@@ -35,27 +37,26 @@ export const useGallery = async (
     await fetchInitialImages();
   });
 
-  const allImages = ref<ImageObject[]>([]);
   const totalImages = ref(0);
-  const loadingInitialImages = ref(false);
+  const fetchInitialTotalImages = async () => {
+    totalImages.value = await fetchTotalImages();
+  };
 
   const fetchInitialImages = async (forceInitial?: boolean) => {
-    loadingInitialImages.value = true;
     const images = await fetchImagesPage(
       forceInitial ? '' : pageIdFromQuery.value,
       firstPageSize
     );
-    allImages.value = images;
-    loadingInitialImages.value = false;
+    galleryImages.value = images;
   };
 
   const fetchNextImages = async () => {
-    if (allImages.value.length === 0) {
+    if (galleryImages.value.length === 0) {
       return;
     }
-    const lastImageId = allImages.value[allImages.value.length - 1].id;
+    const lastImageId = galleryImages.value[galleryImages.value.length - 1].id;
     const newPage = await fetchImagesPage(lastImageId, pageSize);
-    allImages.value = allImages.value.concat(newPage);
+    galleryImages.value = galleryImages.value.concat(newPage);
     return lastImageId;
   };
 
@@ -79,11 +80,11 @@ export const useGallery = async (
   const performSearch = async () => {
     scrollToTop();
     await searchFirstPage();
-    allImages.value = foundImages.value || [];
+    galleryImages.value = foundImages.value || [];
   };
   const performSearchNextPage = async () => {
     await searchNextPage();
-    allImages.value = foundImages.value || [];
+    galleryImages.value = foundImages.value || [];
   };
 
   const clearSearch = async () => {
@@ -100,11 +101,10 @@ export const useGallery = async (
 
 
   return {
-    allImages,
+    allImages: galleryImages,
     fetchNextImages,
     totalImages,
     pageIdFromQuery,
-    loadingInitialImages,
     fetchInitialImages,
     refresh,
     searchObj,
