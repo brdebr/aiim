@@ -1,6 +1,6 @@
 <template>
   <v-container style="background-image: unset">
-    <v-card>
+    <v-card border="md">
       <div class="qw-px-3 qw-py-3">
         <h1>Profile</h1>
         <v-divider class="qw-my-3" />

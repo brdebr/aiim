@@ -1,5 +1,5 @@
 <template>
-  <v-card rounded="lg" :ripple="false">
+  <v-card class="image-card" rounded="lg" border="md" :ripple="false">
     <v-img
       class="image-card__image"
       ref="imageEl"
@@ -7,6 +7,7 @@
       :title="props.showTitle && !isFullscreen ? props.image.prompt : null"
       :src="`${apiBaseURL}/api/images/view/${props.image.id}.png`"
       :aspect-ratio="aspectRatio"
+      :style="maxHeightStyle"
       @click="exitFullscreen"
     >
       <slot />
@@ -20,6 +21,7 @@ import { ImageObject } from '~~/types';
 type ImageCardProps = {
   image: ImageObject;
   showTitle?: boolean;
+  maxHeight?: string;
 };
 
 const apiBaseURL = getApiBaseURL();
@@ -53,6 +55,15 @@ const props = withDefaults(defineProps<ImageCardProps>(), {
 
 const { aspectRatio } = getImageDimensions(props.image);
 
+const maxHeightStyle = computed(() => {
+  if (props.maxHeight) {
+    return {
+      maxHeight: `${props.maxHeight} !important`,
+    };
+  }
+  return {};
+});
+
 defineExpose({
   goFullscreen,
   exitFullscreen,
@@ -60,9 +71,12 @@ defineExpose({
 });
 </script>
 <style lang="scss">
-.image-card__image {
-  img {
-    background-color: #212121;
+.image-card {
+  @apply !qw-border-indigo-900;
+  &__image {
+    img {
+      background-color: #212121;
+    }
   }
 }
 </style>

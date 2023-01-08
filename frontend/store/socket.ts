@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { ImageGenerationEvent } from "~~/composables/useGenerate";
+import { ImageGenerationEvent } from "~~/composables/pages/useGenerate";
 import { apiWsBaseUrlDev } from "~~/constants";
 import { ImageObject } from "~~/types";
 import { playSound } from "~~/utils/general";

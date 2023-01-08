@@ -4,6 +4,7 @@
     :image="imageToShow"
     :vote-type="props.vote?.vote"
     :show-title="!displayingInfo"
+    :max-height="maxHeight"
     ref="imageCard"
   >
     <v-toolbar
@@ -313,6 +314,7 @@ const props = defineProps<{
   vote?: Vote;
   image?: ImageObject;
   hideSendToVClip?: boolean;
+  maxHeight?: string;
 }>();
 </script>
 <style lang="scss">

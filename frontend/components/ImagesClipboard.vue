@@ -22,13 +22,13 @@
           icon="mdi-archive-arrow-up"
         />
       </template>
-      <v-card color="indigo-darken-4" class="qw-mx-auto" min-height="80vh" min-width="80vw">
+      <v-card color="indigo-darken-4" border="md" class="qw-mx-auto" min-height="80vh" min-width="80vw">
         <v-card-title>
           Virtual Clipboard
         </v-card-title>
         <v-divider class="qw-mb-4 !qw-border-indigo-700" />
-        <div class="qw-flex qw-flex-col qw-gap-3 qw-px-3">
-          <ImageCardDetailed v-for="image in clipboard" :key="image.id" :image="image" hide-send-to-v-clip>
+        <div class="qw-flex qw-flex-col qw-gap-3 qw-px-3 qw-pb-5">
+          <ImageCardDetailed v-for="image in clipboard" :key="image.id" :image="image" max-height="350px" hide-send-to-v-clip>
             <template #menu-item>
               <v-list-item @click="generateStore.sendToGenerate(image)">
                 <template v-slot:prepend>

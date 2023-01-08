@@ -86,6 +86,14 @@ export const useApi = (providedFetchOptions?: FetchOptionsType) => {
     const response = await $fetch<number>(endpoint, fetchOptions);
     return response;
   };
+  const sendDeleteImage = async (image: ImageObject) => {
+    const endpoint = `/api/images/${image.id}`;
+    const response = await $fetch(endpoint, {
+      ...fetchOptions,
+      method: 'DELETE',
+    });
+    return response;
+  };
 
   // Queue
   const fetchQueue = async () => {
@@ -239,6 +247,7 @@ export const useApi = (providedFetchOptions?: FetchOptionsType) => {
 
   return {
     // TODO: organize these
+    sendDeleteImage,
     fetchVoteCounts,
     fetchVotedImagesSearch,
     fetchVotedImages,

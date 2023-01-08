@@ -360,9 +360,7 @@
         <div v-if="previewImage">
           <v-img :src="previewImage" :width="width" :height="height" rounded />
         </div>
-        <div class="qw-flex qw-flex-col qw-gap-3">
-          <ImageGallery :images="generatedImages" one-col />
-        </div>
+        <ImageGallery :images="generatedImages" one-col />
       </div>
     </v-card>
   </v-container>
