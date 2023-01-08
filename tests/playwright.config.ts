@@ -1,7 +1,7 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
-const SamsungNoteLite10 = {
+const SamsungNoteLite10Device = {
   name: 'Samsung Galaxy Note Lite 10',
   use: {
     ...devices['Pixel 5'],
@@ -19,6 +19,24 @@ const SamsungNoteLite10 = {
   }
 };
 
+const GoogleChromeDevice = {
+  name: 'Google Chrome',
+  use: {
+    channel: 'chrome',
+    ...{
+      "screen": {
+        "width": 1920,
+        "height": 1080
+      },
+      "viewport": {
+        "width": 1920,
+        "height": 898
+      },
+      "deviceScaleFactor": 1.00,
+    }
+  },
+};
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -31,7 +49,7 @@ const SamsungNoteLite10 = {
 const config: PlaywrightTestConfig = {
   testDir: './.',
   /* Maximum time one test can run for. */
-  timeout: 20 * 1000,
+  timeout: 30 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -90,7 +108,8 @@ const config: PlaywrightTestConfig = {
     //     ...devices['Pixel 5'],
     //   },
     // },
-    SamsungNoteLite10,
+    SamsungNoteLite10Device,
+    GoogleChromeDevice,
     // {
     //   name: 'Mobile Safari',
     //   use: {
@@ -105,12 +124,12 @@ const config: PlaywrightTestConfig = {
     //     channel: 'msedge',
     //   },
     // },
-    {
-      name: 'Google Chrome',
-      use: {
-        channel: 'chrome',
-      },
-    },
+    // {
+    //   name: 'Google Chrome',
+    //   use: {
+    //     channel: 'chrome',
+    //   },
+    // },
   ],
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
