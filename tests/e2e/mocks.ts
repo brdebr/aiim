@@ -228,3 +228,184 @@ export const voteMockRespose = {
 export const playGameMockResponse = [
   paintedCatVote.image
 ];
+
+///
+
+const robotRender = {
+	"id": "63b4be988e896f99062d49c7",
+	"prompt": "a cyberpunk wizard casting an ice spell,  (MydjrnHelper),  HyperFluid",
+	"negativePrompt": "poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "3349606785",
+	"steps": 30,
+	"sampler": "Euler a",
+	"cfg": 9,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2023-01-03T23:47:36.579Z",
+	"imageSize": 813283,
+	"timeToGenerate": 6819,
+	"fileName": null
+};
+
+const blondeWoman = {
+	"id": "63bb062189ace6a3c42c1fed",
+	"prompt": "a portrait of a beautiful blonde woman, fine - art photography, soft portrait shot 8 k, mid length, ultrarealistic uhd faces, unsplash, kodak ultra max 800, 85 mm, intricate, casual pose, centered symmetrical composition, stunning photos, masterpiece, grainy, centered composition, PhotoHelper, PortraitHelper",
+	"negativePrompt": "Neg_Facelift768, greyscale, blender, cropped, lowres, poorly drawn face, out of frame, poorly drawn hands, blurry, bad art, blurred, text, watermark, disfigured, deformed, closed eyes",
+	"seed": "1778419680",
+	"steps": 30,
+	"sampler": "Euler a",
+	"cfg": 9.5,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": "Codeformer",
+	"generatedAt": "2023-01-08T18:06:25.007Z",
+	"imageSize": 843116,
+	"timeToGenerate": 7927,
+	"fileName": null
+}
+
+const inkFace = {
+	"id": "63ac4614ea0bda1bb03920bc",
+	"prompt": "infected by purple virus, as HeartArt, InkPunk768",
+	"negativePrompt": "poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "3699468588",
+	"steps": 30,
+	"sampler": "Euler a",
+	"cfg": 10.5,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2022-12-28T13:35:16.248Z",
+	"imageSize": null,
+	"timeToGenerate": 12016,
+	"fileName": null
+}
+
+const heartArt = {
+	"id": "63ac4589ea0bda1bb03920b9",
+	"prompt": "infected by green virus, jade and ruby, as HeartArt",
+	"negativePrompt": "poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "3596038030",
+	"steps": 30,
+	"sampler": "Euler a",
+	"cfg": 10.5,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2022-12-28T13:32:57.734Z",
+	"imageSize": null,
+	"timeToGenerate": 12203,
+	"fileName": null
+}
+
+const catRender = {
+	"id": "63b41b810a2ff0f0c19bce1c",
+	"prompt": "a fluffy cat by MydjrnHelper",
+	"negativePrompt": "poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "2325481334",
+	"steps": 28,
+	"sampler": "Euler a",
+	"cfg": 9,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2023-01-03T12:11:45.379Z",
+	"imageSize": 940667,
+	"timeToGenerate": 6390,
+	"fileName": null
+}
+
+const watchLiquid = {
+	"id": "63ab047717923d90bde7a8db",
+	"prompt": "blue hyperfluid, grand seiko omega seiko watch, product photography, dramatic lighting, photohelper, vorticity, photorealistic",
+	"negativePrompt": "poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "4184861189",
+	"steps": 28,
+	"sampler": "Euler a",
+	"cfg": 9,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2022-12-27T14:43:03.252Z",
+	"imageSize": null,
+	"timeToGenerate": 11569,
+	"fileName": null
+}
+
+const cityInk = {
+	"id": "63b07be13e6eeb470e027104",
+	"prompt": "a cyberpunk city at night, InkPunk768",
+	"negativePrompt": "person, people, poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "1854479804",
+	"steps": 28,
+	"sampler": "Euler a",
+	"cfg": 10,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2022-12-31T18:13:53.552Z",
+	"imageSize": null,
+	"timeToGenerate": 11529,
+	"fileName": null
+}
+
+const uiDesign = {
+	"id": "63b8bdc0c7f3ba4fcd10f1e6",
+	"prompt": "WebUIHelper design of a landing page website for a medical neurology company , UI, UX, Sleek design, Modern, Very detailed, Complimentary colors, 8K",
+	"negativePrompt": "poorly drawn, ugly, tiling, out of frame, extra limbs, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, blurred, text, watermark, grainy, writing, calligraphy, cut off, disfigured, kitsch, oversaturated, grain, low-res, disgusting, childish",
+	"seed": "1945073305",
+	"steps": 30,
+	"sampler": "Euler a",
+	"cfg": 9.5,
+	"width": 768,
+	"height": 768,
+	"model": null,
+	"modelHash": "4bdfc29c",
+	"denoisingHr": 0,
+	"firstPassHr": null,
+	"faceRestoration": null,
+	"generatedAt": "2023-01-07T00:33:04.827Z",
+	"imageSize": 427161,
+	"timeToGenerate": 6716,
+	"fileName": null
+}
+
+export const galleryMockResponse = [
+  robotRender,
+  catRender,
+  inkFace,
+  heartArt,
+  blondeWoman,
+  watchLiquid,
+  cityInk,
+  uiDesign
+]
