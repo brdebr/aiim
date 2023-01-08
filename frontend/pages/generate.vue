@@ -41,9 +41,10 @@
                     size="x-small"
                     variant="outlined"
                     class="copy-btn text-caption"
+                    :disabled="!embeddings.length"
                     v-bind="props"
                   >
-                    [ {{ embeddings.length }} ] Embeddings
+                    {{ embeddings.length ? `[ ${embeddings.length} ]` : '' }} Embeddings
                   </v-btn>
                 </template>
                 <v-list v-if="embeddings.length" class="qw-mt-1" density="compact">

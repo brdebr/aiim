@@ -14,8 +14,15 @@ export const useSdConfig = () => {
   const runningFrom = ref('');
   const fetchSdStatus = async () => {
     const response = await $fetch<{status: string, statusTxt: string}>('/api/sd-config/engine-status', fetchOptions);
-    status.value = response.status === 'running' ? 'Running' : 'Stopped';
-    runningFrom.value = status.value === 'Running' ? response.statusTxt : '';
+    const isRunning = response.status === 'running';
+    status.value = isRunning ? 'Running' : 'Stopped';
+    runningFrom.value = isRunning ? response.statusTxt : '';
+    if(isRunning) {
+      return;
+    }
+    embeddings.value = [];
+    models.value = [];
+    configs.value = {};
   }
 
   const loadingStartSd = ref(false);
