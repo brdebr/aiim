@@ -10,8 +10,8 @@ export type useGalleryConfig = Partial<{
 }>;
 
 
-export const DEFAULT_GALLERY_PAGE_SIZE = 25;
-const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 55;
+export const DEFAULT_GALLERY_PAGE_SIZE = 20;
+const DEFAULT_GALLERY_FIRST_PAGE_SIZE = 35;
 
 export const useGallery = async (
   pageSize = DEFAULT_GALLERY_PAGE_SIZE,

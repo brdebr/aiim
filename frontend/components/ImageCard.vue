@@ -71,12 +71,15 @@ defineExpose({
 });
 </script>
 <style lang="scss">
-.image-card {
+.v-card.image-card {
   @apply !qw-border-indigo-900;
   &__image {
     img {
       background-color: #212121;
     }
+  }
+  .v-responsive.v-img {
+    @apply qw-bg-gradient-to-b qw-from-blue-900 qw-to-blue-gray-600;
   }
 }
 </style>

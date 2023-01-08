@@ -15,7 +15,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Vote } from '~~/composables/useVotesGallery';
+import { Vote } from '~~/composables/pages/useVotesGallery';
 import { ImageObject } from '~~/types';
 
 const getClassObject = (vote: Vote) => {
@@ -36,12 +36,17 @@ const galleryObjects = computed<Vote[]>(() => {
   }
 });
 
+const firstLoad = ref(false);
 const bottomEl = ref<HTMLElement>();
 useIntersectionObserver(
   bottomEl,
   useThrottleFn(() => {
+    if (!firstLoad.value) {
+      firstLoad.value = true;
+      return;
+    }
     emit('more');
-  }, 1000)
+  }, 1000),
 );
 
 const props = defineProps<{

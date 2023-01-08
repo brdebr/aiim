@@ -1,5 +1,8 @@
 import { ImageObject } from '~~/types';
 import { apiBaseUrlDev } from '~~/constants';
+import dayjs from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 
 type SoundsPaths = 'notification-pretty-good.mp3';
 
@@ -31,6 +34,28 @@ export const getRouteQry = (prop: string) => {
 export const playSound = async (soundUrl: SoundsPaths) => {
   const audio = new Audio(`${baseSoundsPath}/${soundUrl}`);
   await audio.play();
+};
+
+export const dayJs = dayjs;
+
+export const formatDate = (date: string | number | Date) => {
+  if (!process.client) return date as string;
+  return dayJs(date).format('DD/MM/YYYY');
+};
+
+export const formatTime = (date: string | number | Date) => {
+  if (!process.client) return date as string;
+  return dayJs(date).format('HH:mm');
+};
+
+export const formatDateTime = (date: string | number | Date, format?: string) => {
+  if (!process.client) return date as string;
+  return dayJs(date).format(format || 'DD/MM/YYYY - HH:mm');
+};
+
+export const formatRelativeTime = (date: string | number | Date) => {
+  if (!process.client) return date as string;
+  return dayJs(date).fromNow();
 };
 
 export const getImageDimensions = (image?: ImageObject) => {

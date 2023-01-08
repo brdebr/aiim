@@ -43,14 +43,14 @@
                 Show more info
               </v-list-item-title>
             </v-list-item>
-            <v-list-item @click="showInFullscreen">
+            <v-list-item @click="downloadImage(imageToShow?.id)">
               <template #prepend>
                 <v-icon size="small">
-                  mdi-fullscreen
+                  mdi-download
                 </v-icon>
               </template>
               <v-list-item-title class="!qw-text-sm">
-                Fullscreen
+                Download
               </v-list-item-title>
             </v-list-item>
             <DeleteModal :image="imageToShow" />
@@ -100,16 +100,6 @@
                 </v-list-item>
               </template>
             </v-list-group>
-            <v-list-item @click="downloadImage(imageToShow?.id)">
-              <template #prepend>
-                <v-icon size="small">
-                  mdi-download
-                </v-icon>
-              </template>
-              <v-list-item-title class="!qw-text-sm">
-                Download
-              </v-list-item-title>
-            </v-list-item>
             <slot name="menu-item" />
           </v-list>
         </v-menu>
@@ -180,8 +170,8 @@
               <span class="image-field-container__label">
                 Date:
               </span>
-              <span class="qw-tracking-wide qw-text-xs">
-                {{ imageToShow.generatedAt }}
+              <span class="qw-tracking-wide qw-text-xs" :title="formatDateTime(imageToShow.generatedAt)">
+                {{ formatRelativeTime(imageToShow.generatedAt) }}
               </span>
             </v-sheet>
           </div>
