@@ -18,7 +18,7 @@ The images are generated using the [Stable Diffusion](https://github.com/Stabili
 
 ## 📷 Screenshot
 
-<img src="/tests/e2e/screenshots/play/play-page-Samsung-Galaxy-Note-Lite-10.png" alt="Generate page screenshot" height="400" />
+<img src="/tests/e2e/screenshots/play/play-page-Samsung-Galaxy-Note-Lite-10.png?raw=true" alt="Generate page screenshot" height="400" />
 
 ## 💻 Tech Stack
 
@@ -38,19 +38,19 @@ The UI will be available at [`http://localhost:3000`](http://localhost:3000/), a
 
 - In the [`/generate/`](http://localhost:3000/generate/) page you can send image generation requests to the queue and manage the Stable Diffusion docker service. After the queue is empty the application will send a notification.
 
-<img src="/tests/e2e/screenshots/generate/generate-page-Google-Chrome.png" alt="Generate page screenshot" width="830" />
+<img src="/tests/e2e/screenshots/generate/generate-page-Google-Chrome.png?raw=true" alt="Generate page screenshot" width="830" />
 
 - In the [`/gallery/`](http://localhost:3000/gallery/) page you can view and filter the generated images.
 
-<img src="/tests/e2e/screenshots/gallery/gallery-page-Google-Chrome.png" alt="Gallery page screenshot" width="830" />
+<img src="/tests/e2e/screenshots/gallery/gallery-page-Google-Chrome.png?raw=true" alt="Gallery page screenshot" width="830" />
 
 - In the [`/play/`](http://localhost:3000/play/) page you can categorize the images with a tinder-like UI.
 
-<img src="/tests/e2e/screenshots/play/play-page-Google-Chrome.png" alt="Play page screenshot" width="830" />
+<img src="/tests/e2e/screenshots/play/play-page-Google-Chrome.png?raw=true" alt="Play page screenshot" width="830" />
 
 - In the [`/votes/`](http://localhost:3000/votes/) page you can see the images that have been categorized, filtered by vote type (like, dislike, favorite, etc) and with the possibility to add more filters.
 
-<img src="/tests/e2e/screenshots/votes/votes-page-Google-Chrome.png" alt="Votes page screenshot" width="830" />
+<img src="/tests/e2e/screenshots/votes/votes-page-Google-Chrome.png?raw=true" alt="Votes page screenshot" width="830" />
 
 ## 🛠️ Development
 
