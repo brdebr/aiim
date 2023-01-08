@@ -76,6 +76,17 @@ export class ImageObjectService {
   async getImage(id: string) {
     const queryResponse = await this.prisma.imageObject.findUnique({
       where: { id },
+      select: defaultImageFieldsSelect,
+    });
+    return queryResponse;
+  }
+
+  async getImageFile(id: string) {
+    const queryResponse = await this.prisma.imageObject.findUnique({
+      where: { id },
+      select: {
+        imageFile: true,
+      },
     });
     return queryResponse;
   }

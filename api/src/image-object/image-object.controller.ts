@@ -28,11 +28,17 @@ export class ImageObjectController {
     @Param('id') id: string,
     @Res({ passthrough: true }) response,
   ): Promise<StreamableFile> {
-    const image = await this.imageService.getImage(id);
+    const image = await this.imageService.getImageFile(id);
     response.set({
       'Content-Type': 'image/png',
     });
     return new StreamableFile(image.imageFile);
+  }
+
+  @Get('info/:id')
+  async getImageObject(@Param('id') id: string) {
+    const image = await this.imageService.getImage(id);
+    return image;
   }
 
   @Delete(':id')
