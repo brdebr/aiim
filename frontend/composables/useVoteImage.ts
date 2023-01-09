@@ -11,7 +11,7 @@ export const useVoteImage = () => {
     type: VoteType = VoteType.UPVOTE
   ) => {
     voteLoading.value = true;
-    sendVoteImage(image, type)
+    await sendVoteImage(image, type)
     voteLoading.value = false;
   };
 

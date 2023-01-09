@@ -62,6 +62,28 @@
       </v-btn>
     </div>
   </div>
+  <ToolbarAppend>
+    <div class="qw-flex qw-gap-3 qw-items-center">
+      <Help>
+        <template #default>
+          <div class="qw-mt-1">
+            Keyboard shortcuts
+          </div>
+          <hr class="qw-my-2 qw-border-blue-gray-200">
+          <div>
+            <kbd>Shift</kbd> + <kbd>Arrow Left</kbd>: Downvote <br />
+            <kbd>Shift</kbd> + <kbd>Arrow Up</kbd>: Favorite <br />
+            <kbd>Shift</kbd> + <kbd>Arrow Right</kbd>: Upvote <br />
+            <kbd>Shift</kbd> + <kbd>Arrow Down</kbd>: Rewind <br />
+            <kbd>Shift</kbd> + <kbd>0</kbd>: To Modify <br />
+          </div>
+        </template>
+        <template #icon>
+          mdi-keyboard
+        </template>
+      </Help>
+    </div>
+  </ToolbarAppend>
 </template>
 <script setup lang="ts">
 useHead({
@@ -72,6 +94,34 @@ const {
   recoverLastFromBuffer,
   voteFn,
 } = await useCardGame();
+
+const keys = useMagicKeys()
+const debounceOptions = { debounce: 250 }
+
+const shiftArrowLeft = keys['Shift+ArrowLeft']
+watchDebounced(shiftArrowLeft, () => {
+  voteFn(VoteType.DOWNVOTE)
+}, debounceOptions)
+
+const shiftArrowUp = keys['Shift+ArrowUp']
+watchDebounced(shiftArrowUp, () => {
+  voteFn(VoteType.FAVORITE)
+}, debounceOptions)
+
+const shiftArrowRight = keys['Shift+ArrowRight']
+watchDebounced(shiftArrowRight, () => {
+  voteFn(VoteType.UPVOTE)
+}, debounceOptions)
+
+const shiftArrowDown = keys['Shift+ArrowDown']
+watchDebounced(shiftArrowDown, () => {
+  recoverLastFromBuffer()
+}, debounceOptions)
+
+const shiftZero = keys['Shift+0']
+watchDebounced(shiftZero, () => {
+  voteFn(VoteType.TO_MODIFY)
+}, debounceOptions)
 
 const actionButtons = [
   {

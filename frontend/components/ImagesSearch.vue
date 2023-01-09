@@ -1,5 +1,5 @@
 <template>
-  <div class="images-search qw-flex qw-flex-col qw-gap-5 qw-px-3 qw-py-6">
+  <form @submit.prevent="emit('performSearch')" class="images-search qw-flex qw-flex-col qw-gap-5 qw-px-3 qw-py-6">
     <div class="qw-text-center">
       Search {{ totalSearchResults ? `[ ${totalSearchResults} ]` : '' }}
     </div>
@@ -107,7 +107,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-  </div>
+  </form>
 </template>
 <script lang="ts" setup>
 import { ImageSearchType } from '~~/composables/useSearchLogic';

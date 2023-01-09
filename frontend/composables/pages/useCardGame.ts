@@ -64,6 +64,7 @@ export const useCardGame = async () => {
   };
 
   const voteFn = async (voteType: VoteType) => {
+    if(voteLoading.value) return;
     const image = saveLastToBuffer();
     if (!image) return;
     await voteImage(image, voteType);
